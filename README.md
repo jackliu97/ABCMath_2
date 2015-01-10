@@ -1,8 +1,6 @@
 # ABCMath_2
 ABCMath v2.0
 
-## ABCMath CMS
-
 ### A simple CMS for
 
 * adding/removing students
