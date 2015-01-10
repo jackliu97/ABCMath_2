@@ -1,0 +1,18 @@
+<div class="input-group">
+  <span class="input-group-addon">Srch</span>
+  <input type="text" class="form-control filter_class" placeholder="Filter">
+</div>
+
+<p>
+<ul class="list-group">
+{% for class in classes %}
+<li class="list-group-item class_list {% if(class.id == class_id) %}active{% endif %}">
+	{% if(class.id == class_id) %}
+		{{ class.description|raw }} ({{ class.external_id|raw }})
+	{% else %}
+		<a href="/class_dashboard/info/{{ class.id }}">{{ class.description|raw }} ({{ class.external_id|raw }})</a>
+	{% endif %}
+</li>
+{% endfor %}
+</ul>
+</p>

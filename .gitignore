@@ -4,3 +4,7 @@
 */cache/*
 */cache/!index.html
 */cache/!.htaccess
+config/config.php
+lib/ABCMath/Template/Cache/*
+lib/vendor/*
+.DS_Store

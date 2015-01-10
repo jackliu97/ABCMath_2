@@ -1,0 +1,144 @@
+body{
+    margin-bottom:100px;
+}
+
+.edit_mode, .list_mode, .pointer{
+    cursor: pointer;
+}
+
+/*
+* misc
+*/
+.pad-top{
+    margin-top: 10px;
+}
+
+/*
+* nav bars
+*/
+
+.main-navbar{
+    margin-bottom: 5px;
+}
+
+.sub-navbar {
+    width:100%;
+    margin-left:20px;
+    margin-right:auto;
+}
+
+.logout {
+    margin-left: 10px;
+}
+
+/*
+* keyword form
+*/
+
+.keyword-form {
+    margin-top: 20px;
+}
+
+
+/*
+* Bootstrap datatable override
+*/
+
+
+.paginate_button{
+    border-radius:5px;
+}
+
+.dataTables_form_override{
+    display:inline;
+    width:50%;
+}
+
+.dataTables_wrapper{
+	width:80%;
+	margin-left:auto;
+    margin-right:auto;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  margin-left: 10px;
+}
+
+ 
+div.dataTables_length select {
+    width: 75px;
+}
+
+
+div.dataTable_fixed_10 {
+    display:block;
+    width:100%;
+    height:575px;
+    overflow:scroll;
+}
+
+.header{
+   white-space: nowrap;
+}
+
+.first-col{
+   white-space: nowrap;
+}
+
+.first-col > label{
+   padding-right: 5px;
+}
+
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform: 
+    /* Magic Numbers */
+    translate(25px, 51px)
+    /* 45 is really 360 - 45 */
+    rotate(315deg);
+  width: 30px;
+}
+
+th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 0px;
+
+}
+
+table.rotate_table td{
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    width:70px;
+    height:40px;
+    padding: 5px 0px 5px 5px;
+}
+
+td.data-column{
+    border-left: 1px solid #ccc;
+}
+
+.class_list, .nowrap_column{
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/*
+.fixed-container{
+    width: 90%;
+    overflow-x:scroll;  
+    margin-left:10em;
+    overflow-y:visible;
+    padding-bottom:1px;
+}
+
+.first-col{
+    position: absolute;
+    width:10em;
+    top:auto;
+}
+*/

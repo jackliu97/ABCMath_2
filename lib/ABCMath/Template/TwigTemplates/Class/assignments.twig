@@ -1,0 +1,57 @@
+{% if lesson_id %}
+	<div class="panel panel-default">
+		<div class="panel-heading">All assignments for {{ currentLesson.description }} {{currentLesson.lesson_date |date("m/d/Y") }}</div>
+		<div class="panel-body">
+			<input type="hidden" id="lesson_id" value="{{ lesson_id }}">
+			<div class="row">
+					<div class="col-sm-3">
+						<a type="button" class="add_assignment btn btn-xs btn-success">ADD</a>
+					</div>
+
+					<div class="col-sm-2">
+						<label>Type</label>
+					</div>
+					<div class="col-sm-2">
+						<label>Name</label>
+					</div>
+					<div class="col-sm-2">
+						<label>Weight</label>
+					</div>
+					<div class="col-sm-2">
+						&nbsp;
+					</div>
+					
+				</div>
+		</div>
+		<ul class="list-group">
+		{% for assignment in assignments %}
+			<li class="list-group-item">
+				<div class="row">
+					<div class="col-sm-3">
+						<button assignment_id="{{ assignment.id }}" class="btn edit_assignment glyphicon glyphicon-pencil" style="width:45px;"></button>
+						<button assignment_id="{{ assignment.id }}" class="btn delete_assignment glyphicon glyphicon-remove" style="width:45px;"></button>
+					</div>
+					<div class="col-sm-2 assignment_type">
+						{{ assignment.type }}
+					</div>
+					<div class="col-sm-2 assignment_name">
+						{{ assignment.name }}
+					</div>
+					<div class="col-sm-2 assignment_weight">
+						{{ assignment.weight }}
+					</div>
+					<div class="col-sm-2 assignment_weight">
+						<!--a type="button" class="btn btn-primary btn-sm">Attachments</a-->
+					</div>
+					
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+{% else %}
+	<div class="alert alert-warning" role="alert">Please select a lesson from the right.</div>
+{% endif %}
+
+
+

@@ -1,0 +1,26 @@
+{% if lesson_id %}
+	<div class="panel panel-default">
+		<div class="panel-heading">Take attendance for {{ currentLesson.description }}, {{currentLesson.lesson_date |date("m/d/Y") }}</div>
+		<div class="panel-body">
+			<input type="hidden" id="lesson_id" value="{{ lesson_id }}">
+		</div>
+		<ul class="list-group">
+		{% for student in students %}
+			<li class="list-group-item">
+				<div class="row">
+					<div class="col-sm-4">
+						{{ student.first_name }} {{ student.last_name }}
+					</div>
+					<div class="col-sm-4">
+						<a type="button" student_id="{{ student.id }}" class="here_button mark_present btn btn-{% if student.present == 1 %}success{% else %}default{% endif %}">HERE</a>
+						<a type="button" student_id="{{ student.id }}" class="tardy_button mark_tardy btn btn-{% if student.tardy == '' %}default{% else %}danger{% endif %}">LATE</a>
+					</div>
+					
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+{% else %}
+	<div class="alert alert-warning" role="alert">Please select a lesson from the right.</div>
+{% endif %}

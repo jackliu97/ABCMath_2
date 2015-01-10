@@ -1,0 +1,31 @@
+<table id="gradeContainer" class="rotate_table table-hover">
+	<thead>
+		<tr>
+			{% for head in header %}
+			<th class="first-col header rotate" assignment_id="{{ head.assignment_id }}">
+				<div><span>{{ head.title|raw }}</span></div></th>
+			{% endfor %}
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for row in data %}
+			<tr>
+				{% for col in row %}
+
+					{% if loop.index == 1 %}
+						{#loop through first column, which is just name#}
+						<td class="first-col"><label><a href="/student_dashboard/info/{{ col.student_id }}" target="_blank">{{ col.student_name }}</a></label></td>
+					{% else %}
+
+						{#loop through rest of columns, which are grades#}
+						<td class="grade_action data-column">
+							<span grade_id="{{ col.grade_id }}" student_id="{{ col.student_id }}" assignment_id="{{ col.assignment_id }}" grade="{{ col.grade }}" lesson_id="{{ col.lesson_id }}">{{ col.grade }}</span>
+						</td>
+					{% endif %}
+
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
