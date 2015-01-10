@@ -22,3 +22,6 @@ ABCMath v2.0
 * Bootstrap 3
 * jQuery 1.10.2
 * DataTable 1.10.0
+
+
+I have not added the schema yet. I am currently working on making a bootstrap sql dump.
