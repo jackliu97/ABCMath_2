@@ -3,6 +3,7 @@
 		<div class="panel-heading">Take attendance for {{ currentLesson.description }}, {{currentLesson.lesson_date |date("m/d/Y") }}</div>
 		<div class="panel-body">
 			<input type="hidden" id="lesson_id" value="{{ lesson_id }}">
+			<a type="button" class="mark_all_present btn btn-default">MARK ALL HERE</a>
 		</div>
 		<ul class="list-group">
 		{% for student in students %}

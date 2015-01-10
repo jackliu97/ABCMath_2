@@ -273,6 +273,13 @@
 			return false;
 		});
 
+		$body.on('click', '.mark_all_present', function(){
+			$('.mark_present').each(function(){
+				$(this).click();
+			});
+
+			return false;
+		});
 
 		$body.on('click', '.mark_present', function(){
 			var $this = $(this);
