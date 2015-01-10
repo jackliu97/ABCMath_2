@@ -1,98 +1,94 @@
 <?php
 namespace ABCMath\Scaffolding;
 
-use \ABCMath\Meta\Implement\ElementList,
-	\ABCMath\Entity\Entity,
-	\ABCMath\Entity\EntityField,
-	\ABCMath\Entity\EntityManager,
-	\ABCMath\Base,
-	\ABCMath\Scaffolding\ABCMathObjectBase;
+use ABCMath\Meta\Implement\ElementList;
+use ABCMath\Entity\Entity;
+use ABCMath\Entity\EntityField;
+use ABCMath\Scaffolding\ABCMathObjectBase;
 
-class ABCMathObjectList extends ABCMathObjectBase implements ElementList{
+class ABCMathObjectList extends ABCMathObjectBase implements ElementList
+{
+    public $id;
+    public $data;
 
-	public $id;
-	public $data;
+    public function __construct()
+    {
+        parent::__construct();
 
-	public function __construct(){
-		parent::__construct();
+        $this->id = null;
+    }
 
-		$this->id = NULL;
-	}
+    public function loadSql()
+    {
+        if (!count($this->entityFields)) {
+            return false;
+        }
 
-	public function loadSql(){
+        $display_fields = array();
+        $joins = array();
 
-		if(!count($this->entityFields)){
-			return false;
-		}
+        foreach ($this->entityFields as $field) {
+            if (!$field->showInList()) {
+                continue;
+            }
 
-		$display_fields = array();
-		$joins = array();
+            if ($field->field_type_id == EntityField::SELECT) {
+                $this->buildSQLSelect($field, $display_fields, $joins);
+            } elseif ($field->field_type_id == EntityField::TIME) {
+                $this->buildSQLTime($field, $display_fields);
+            } elseif ($field->field_type_id == EntityField::DATE) {
+                $this->buildSQLDate($field, $display_fields);
+            } elseif ($field->field_type_id == EntityField::DATETIME) {
+                $this->buildSQLDateTime($field, $display_fields);
+            } else {
+                $display_fields [] = 't.'.$field->field_name;
+            }
+        }
 
-		foreach($this->entityFields as $field){
+        $sql =    "SELECT\n".implode(",\n", $display_fields)."\n".
+                "FROM {$this->entity->table_name} t \n".
+                implode("\n", $joins);
 
-			if(!$field->showInList()){
-				continue;
-			}
+        return $sql;
+    }
 
-			if($field->field_type_id == EntityField::SELECT ) {
-				$this->buildSQLSelect($field, $display_fields, $joins);
+    public function buildSQLDateTime($field, &$display_fields)
+    {
+        $display_fields [] = "DATE_FORMAT({$field->field_name}, '%b / %d / %Y %h:%i %p') AS `$field->field_name`";
+    }
 
-			}else if ($field->field_type_id == EntityField::TIME){
-				$this->buildSQLTime($field, $display_fields);
+    public function buildSQLDate($field, &$display_fields)
+    {
+        $display_fields [] = "DATE_FORMAT({$field->field_name}, '%b / %d / %Y') AS `$field->field_name`";
+    }
 
-			}else if ($field->field_type_id == EntityField::DATE){
-				$this->buildSQLDate($field, $display_fields);
+    public function buildSQLTime($field, &$display_fields)
+    {
+        $display_fields [] = "DATE_FORMAT({$field->field_name}, '%h:%i %p') AS `$field->field_name`";
+    }
 
-			}else if ($field->field_type_id == EntityField::DATETIME){
-				$this->buildSQLDateTime($field, $display_fields);
+    public function buildSQLSelect($field, &$display_fields, &$joins)
+    {
+        if (empty($field->join_table) ||
+            empty($field->join_column) ||
+            empty($field->join_display)) {
+            $display_fields [] = 't.'.$field->field_name;
 
-			}else{
-				$display_fields []= 't.' . $field->field_name;
-			}
+            return;
+        }
 
-		}
+        $joins[] = "LEFT JOIN {$field->join_table} {$field->join_table} ".
+                    "ON t.{$field->field_name} = {$field->join_table}.{$field->join_column}";
 
-		$sql = 	"SELECT\n" . implode(",\n", $display_fields) . "\n" .
-				"FROM {$this->entity->table_name} t \n" . 
-				implode("\n", $joins);
+        $display_fields [] = "{$field->join_table}.{$field->join_display} AS `{$field->field_name}`";
+    }
 
-		return $sql;
-	}
+    public function loadMeta()
+    {
+        if (parent::loadMeta()) {
+            return $this->loadEntityFields();
+        }
 
-	public function buildSQLDateTime($field, &$display_fields){
-		$display_fields []= "DATE_FORMAT({$field->field_name}, '%b / %d / %Y %h:%i %p') AS `$field->field_name`";
-	}
-
-	public function buildSQLDate($field, &$display_fields){
-		$display_fields []= "DATE_FORMAT({$field->field_name}, '%b / %d / %Y') AS `$field->field_name`";
-	}
-
-	public function buildSQLTime($field, &$display_fields){
-		$display_fields []= "DATE_FORMAT({$field->field_name}, '%h:%i %p') AS `$field->field_name`";
-	}
-
-	public function buildSQLSelect($field, &$display_fields, &$joins){
-		if(empty($field->join_table) || 
-			empty($field->join_column) || 
-			empty($field->join_display)){
-			$display_fields []= 't.' . $field->field_name;
-			return;
-		}
-
-		$joins[] = "LEFT JOIN {$field->join_table} {$field->join_table} " . 
-					"ON t.{$field->field_name} = {$field->join_table}.{$field->join_column}";
-
-		$display_fields []= "{$field->join_table}.{$field->join_display} AS `{$field->field_name}`";
-
-	}
-
-	public function loadMeta(){
-		if(parent::loadMeta()){
-
-			return $this->loadEntityFields();
-		}
-
-		return false;
-	}
-
+        return false;
+    }
 }

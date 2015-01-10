@@ -1,84 +1,91 @@
 <?php
 namespace ABCMath\Course;
 
-use \ABCMath\Base,
-	\ABCMath\Course\ABCClass;
-
+use ABCMath\Base;
+use ABCMath\Course\ABCClass;
 
 /**
-* This class manages a group of classes.
-* 
-*/
+ * This class manages a group of classes.
+ *
+ */
 
-class ABCClassManager extends Base {
+class ABCClassManager extends Base
+{
+    public $classes;
+    public $semester_id;
 
-	public $classes;
-	public $semester_id;
+    public function __construct()
+    {
+        parent::__construct();
+        $this->semester_id = null;
+    }
 
-	public function __construct(){
-		parent::__construct();
-		$this->semester_id = null;
-	}
+    public function addClass(ABCClass $class)
+    {
+        $this->classes [] = $class;
+    }
 
-	public function addClass(ABCClass $class){
-		$this->classes []= $class;
-	}
+    public function getClassesByTeacher($teacher_id)
+    {
+        $classes = $this->_getClassByTeacher($teacher_id);
 
-	public function getClassesByTeacher($teacher_id){
-		$classes = $this->_getClassByTeacher($teacher_id);
+        if (!count($classes)) {
+            return;
+        }
 
-		if(!count($classes)){
-			return;
-		}
+        foreach ($classes as $class) {
+            $class_obj = new ABCClass();
+            $class_obj->load($class);
+            $this->addClass($class_obj);
+        }
+    }
 
-		foreach($classes as $class){
-			$class_obj = new ABCClass();
-			$class_obj->load($class);
-			$this->addClass($class_obj);
-		}
-	}
+    protected function _getClassByTeacher($teacher_id)
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('*')
+            ->from(ADMIN_DB.'.classes', 'c')
+            ->where('c.teacher_id = ?')
+            ->setParameter(0, $teacher_id);
 
-	protected function _getClassByTeacher($teacher_id){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('*')
-			->from(ADMIN_DB . '.classes', 'c')
-			->where('c.teacher_id = ?')
-			->setParameter(0, $teacher_id);
-		return $qb->execute()->fetchAll();
-	}
+        return $qb->execute()->fetchAll();
+    }
 
-	public function getAllClasses($type=null){
-		$stmt = $this->_conn->prepare($this->getAllClassesSQL());
-		$stmt->execute();
-		$classes = $stmt->fetchAll();
+    public function getAllClasses($type = null)
+    {
+        $stmt = $this->_conn->prepare($this->getAllClassesSQL());
+        $stmt->execute();
+        $classes = $stmt->fetchAll();
 
-		if($type === null){
-			return $classes;
-		}
+        if ($type === null) {
+            return $classes;
+        }
 
-		if($type === 'options'){
-			$options = array(''=>'Pick a class');
-			foreach($classes as $class){
-				$options[$class['id']] = "{$class['external_id']} {$class['school']}";
-			}
-			return $options;
-		}
-	}
+        if ($type === 'options') {
+            $options = array('' => 'Pick a class');
+            foreach ($classes as $class) {
+                $options[$class['id']] = "{$class['external_id']} {$class['school']}";
+            }
 
-	public function getAllClassesSQL($active_only=false){
-		$where = array();
+            return $options;
+        }
+    }
 
-		if($active_only){
-			$where []= 'c.start_time < NOW()';
-			$where []= 'c.end_time > NOW()';
-			$where []= 'c.' . strtolower(date('D')) . '=1';
-		}
+    public function getAllClassesSQL($active_only = false)
+    {
+        $where = array();
 
-		if($this->semester_id){
-			$where []= "c.term_id = {$this->semester_id}";
-		}
+        if ($active_only) {
+            $where [] = 'c.start_time < NOW()';
+            $where [] = 'c.end_time > NOW()';
+            $where [] = 'c.'.strtolower(date('D')).'=1';
+        }
 
-		$select = "SELECT 	
+        if ($this->semester_id) {
+            $where [] = "c.term_id = {$this->semester_id}";
+        }
+
+        $select = "SELECT
 							c.id,
 							c.external_id,
 							c.description,
@@ -100,13 +107,12 @@ class ABCClassManager extends Base {
 						LEFT JOIN `teachers` t ON c.teacher_id = t.id
 						LEFT JOIN schools sch ON sch.id = c.school_id";
 
-		if(count($where)){
-			$select .= ' WHERE ' . implode(' AND ', $where);
-		}
+        if (count($where)) {
+            $select .= ' WHERE '.implode(' AND ', $where);
+        }
 
-		$select .= ' ORDER BY c.external_id';
+        $select .= ' ORDER BY c.external_id';
 
-		return $select;
-	}
-
+        return $select;
+    }
 }

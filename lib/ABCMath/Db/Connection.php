@@ -1,34 +1,32 @@
 <?php
 namespace ABCMath\Db;
 
-use \Doctrine\DBAL\Configuration,
-	\Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DriverManager;
 
-class Connection{
+class Connection
+{
+    protected static $_config = null;
+    protected static $_conn = null;
 
-	protected static $_config = NULL;
-	protected static $_conn = NULL;
+    public static function getConnection()
+    {
+        if (!is_null(self::$_conn)) {
+            return self::$_conn;
+        }
 
-	public static function getConnection(){
-		if(!is_null(self::$_conn)){
-			return self::$_conn;
-		}
+        if (is_null(self::$_config)) {
+            self::$_config = new Configuration();
+            $connectionParams = array(
+                'dbname'    => DB_DATABASE,
+                'user'        => DB_USERNAME,
+                'password'    => DB_PASSWORD,
+                'host'        => DB_HOSTNAME,
+                'driver'    => 'pdo_mysql',
+            );
+        }
+        self::$_conn = DriverManager::getConnection($connectionParams, self::$_config);
 
-		if(is_null(self::$_config)){
-			self::$_config = new Configuration();
-			$connectionParams = array(
-				'dbname' 	=> DB_DATABASE,
-				'user' 		=> DB_USERNAME,
-				'password' 	=> DB_PASSWORD,
-				'host' 		=> DB_HOSTNAME,
-				'driver' 	=> 'pdo_mysql',
-			);
-		}
-		self::$_conn = DriverManager::getConnection($connectionParams, self::$_config);
-		return self::$_conn;
-	}
-
-
+        return self::$_conn;
+    }
 }
-
-?>

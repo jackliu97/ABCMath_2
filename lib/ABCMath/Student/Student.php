@@ -1,119 +1,131 @@
 <?php
 namespace ABCMath\Student;
 
-use \ABCMath\Base;
+use ABCMath\Base;
 
-class Student extends Base {
+class Student extends Base
+{
+    public $id;
+    protected $_rawData;
 
-	public $id;
-	protected $_rawData;
+    public function __construct()
+    {
+        parent::__construct();
+        $this->_dbData = array();
+    }
 
-	public function __construct(){
-		parent::__construct();
-		$this->_dbData = array();
-	}
+    public function __get($key)
+    {
+        return isset($this->_rawData[$key]) ? $this->_rawData[$key] : null;
+    }
 
-	public function __get($key){
-		return isset($this->_rawData[$key]) ? $this->_rawData[$key] : null;
-	}
+    public function __set($key, $value)
+    {
+        $this->{$key} = $value;
+        $this->_rawData[$key] = $value;
+    }
 
-	public function __set($key, $value){
-		$this->{$key} = $value;
-		$this->_rawData[$key] = $value;
-	}
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	public function setId($id){
-		$this->id = $id;
-	}
+    public function getRawData()
+    {
+        return $this->_rawData;
+    }
 
-	public function getRawData(){
-		return $this->_rawData;
-	}
+    public function getAllClasses()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('sc.class_id')
+            ->from('student_class', 'sc')
+            ->innerJoin('sc', 'classes', 'c', 'sc.class_id = c.id')
+            ->where('sc.student_id = ?')
+            ->setParameter(0, $this->id);
 
-	public function getAllClasses(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('sc.class_id')
-			->from('student_class', 'sc')
-			->innerJoin('sc', 'classes', 'c', 'sc.class_id = c.id')
-			->where('sc.student_id = ?')
-			->setParameter(0, $this->id);
+        return $qb->execute()->fetch();
+    }
 
-		return $qb->execute()->fetch();
-	}
+    public function getNote($note_id)
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('n.notes')
+            ->from('notes', 'n')
+            ->where('n.id = ?')
+            ->setParameter(0, $note_id);
 
-	public function getNote($note_id){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('n.notes')
-			->from('notes', 'n')
-			->where('n.id = ?')
-			->setParameter(0, $note_id);
+        try {
+            $result = $qb->execute()->fetch();
 
-		try {
-			$result = $qb->execute()->fetch();
-			return array('success'=>true,
-						'notes' =>$result['notes']
-						);
-		}catch ( \Doctrine\DBAL\DBALException $e){
-			return array('success'=>false, 'message'=>$e->getMessage());
-		}
-	}
+            return array('success' => true,
+                        'notes' => $result['notes'],
+                        );
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
 
-	public function deleteNote($note_id){
-		$this->_conn->delete('notes', array('id' => $note_id));
-		return array('success'=>true);
-	}
+    public function deleteNote($note_id)
+    {
+        $this->_conn->delete('notes', array('id' => $note_id));
 
-	public function saveNote($notes, $user_id, $note_id=''){
-		if(empty($notes)){
-			return array(
-				'success'=>false,
-				'message'=>'Note is blank. Please write something.');
-		}
+        return array('success' => true);
+    }
 
-		if(empty($note_id)){
-			return $this->_insertNote($notes, $user_id);
-		}else{
-			return $this->_updateNote($note_id, $notes, $user_id);
-		}
-	}
+    public function saveNote($notes, $user_id, $note_id = '')
+    {
+        if (empty($notes)) {
+            return array(
+                'success' => false,
+                'message' => 'Note is blank. Please write something.', );
+        }
 
-	protected function _insertNote($notes, $user_id){
+        if (empty($note_id)) {
+            return $this->_insertNote($notes, $user_id);
+        } else {
+            return $this->_updateNote($note_id, $notes, $user_id);
+        }
+    }
 
-		try{
-			$this->_conn->insert('notes', 
-					array(
-						'student_id' => $this->id,
-						'user_id'=> $user_id,
-						'notes' => $notes,
-						'creation_datetime'=> date('c')
-						)
-				);
-			return array('success'=>true, 'message'=>'Note successfully inserted');
+    protected function _insertNote($notes, $user_id)
+    {
+        try {
+            $this->_conn->insert('notes',
+                    array(
+                        'student_id' => $this->id,
+                        'user_id' => $user_id,
+                        'notes' => $notes,
+                        'creation_datetime' => date('c'),
+                        )
+                );
 
-		} catch ( \Doctrine\DBAL\DBALException $e){
-			return array('success'=>false, 'message'=>$e->getMessage());
-		}
+            return array('success' => true, 'message' => 'Note successfully inserted');
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
 
-	}
+    protected function _updateNote($note_id, $notes, $user_id)
+    {
+        try {
+            $this->_conn->update('notes',
+                    array(
+                        'user_id' => $user_id,
+                        'student_id' => $this->id,
+                        'notes' => $notes,
+                        ),
+                array('id' => $note_id));
 
-	protected function _updateNote($note_id, $notes, $user_id){
-		try{
-			$this->_conn->update('notes', 
-					array(
-						'user_id'=> $user_id,
-						'student_id' => $this->id,
-						'notes' => $notes
-						),
-				array('id'=>$note_id));
-			return array('success'=>true, 'message'=>'Note successfully updated');
+            return array('success' => true, 'message' => 'Note successfully updated');
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
 
-		} catch ( \Doctrine\DBAL\DBALException $e){
-			return array('success'=>false, 'message'=>$e->getMessage());
-		}
-	}
-
-	public function getAllClassesSQL(){
-		$sql = "SELECT  c.id id, 
+    public function getAllClassesSQL()
+    {
+        $sql = "SELECT  c.id id,
 						c.description,
 						s.description subject,
 						CONCAT(t.first_name, ' ', t.last_name) teacher,
@@ -131,17 +143,18 @@ class Student extends Base {
 				INNER JOIN student_class sc ON c.id = sc.class_id
 				LEFT JOIN subject s ON s.id = c.subject_id
 				LEFT JOIN teachers t ON t.id = c.teacher_id
-				WHERE sc.student_id = " . mysql_real_escape_string($this->id);
+				WHERE sc.student_id = ".mysql_real_escape_string($this->id);
 
-		if($this->semester_id){
-			$sql .= ' AND c.term_id = ' . mysql_real_escape_string($this->semester_id);
-		}
+        if ($this->semester_id) {
+            $sql .= ' AND c.term_id = '.mysql_real_escape_string($this->semester_id);
+        }
 
-		return $sql;
-	}
+        return $sql;
+    }
 
-	public function getAllNotesSQL(){
-		$sql = "SELECT 	n.id note_id,
+    public function getAllNotesSQL()
+    {
+        $sql = "SELECT 	n.id note_id,
 						DATE_FORMAT(n.creation_datetime, '%b %d, %Y %h:%i %p') `creation_datetime`,
 						DATE_FORMAT(n.update_timestamp, '%b %d, %Y %h:%i %p') `update_timestamp`,
 						IF(
@@ -153,38 +166,39 @@ class Student extends Base {
 				FROM students s
 					INNER JOIN notes n ON n.student_id = s.id
 					LEFT JOIN users u ON u.id = n.user_id
-				WHERE s.id = " . mysql_real_escape_string($this->id);
+				WHERE s.id = ".mysql_real_escape_string($this->id);
 
-		return $sql;
-	}
+        return $sql;
+    }
 
-	public function load($data=array()){
+    public function load($data = array())
+    {
+        if (!count($data)) {
+            $this->log('Data does not exist, loading from DB');
+            $data = $this->_getFromDB();
+        }
 
-		if(!count($data)){
-			$this->log('Data does not exist, loading from DB');
-			$data = $this->_getFromDB();
-		}
+        if (!$data || count($data) === 0) {
+            return false;
+        }
 
-		if(!$data || count($data) === 0){
-			return false;
-		}
+        $this->_rawData = $data;
 
-		$this->_rawData = $data;
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
 
-		foreach($data as $k=>$v){
-			$this->{$k} = $v;
-		}
+        return true;
+    }
 
-		return true;
-	}
+    protected function _getFromDB()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('*')
+            ->from('students', 's')
+            ->where('s.id = ?')
+            ->setParameter(0, $this->id);
 
-	protected function _getFromDB(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('*')
-			->from('students', 's')
-			->where('s.id = ?')
-			->setParameter(0, $this->id);
-		return $qb->execute()->fetch();
-	}
-
+        return $qb->execute()->fetch();
+    }
 }

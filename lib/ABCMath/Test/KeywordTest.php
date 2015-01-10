@@ -1,19 +1,22 @@
 <?php
 require_once "test_bootstrap.php";
 
-use \ABCMath\Grouping\Keyword,
-\ABCMath\Grouping\KeywordManager;
+use \ABCMath\Grouping\Keyword;
+use \ABCMath\Grouping\KeywordManager;
 
-class KeywordTest extends PHPUnit_Framework_TestCase {
+class KeywordTest extends PHPUnit_Framework_TestCase
+{
+    protected $dataNoID;
+    protected $dataWithID;
+    public static function setUpBeforeClass()
+    {
+    }
 
-  protected $dataNoID;
-  protected $dataWithID;
-  public static function setUpBeforeClass() {}
-
-  protected function setUp() {
-    $this->readingDataWithID = array(
-      'id'=>1,
-      'full_text'=>"\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
+    protected function setUp()
+    {
+        $this->readingDataWithID = array(
+      'id' => 1,
+      'full_text' => "\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
     introduction into education would remove the conventionality,
     artificiality, and backward-lookingness which were characteristic;
     of classical studies, but they were gravely disappointed. So, too, in
@@ -52,7 +55,7 @@ method of science is the long and bitter way of personal
     minority of people who are able to acquire some of the techniques
     of science and a still smaller minority who are able to use and
 develop them.",
-      'lines'=>array(
+      'lines' => array(
         0 => '"They\'re trying to kill me!" the boy screamed.The pioneers of the teaching of science imagined that its',
         1 => 'introduction into education would remove the conventionality,',
         2 => 'artificiality, and backward-lookingness which were characteristic;',
@@ -93,9 +96,8 @@ develop them.",
         37 => 'of science and a still smaller minority who are able to use and',
         38 => 'develop them.',
       ),
-      'questions'=>array(
-        0 =>
-        array(
+      'questions' => array(
+        0 => array(
           'id' => '13',
           'reading_comprehension_id' => '1',
           'text' => 'The study of standards for what is right and what is wrong is called _____.',
@@ -106,212 +108,200 @@ c. ethics
 d. technology
 ANS: C',
           'choices' => array(
-            0 =>
-            array(
+            0 => array(
               'id' => '272',
               'reading_comprehension_question_id' => '13',
               'text' => 'pure science',
               'is_answer' => '0',
             ),
-            1 =>
-            array(
+            1 => array(
               'id' => '273',
               'reading_comprehension_question_id' => '13',
               'text' => 'applied science',
               'is_answer' => '0',
             ),
-            2 =>
-            array(
+            2 => array(
               'id' => '275',
               'reading_comprehension_question_id' => '13',
               'text' => 'technology',
               'is_answer' => '0',
             ),
-            3 =>
-            array(
+            3 => array(
               'id' => '274',
               'reading_comprehension_question_id' => '13',
               'text' => 'ethics',
               'is_answer' => '1',
             ),
-          )
+          ),
         ),
-      )
+      ),
     );
 
-    $this->dataNoID = array (
+        $this->dataNoID = array(
       'word' => 'sat2',
       'type' => '',
     );
 
-    $this->dataWithID = array (
+        $this->dataWithID = array(
       'id' => '8',
       'word' => 'sat2',
       'type' => '',
     );
 
-    $this->batchKeyword = array (
-      0 =>
-      array (
+        $this->batchKeyword = array(
+      0 => array(
         'id' => '11',
         'word' => '11th grade',
       ),
-      1 =>
-      array (
+      1 => array(
         'id' => '10',
         'word' => '12th grade',
       ),
-      2 =>
-      array (
+      2 => array(
         'id' => '27',
         'word' => 'Blah Blah bLah',
       ),
-      3 =>
-      array (
+      3 => array(
         'id' => '',
         'word' => 'test3',
       ),
     );
-  }
+    }
 
   //php phpunit.phar --filter testLoad__withNoId KeywordTest.php
-  public function testLoad__withNoId() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testLoad__withNoId()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $kw->expects( $this->never() )
-    ->method( '_loadFromDb' );
+      $kw->expects($this->never())
+    ->method('_loadFromDb');
 
-    $kw->load( $this->dataNoID );
-    $this->assertEquals( $kw->word, 'sat2' );
-
+      $kw->load($this->dataNoID);
+      $this->assertEquals($kw->word, 'sat2');
   }
 
   //php phpunit.phar --filter testLoad__withId KeywordTest.php
-  public function testLoad__withId() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testLoad__withId()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $kw->expects( $this->once() )
-    ->method( '_loadFromDb' )
-    ->will( $this->returnValue( $this->dataWithID ) );
+      $kw->expects($this->once())
+    ->method('_loadFromDb')
+    ->will($this->returnValue($this->dataWithID));
 
-    $kw->load();
-    $this->assertEquals( $kw->word, 'sat2' );
-
+      $kw->load();
+      $this->assertEquals($kw->word, 'sat2');
   }
 
   //php phpunit.phar --filter testSave__withoutId KeywordTest.php
-  public function testSave__withoutId() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testSave__withoutId()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $kw->expects( $this->never() )
-    ->method( '_loadFromDb' );
+      $kw->expects($this->never())
+    ->method('_loadFromDb');
 
-    $kw->expects( $this->never() )
-    ->method( '_update' );
+      $kw->expects($this->never())
+    ->method('_update');
 
-    $kw->expects( $this->once() )
-    ->method( '_insert' );
+      $kw->expects($this->once())
+    ->method('_insert');
 
-    $kw->load( $this->dataNoID );
-    $kw->save();
-    $this->assertEquals( $kw->word, 'sat2' );
-
+      $kw->load($this->dataNoID);
+      $kw->save();
+      $this->assertEquals($kw->word, 'sat2');
   }
 
   //php phpunit.phar --filter testSave__withId KeywordTest.php
-  public function testSave__withId() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testSave__withId()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $kw->expects( $this->never() )
-    ->method( '_loadFromDb' );
+      $kw->expects($this->never())
+    ->method('_loadFromDb');
 
-    $kw->expects( $this->once() )
-    ->method( '_update' );
+      $kw->expects($this->once())
+    ->method('_update');
 
-    $kw->expects( $this->never() )
-    ->method( '_insert' );
+      $kw->expects($this->never())
+    ->method('_insert');
 
-    $kw->load( $this->dataWithID );
-    $kw->save();
-    $this->assertEquals( $kw->word, 'sat2' );
-
+      $kw->load($this->dataWithID);
+      $kw->save();
+      $this->assertEquals($kw->word, 'sat2');
   }
 
   //php phpunit.phar --filter testBind__existingKeyword KeywordTest.php
-  public function testBind__existingKeyword() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testBind__existingKeyword()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $kw->load( $this->dataWithID );
+      $kw->load($this->dataWithID);
 
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->load( $this->readingDataWithID );
-    $rc->addKeyword( $kw );
+      $rc->load($this->readingDataWithID);
+      $rc->addKeyword($kw);
 
-    $kw->expects( $this->never() )
-    ->method( '_insert' );
+      $kw->expects($this->never())
+    ->method('_insert');
 
-    $kw->expects( $this->never() )
-    ->method( '_update' );
-
+      $kw->expects($this->never())
+    ->method('_update');
   }
 
   //php phpunit.phar --filter testBind__newKeyword KeywordTest.php
-  public function testBind__newKeyword() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
-    $kw->expects( $this->once() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( 12 ) );
+  public function testBind__newKeyword()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
+      $kw->expects($this->once())
+    ->method('_insert')
+    ->will($this->returnValue(12));
 
-    $kw->expects( $this->never() )
-    ->method( '_update' );
+      $kw->expects($this->never())
+    ->method('_update');
 
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $kw->load( $this->dataNoID );
-    $rc->load( $this->readingDataWithID );
-    $rc->addKeyword( $kw );
+      $kw->load($this->dataNoID);
+      $rc->load($this->readingDataWithID);
+      $rc->addKeyword($kw);
 
-    $this->assertEquals( $rc->keywords[0]->id, 12 );
+      $this->assertEquals($rc->keywords[0]->id, 12);
 
-
-    $kw2 = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
-    $kw2->expects( $this->once() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( 14 ) );
-    $kw2->load( $this->dataNoID );
-    $rc->addKeyword( $kw2 );
-    $this->assertEquals( $rc->keywords[1]->id, 14 );
+      $kw2 = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
+      $kw2->expects($this->once())
+    ->method('_insert')
+    ->will($this->returnValue(14));
+      $kw2->load($this->dataNoID);
+      $rc->addKeyword($kw2);
+      $this->assertEquals($rc->keywords[1]->id, 14);
   }
 
   //php phpunit.phar --filter testLoad__batchKeywords KeywordTest.php
-  public function testLoad__batchKeywords() {
-
-    $kwm = new KeywordManager();
-    $kwm->load( $this->batchKeyword );
-    $this->assertEquals( count( $kwm->keywordList ), 4 );
-
+  public function testLoad__batchKeywords()
+  {
+      $kwm = new KeywordManager();
+      $kwm->load($this->batchKeyword);
+      $this->assertEquals(count($kwm->keywordList), 4);
   }
-
 }

@@ -1,22 +1,25 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (! defined('BASEPATH')) {
+    exit('No direct script access allowed');
+}
 
-class Material extends CI_Controller {
+class material extends CI_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
 
-	public function __construct(){
-		parent::__construct();
+        if (!$this->User_Model->check_login()) {
+            $this->session->sess_destroy();
+            header('Location: /login');
+        }
+    }
 
-		if(!$this->User_Model->check_login()){
-			$this->session->sess_destroy();
-			header('Location: /login');
-		}
-	}
+    public function index()
+    {
+        $data = array();
 
-	public function index(){
-		$data = array();
-
-		$this->load->view('header');
-		$this->load->view('navbar');
-		$this->load->view('footer');
-
-	}
+        $this->load->view('header');
+        $this->load->view('navbar');
+        $this->load->view('footer');
+    }
 }

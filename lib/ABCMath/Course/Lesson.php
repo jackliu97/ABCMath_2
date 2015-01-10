@@ -1,215 +1,229 @@
 <?php
 namespace ABCMath\Course;
 
-use \ABCMath\Base,
-	\ABCMath\Course\AssignmentManager,
-	\ABCMath\Attachment\Attachment;
+use ABCMath\Base;
+use ABCMath\Course\AssignmentManager;
+use ABCMath\Attachment\Attachment;
 
-class Lesson extends Base {
+class Lesson extends Base
+{
+    public $id;
+    public $assignments;
 
-	public $id;
-	public $assignments;
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	public function __construct(){
-		parent::__construct();
-	}
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	public function setId($id){
-		$this->id = $id;
-	}
+    public function load($data = array())
+    {
+        if (!count($data)) {
+            $data = $this->_getFromDB();
+        }
 
-	public function load($data=array()){
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
+    }
 
-		if(!count($data)){
-			$data = $this->_getFromDB();
-		}
+    public function loadAssignments()
+    {
+        $a_manager = new AssignmentManager();
+        $this->assignments = $a_manager->getAssignmentByLesson($this->id);
+    }
 
-		foreach($data as $k=>$v){
-			$this->{$k} = $v;
-		}
-	}
+    /**
+     * get an attendance data about this lesson.
+     */
+    public function getAttendance()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('student_id, present, tardy')
+            ->from('attendance', 'a')
+            ->where('a.lesson_id = ?')
+            ->setParameter(0, $this->id);
+        $data = $qb->execute()->fetchAll();
+        if (!$data) {
+            return array();
+        }
 
-	public function loadAssignments(){
-		$a_manager = new AssignmentManager();
-		$this->assignments = $a_manager->getAssignmentByLesson($this->id);
-	}
+        $return = array();
+        foreach ($data as $row) {
+            $return[$row['student_id']] = $row;
+        }
 
-	/**
-	* get an attendance data about this lesson.
-	*/
-	public function getAttendance(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('student_id, present, tardy')
-			->from('attendance', 'a')
-			->where('a.lesson_id = ?')
-			->setParameter(0, $this->id);
-		$data = $qb->execute()->fetchAll();
-		if(!$data){
-			return array();
-		}
+        return $return;
+    }
 
-		$return = array();
-		foreach($data as $row){
-			$return[$row['student_id']] = $row;
-		}
+    /**
+     * get attendence data for one student
+     */
+    public function getAttendanceSingleStudent($student_id)
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('a.id, a.present', 'a.tardy')
+            ->from('attendance', 'a')
+            ->where('a.lesson_id = ? AND a.student_id=?')
+            ->setParameter(0, $this->id)
+            ->setParameter(1, $student_id);
 
-		return $return;
-	}
+        return $qb->execute()->fetch();
+    }
 
-	/**
-	* get attendence data for one student 
-	*/
-	public function getAttendanceSingleStudent($student_id){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('a.id, a.present', 'a.tardy')
-			->from('attendance', 'a')
-			->where('a.lesson_id = ? AND a.student_id=?')
-			->setParameter(0, $this->id)
-			->setParameter(1, $student_id);
+    public function takeAttendance($student_id)
+    {
+        $return = array(
+            'success' => true,
+            'message' => '',
+            'present' => false,
+            );
 
-		return $qb->execute()->fetch();
-	}
+        $attendance_data = $this->getAttendanceSingleStudent($student_id);
 
+        if (!$attendance_data) {
+            //if this never existed, mark as present.
+            $this->_insertAttendance($student_id);
+            $return['present'] = true;
 
+            return $return;
+        }
 
-	public function takeAttendance($student_id){
-		$return = array(
-			'success'=>true,
-			'message'=>'',
-			'present'=>false
-			);
+        if ($attendance_data['present'] != 1) {
+            $return['present'] = true;
+        }
 
-		$attendance_data = $this->getAttendanceSingleStudent($student_id);
+        $this->_updateAttendance($attendance_data['id'], $return['present']);
 
-		if(!$attendance_data){
-			//if this never existed, mark as present.
-			$this->_insertAttendance($student_id);
-			$return['present'] = true;
-			return $return;
-		}
+        return $return;
+    }
 
-		if($attendance_data['present'] != 1){
-			$return['present'] = true;
-		}
+    public function markTardy($student_id)
+    {
+        $return = array(
+            'success' => true,
+            'message' => '',
+            'present' => true,
+            'tardy' => false,
+            );
 
-		$this->_updateAttendance($attendance_data['id'], $return['present']);
-		return $return;
+        $attendance_data = $this->getAttendanceSingleStudent($student_id);
+        if (!$attendance_data) {
+            //if this never existed, mark as present and late.
+            $this->_insertAttendance($student_id, true);
+            $return['present'] = true;
+            $return['tardy'] = true;
 
-	}
+            return $return;
+        }
 
-	public function markTardy($student_id){
-		$return = array(
-			'success'=>true,
-			'message'=>'',
-			'present'=>true,
-			'tardy'=>false
-			);
+        if (!$attendance_data['tardy']) {
+            $return['tardy'] = true;
+        }
+        $this->_updateAttendance($attendance_data['id'], 1, $return['tardy']);
 
-		$attendance_data = $this->getAttendanceSingleStudent($student_id);
-		if(!$attendance_data){
-			//if this never existed, mark as present and late.
-			$this->_insertAttendance($student_id, true);
-			$return['present'] = true;
-			$return['tardy'] = true;
-			return $return;
-		}
+        return $return;
+    }
 
-		if(!$attendance_data['tardy']){
-			$return['tardy'] = true;
-		}
-		$this->_updateAttendance($attendance_data['id'], 1, $return['tardy']);
+    public function addAttachment(Attachment $attachment)
+    {
+        $attachment_id = $attachment->id;
+        if (!isset($attachment->id) && !$attachment->id) {
+            return 'Invalid attachment id.';
+        }
 
-		return $return;
+        $stmt = $this->_conn->prepare(
+                'INSERT IGNORE INTO lessons_attachments (lesson_id, attachment_id) VALUES (?, ?)'
+                );
 
-	}
+        $stmt->bindValue(1, $this->id);
+        $stmt->bindValue(2, $attachment->id);
 
-	public function addAttachment(Attachment $attachment){
-		$attachment_id = $attachment->id;
-		if(!isset($attachment->id) && !$attachment->id){
-			return 'Invalid attachment id.';
-		}
+        try {
+            $stmt->execute();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
 
-		$stmt = $this->_conn->prepare(
-				'INSERT IGNORE INTO lessons_attachments (lesson_id, attachment_id) VALUES (?, ?)'
-				);
+        return true;
+    }
 
-		$stmt->bindValue(1, $this->id);
-		$stmt->bindValue(2, $attachment->id);
-
-		try{
-			$stmt->execute();
-		} catch ( \Exception $e){
-			return $e->getMessage();
-		}
-
-		return true;
-
-	}
-
-	protected function _getAllAttachmentsSQL(){
-		return "SELECT
+    protected function _getAllAttachmentsSQL()
+    {
+        return "SELECT
 					 a.*
-				FROM lessons_attachments la 
+				FROM lessons_attachments la
 				INNER JOIN attachments a ON la.attachment_id = a.id
 				WHERE la.lesson_id = ?";
-	}
+    }
 
-	public function getAllAttachments(){
-		$return = array( 'success'=>true, 'message'=>'' );
+    public function getAllAttachments()
+    {
+        $return = array( 'success' => true, 'message' => '' );
 
-		$stmt = $this->_conn->prepare( $this->_getAllAttachmentsSQL() );
-		$stmt->bindValue(1, $this->id);
+        $stmt = $this->_conn->prepare($this->_getAllAttachmentsSQL());
+        $stmt->bindValue(1, $this->id);
 
-		try{
-			$stmt->execute();
-			$attachments = $stmt->fetchAll();
-		} catch ( \Exception $e){
-			$return = array( 'success'=>false, 'message'=>$e->getMessage() );
-			return $return;
-		}
+        try {
+            $stmt->execute();
+            $attachments = $stmt->fetchAll();
+        } catch (\Exception $e) {
+            $return = array( 'success' => false, 'message' => $e->getMessage() );
 
-		$return['attachments'] = $attachments;
-		return $return;
-	}
+            return $return;
+        }
 
-	protected function _updateAttendance($id, $present, $tardy=false){
-		try{
-			$this->_conn->update('attendance', 
-					array(
-						'present'=> $present,
-						'tardy' => ($tardy ? date('c') : null)
-						),
-				array('id'=>$id));
-			return array('success'=>true);
+        $return['attachments'] = $attachments;
 
-		} catch ( \Doctrine\DBAL\DBALException $e){
-			return array('success'=>false, 'message'=>$e->getMessage());
-		}
-	}
+        return $return;
+    }
 
-	protected function _insertAttendance($student_id, $tardy=false){
-		try{
-			$this->_conn->insert('attendance',
-				array(
-					'lesson_id' => $this->id,
-					'student_id' => $student_id,
-					'present' => 1,
-					'tardy' => ($tardy ? date('c') : null)
-					)
-				);
-			return array('success'=>true);
-		} catch ( \Doctrine\DBAL\DBALException $e){
-			return array('success'=>false, 'message'=>$e->getMessage());
-		}
-	}
+    protected function _updateAttendance($id, $present, $tardy = false)
+    {
+        try {
+            $this->_conn->update('attendance',
+                    array(
+                        'present' => $present,
+                        'tardy' => ($tardy ? date('c') : null),
+                        ),
+                array('id' => $id));
 
-	protected function _getFromDB(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('*')
-			->from('lessons', 'l')
-			->where('l.id = ?')
-			->setParameter(0, $this->id);
-		return $qb->execute()->fetch();
-	}
+            return array('success' => true);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
 
+    protected function _insertAttendance($student_id, $tardy = false)
+    {
+        try {
+            $this->_conn->insert('attendance',
+                array(
+                    'lesson_id' => $this->id,
+                    'student_id' => $student_id,
+                    'present' => 1,
+                    'tardy' => ($tardy ? date('c') : null),
+                    )
+                );
+
+            return array('success' => true);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
+
+    protected function _getFromDB()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('*')
+            ->from('lessons', 'l')
+            ->where('l.id = ?')
+            ->setParameter(0, $this->id);
+
+        return $qb->execute()->fetch();
+    }
 }

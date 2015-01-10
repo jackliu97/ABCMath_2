@@ -1,149 +1,159 @@
 <?php
 namespace ABCMath\ScrambledParagraph;
 
-use \ABCMath\Meta\Implement\Element,
-	\ABCMath\Grouping\Keyword,
-	\ABCMath\Grouping\KeywordList,
-	\ABCMath\ElementBase;
+use ABCMath\Meta\Implement\Element;
+use ABCMath\Grouping\Keyword;
+use ABCMath\ElementBase;
 
-class ScrambledParagraph extends ElementBase implements Element{
+class ScrambledParagraph extends ElementBase implements Element
+{
+    public $id;
+    public $full_text;
+    public $lines;
 
-	public $id;
-	public $full_text;
-	public $lines;
+    public function __construct($id = null)
+    {
+        parent::__construct();
+        $this->table = 'scrambled_paragraph';
+        $this->id = $id;
+        $this->full_text = null;
+        $this->lines = array();
+    }
 
-	public function __construct($id=NULL){
-		parent::__construct();
-		$this->table = 'scrambled_paragraph';
-		$this->id = $id;
-		$this->full_text = NULL;
-		$this->lines = array();
-	}
+    public function load($data = array())
+    {
+        if (!count($data)) {
+            $data = $this->_loadFromDb();
+        }
 
-	public function load($data=array()){
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
 
-		if(!count($data)){
-			$data = $this->_loadFromDb();
-		}
+        if (!isset($data['lines'])) {
+            $this->lines = $this->_loadLinesFromDB();
+        }
+    }
 
-		foreach($data as $k=>$v){
-			$this->{$k} = $v;
-		}
+    public function save()
+    {
+        $this->_conn->beginTransaction();
 
-		if(!isset($data['lines'])){
-			$this->lines = $this->_loadLinesFromDB();
-		}
+        if (!$this->id) {
+            $this->id = $this->_insert();
+        } else {
+            $this->_update();
+        }
 
-	}
+        //we must have ID to go beyond this point.
+        if (!$this->id) {
+            $this->_conn->rollback();
 
-	public function save(){
+            $return = array(
+                'success' => false,
+                'message' => 'No scrambled paragraph ID produced.', );
+            $this->log($return['message']);
 
-		$this->_conn->beginTransaction();
-		
-		if(!$this->id){
-			$this->id = $this->_insert();
-		}else{
-			$this->_update();
-		}
+            return $return;
+        }
 
-		//we must have ID to go beyond this point.
-		if(!$this->id){
-			$this->_conn->rollback();
+        //if we don't have any lines, no point in proceeding.
+        if (!count($this->lines)) {
+            $this->_conn->rollback();
 
-			$return = array(
-				'success'=>false,
-				'message'=>'No scrambled paragraph ID produced.');
-			$this->log($return['message']);
-			return $return;
-		}
+            $return = array(
+                'success' => false,
+                'message' => 'No lines inputted for this scrambled paragraph.', );
+            $this->log($return['message']);
 
-		//if we don't have any lines, no point in proceeding.
-		if(!count($this->lines)){
-			$this->_conn->rollback();
+            return $return;
+        }
 
-			$return = array(
-				'success'=>false,
-				'message'=>'No lines inputted for this scrambled paragraph.');
-			$this->log($return['message']);
-			return $return;
-		}
+        //save lines.
+        $this->_deleteAllLines();
+        foreach ($this->lines as $line) {
+            $this->_saveLine($line);
+        }
 
-		//save lines.
-		$this->_deleteAllLines();
-		foreach($this->lines as $line){
-			$this->_saveLine($line);
-		}
+        $this->_conn->commit();
 
-		$this->_conn->commit();
+        return array('success' => true);
+    }
 
-		return array('success'=>true);
-	}
+    protected function _insert()
+    {
+        $this->_conn->insert('scrambled_paragraph',
+            array('full_text' => $this->full_text));
 
-	protected function _insert(){
-		$this->_conn->insert('scrambled_paragraph', 
-			array('full_text' => $this->full_text));
-		return $this->_conn->lastInsertId();
-	}
+        return $this->_conn->lastInsertId();
+    }
 
-	protected function _update(){
-		$this->_conn->update('scrambled_paragraph', 
-			array('full_text' => $this->full_text),
-			array('id'=>$this->id));
-	}
+    protected function _update()
+    {
+        $this->_conn->update('scrambled_paragraph',
+            array('full_text' => $this->full_text),
+            array('id' => $this->id));
+    }
 
+    protected function _loadFromDb()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('s.id', 's.full_text')
+            ->from('scrambled_paragraph', 's')
+            ->where('s.id = ?')
+            ->setParameter(0, $this->id);
 
-	protected function _loadFromDb(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('s.id', 's.full_text')
-			->from('scrambled_paragraph', 's')
-			->where('s.id = ?')
-			->setParameter(0, $this->id);
-		return $qb->execute()->fetch();
-	}
+        return $qb->execute()->fetch();
+    }
 
-	protected function _loadLinesFromDB(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('s.order_id', 's.text')
-			->from('scrambled_paragraph_line', 's')
-			->where('s.scrambled_paragraph_id = ?')
-			->setParameter(0, $this->id);
-		return $qb->execute()->fetchAll();
-	}
+    protected function _loadLinesFromDB()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('s.order_id', 's.text')
+            ->from('scrambled_paragraph_line', 's')
+            ->where('s.scrambled_paragraph_id = ?')
+            ->setParameter(0, $this->id);
 
-	public function delete(){
-		if($this->id == NULL){
-			return;
-		}
+        return $qb->execute()->fetchAll();
+    }
 
-		$this->_conn->delete('scrambled_paragraph', array('id' => $this->id));
-	}
+    public function delete()
+    {
+        if ($this->id == null) {
+            return;
+        }
 
-	protected function _saveLine($line){
-		$this->_conn->insert('scrambled_paragraph_line', 
-			array(
-				'scrambled_paragraph_id' => $this->id,
-				'order_id' => $line['order_id'],
-				'text' => $line['text']
-				));
-	}
+        $this->_conn->delete('scrambled_paragraph', array('id' => $this->id));
+    }
 
-	protected function _deleteAllLines(){
-		if($this->id == NULL){
-			return;
-		}
+    protected function _saveLine($line)
+    {
+        $this->_conn->insert('scrambled_paragraph_line',
+            array(
+                'scrambled_paragraph_id' => $this->id,
+                'order_id' => $line['order_id'],
+                'text' => $line['text'],
+                ));
+    }
 
-		$this->_conn->delete('scrambled_paragraph_line', 
-			array('scrambled_paragraph_id' => $this->id));
-	}
+    protected function _deleteAllLines()
+    {
+        if ($this->id == null) {
+            return;
+        }
 
-	protected function _saveKeywords(){
-		foreach($this->keywords as $keyword){
-			try{
-				$keyword->bind('scrambled_paragraph', $this->id);
-			}catch(Exception $e){
-				throw $e;
-			}
-		}
-	}
+        $this->_conn->delete('scrambled_paragraph_line',
+            array('scrambled_paragraph_id' => $this->id));
+    }
 
+    protected function _saveKeywords()
+    {
+        foreach ($this->keywords as $keyword) {
+            try {
+                $keyword->bind('scrambled_paragraph', $this->id);
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
+    }
 }

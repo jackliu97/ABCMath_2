@@ -1,121 +1,125 @@
 <?php
 namespace ABCMath\Course;
 
-use \ABCMath\Base,
-	\ABCMath\Course\Assignment;
-
+use ABCMath\Base;
+use ABCMath\Course\Assignment;
 
 /**
-* This class manages a group of classes.
-* 
-*/
+ * This class manages a group of classes.
+ *
+ */
 
-class AssignmentManager extends Base {
+class AssignmentManager extends Base
+{
+    public $assignments;
 
-	public $assignments;
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	public function __construct(){
-		parent::__construct();
-	}
+    public function addAssignment(Assignment $assignment)
+    {
+        $this->assignments [] = $assignment;
+    }
 
-	public function addAssignment(Assignment $assignment){
-		$this->assignments []= $assignment;
-	}
+    public function getAssignmentByLesson($lesson_id)
+    {
+        $assignments = $this->_getAssignmentByLesson($lesson_id);
 
-	public function getAssignmentByLesson($lesson_id){
-		$assignments = $this->_getAssignmentByLesson($lesson_id);
+        if (!count($assignments)) {
+            return;
+        }
 
-		if(!count($assignments)){
-			return;
-		}
+        foreach ($assignments as $assignment) {
+            $assignment_obj = new Assignment();
+            $assignment_obj->load($assignment);
+            $this->addAssignment($assignment_obj);
+        }
 
-		foreach($assignments as $assignment){
-			$assignment_obj = new Assignment();
-			$assignment_obj->load($assignment);
-			$this->addAssignment($assignment_obj);
-		}
+        return $this->assignments;
+    }
 
-		return $this->assignments;
-	}
+    public function getAssignmentTypes()
+    {
+        $q = "SELECT id, description FROM assignment_types";
+        $stmt = $this->_conn->prepare($q);
+        $stmt->execute();
+        $types = $stmt->fetchAll();
 
-	public function getAssignmentTypes(){
-		$q = "SELECT id, description FROM assignment_types";
-		$stmt = $this->_conn->prepare($q);
-		$stmt->execute();
-		$types = $stmt->fetchAll();
+        $return = array();
+        foreach ($types as $type) {
+            $return[$type['id']] = $type['description'];
+        }
 
-		$return = array();
-		foreach($types as $type){
-			$return[$type['id']] = $type['description'];
-		}
+        return $return;
+    }
 
-		return $return;
+    public function gradeAssignments(array $data)
+    {
+        if (!count($data)) {
+            return array('success' => true);
+        }
 
-	}
+        $this->_conn->beginTransaction();
 
-	public function gradeAssignments( array $data ){
+        foreach ($data as $grade) {
+            try {
+                if ($grade['grade_id']) {
+                    $this->_updateGrade($grade);
+                } else {
+                    $this->_insertGrade($grade);
+                }
+            } catch (Exception $e) {
+                $this->_conn->rollback();
 
-		if(!count($data)){
-			return array('success'=>true);
-		}
+                return array(
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    );
+            }
+        }
 
-		$this->_conn->beginTransaction();
+        $this->_conn->commit();
 
-		foreach($data as $grade){
-			try{
-				if($grade['grade_id']){
-					$this->_updateGrade($grade);
-				}else{
-					$this->_insertGrade($grade);
-				}
-			}catch (Exception $e){
-				$this->_conn->rollback();
-				return array(
-					'success'=>false,
-					'message'=>$e->getMessage()
-					);
-			}
+        return array(
+            'success' => true,
+            'data' => $data,
+            'message' => 'Grades successfully saved.',
+            );
+    }
 
-		}
+    protected function _updateGrade(array $grade)
+    {
+        if (!count($grade)) {
+            return true;
+        }
 
-		$this->_conn->commit();
+        $this->_conn->update(
+            'grades',
+                array('grade' => intval($grade['grade'])),
+                array('id' => $grade['grade_id']));
+    }
 
-		return array(
-			'success'=>true,
-			'data'=>$data,
-			'message'=>'Grades successfully saved.'
-			);
+    protected function _insertGrade(array $grade)
+    {
+        if (!count($grade)) {
+            return true;
+        }
 
-	}
+        $this->_conn->insert(
+            'grades',
+                array(
+                    'student_id' => intval($grade['student_id']),
+                    'assignment_id' => intval($grade['assignment_id']),
+                    'grade' => intval($grade['grade']),
+                    )
+                );
+    }
 
-	protected function _updateGrade(array $grade){
-		if(!count($grade)){
-			return true;
-		}
-
-		$this->_conn->update(
-			'grades',
-				array('grade' => intval($grade['grade'])),
-				array('id' => $grade['grade_id']));
-	}
-
-	protected function _insertGrade(array $grade){
-		if(!count($grade)){
-			return true;
-		}
-
-		$this->_conn->insert(
-			'grades',
-				array(
-					'student_id' => intval($grade['student_id']),
-					'assignment_id' => intval($grade['assignment_id']),
-					'grade' => intval($grade['grade'])
-					)
-				);
-	}
-
-	protected function _getAssignmentByLesson($lesson_id){
-		$q = "SELECT 	a.id id,
+    protected function _getAssignmentByLesson($lesson_id)
+    {
+        $q = "SELECT 	a.id id,
 						a.name name,
 						a.description description,
 						a.assignment_type_id assignment_type_id,
@@ -127,10 +131,10 @@ class AssignmentManager extends Base {
 					ON a.assignment_type_id = t.id
 				WHERE a.lesson_id = ?";
 
-		$stmt = $this->_conn->prepare($q);
-		$stmt->bindValue(1, $lesson_id);
-		$stmt->execute();
-		return $stmt->fetchAll();
-	}
+        $stmt = $this->_conn->prepare($q);
+        $stmt->bindValue(1, $lesson_id);
+        $stmt->execute();
 
+        return $stmt->fetchAll();
+    }
 }

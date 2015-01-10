@@ -15,7 +15,7 @@
 						<a type="button" student_id="{{ student.id }}" class="here_button mark_present btn btn-{% if student.present == 1 %}success{% else %}default{% endif %}">HERE</a>
 						<a type="button" student_id="{{ student.id }}" class="tardy_button mark_tardy btn btn-{% if student.tardy == '' %}default{% else %}danger{% endif %}">LATE</a>
 					</div>
-					
+
 				</div>
 			</li>
 		{% endfor %}

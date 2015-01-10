@@ -1,234 +1,249 @@
 <?php
 namespace ABCMath\Vocabulary;
 
-use \ABCMath\Meta\Implement\Element,
-	\ABCMath\ElementBase,
-	\ABCMath\Grouping\Keyword,
-	\ABCMath\Grouping\KeywordManager,
-	\ABCMath\Vocabulary\Definition;
+use ABCMath\Meta\Implement\Element;
+use ABCMath\ElementBase;
+use ABCMath\Vocabulary\Definition;
 
-class Word extends ElementBase implements Element{
+class Word extends ElementBase implements Element
+{
+    public $id;
+    public $word;
+    public $definitions;
 
-	public $id;
-	public $word;
-	public $definitions;
+    /**
+     * @var boolean turns off transaction.
+     */
+    public $transaction;
 
-	/**
-	* @var boolean turns off transaction.
-	*/
-	public $transaction;
+    public function __construct($id = null)
+    {
+        parent::__construct();
 
-	public function __construct($id=NULL){
-		parent::__construct();
+        $this->id = $id;
+        $this->word = null;
+        $this->definitions = array();
+        $this->transaction = false;
+    }
 
-		$this->id = $id;
-		$this->word = NULL;
-		$this->definitions = array();
-		$this->transaction = false;
-	}
+    public function addDefinition(Definition $definition)
+    {
+        $this->definitions[] = $definition;
+    }
 
-	public function addDefinition(Definition $definition){
-		$this->definitions[]= $definition;
-	}
+    public function clearDefinition()
+    {
+        $this->definition = array();
+    }
 
-	public function clearDefinition(){
-		$this->definition = array();
-	}
+    /**
+     * A word can be loaded by
+     *	populating $this->id
+     *   populating $this->word
+     *   passing an Array
+     *
+     * @param  Array   $data array with key structure similar to table.
+     * @return boolean false if failed, true if no error.
+     */
+    public function load($data = array())
+    {
+        if (!count($data)) {
+            if ($this->id) {
+                $data = $this->_loadFromDbWithId();
+            } elseif ($this->word) {
+                $data = $this->_loadFromDbWithWord();
+            } else {
+                $this->log('ID or word is needed to load existing data.');
 
-	/**
-	* A word can be loaded by
-	*	populating $this->id
-	*   populating $this->word
-	*   passing an Array
-	*
-	* @param Array $data array with key structure similar to table.
-	* @return boolean false if failed, true if no error.
-	*/
-	public function load($data=array()){
+                return false;
+            }
+        }
 
-		if(!count($data)){
+        foreach ($data as $k => $v) {
+            $this->{$k} = $v;
+        }
 
-			if($this->id){
-				$data = $this->_loadFromDbWithId();
-			}else if($this->word){
-				$data = $this->_loadFromDbWithWord();
-			}else{
-				$this->log('ID or word is needed to load existing data.');
-				return false;
-			}
-		}
+        if (!isset($data['definitions']) || !count($data['definitions'])) {
+            $data['definitions'] = $this->_loadDefinitions();
+        }
+        if (!count($data['definitions'])) {
+            return true;
+        }
+        $this->definitions = array();
+        foreach ($data['definitions'] as $definition) {
+            $defObj = new Definition();
+            $defObj->load($definition);
+            $this->definitions[] = $defObj;
+        }
 
-		foreach($data as $k=>$v){
-			$this->{$k} = $v;
-		}
+        return true;
+    }
 
-		if(!isset($data['definitions']) || !count($data['definitions'])){
-			$data['definitions'] = $this->_loadDefinitions();
-		}
-		if(!count($data['definitions'])){
-			return true;
-		}
-		$this->definitions = array();
-		foreach($data['definitions'] as $definition){
-			$defObj = new Definition();
-			$defObj->load($definition);
-			$this->definitions[]= $defObj;
-		}
+    public function checkWordExist()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('v.id')
+            ->from('vocabulary', 'v')
+            ->where('v.word = ?')
+            ->setParameter(0, $this->word);
 
-		return true;
-	}
+        return count($qb->execute()->fetchAll()) != 0;
+    }
 
-	public function checkWordExist(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('v.id')
-			->from('vocabulary', 'v')
-			->where('v.word = ?')
-			->setParameter(0, $this->word);
-		return count($qb->execute()->fetchAll()) != 0;
-	}
+    public function save()
+    {
+        if (!$this->word) {
+            return array(
+                'success' => false,
+                'message' => 'Word is not populated correctly.',
+                );
+        }
 
-	public function save(){
+        $this->_beginTransaction();
 
-		if(!$this->word){
-			return array(
-				'success'=>false,
-				'message'=>'Word is not populated correctly.'
-				);
-		}
+        if (!$this->id) {
+            $this->id = $this->_insert();
+        } else {
+            $this->_update();
+        }
 
-		$this->_beginTransaction();
+        if (!$this->id) {
+            $this->_rollback();
 
-		if(!$this->id){
-			$this->id = $this->_insert();
-		}else{
-			$this->_update();
-		}
+            return array('success' => false,
+                'message' => 'ID Failed to populate on save.', );
+        }
 
-		if(!$this->id){
-			$this->_rollback();
-			return array('success'=>false,
-				'message'=>'ID Failed to populate on save.');
-		}
+        if ($this->_saveDefinitions()) {
+            $this->_commit();
 
-		if($this->_saveDefinitions()){
-			$this->_commit();
-			return array('success'=>true);
-		}else{
-			$this->_rollback();
-			return array('success'=>false, 'message'=>'Failed to save word definitions.');
-		}
-	}
+            return array('success' => true);
+        } else {
+            $this->_rollback();
 
-	public function delete(){
-		if($this->id == NULL){
-			throw new \Exception('ID is required in order to delete.');
-		}
+            return array('success' => false, 'message' => 'Failed to save word definitions.');
+        }
+    }
 
-		$this->_conn->delete('vocabulary', array('id' => $this->id));
-		$this->_conn->delete('vocabulary_keyword', array('vocabulary_id' => $this->id));
-		$this->_conn->delete('vocabulary_definition', array('vocabulary_id' => $this->id));
+    public function delete()
+    {
+        if ($this->id == null) {
+            throw new \Exception('ID is required in order to delete.');
+        }
 
-	}
+        $this->_conn->delete('vocabulary', array('id' => $this->id));
+        $this->_conn->delete('vocabulary_keyword', array('vocabulary_id' => $this->id));
+        $this->_conn->delete('vocabulary_definition', array('vocabulary_id' => $this->id));
+    }
 
-	public function markedAsChecked($source_id){
-		$this->_conn->insert('vocabulary_source_checked',
-					array(
-						'vocabulary_id' => $this->id,
-						'source_id' => $source_id));
-		return true;
-	}
+    public function markedAsChecked($source_id)
+    {
+        $this->_conn->insert('vocabulary_source_checked',
+                    array(
+                        'vocabulary_id' => $this->id,
+                        'source_id' => $source_id, ));
 
-	protected function _loadDefinitions(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('vd.id',
-					'vd.vocabulary_id as word_id',
-					'vd.word',
-					'vd.parts_of_speech',
-					'vd.definition')
-			->from('vocabulary_definition', 'vd')
-			->where('vd.vocabulary_id = ?')
-			->setParameter(0, $this->id);
-		$definitions = $qb->execute()->fetchAll();
+        return true;
+    }
 
-		if(!is_array($definitions) || !count($definitions)){
-			return array();
-		}
+    protected function _loadDefinitions()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('vd.id',
+                    'vd.vocabulary_id as word_id',
+                    'vd.word',
+                    'vd.parts_of_speech',
+                    'vd.definition')
+            ->from('vocabulary_definition', 'vd')
+            ->where('vd.vocabulary_id = ?')
+            ->setParameter(0, $this->id);
+        $definitions = $qb->execute()->fetchAll();
 
-		return $definitions;
-	}
+        if (!is_array($definitions) || !count($definitions)) {
+            return array();
+        }
 
-	protected function _loadFromDbWithId(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('v.id', 'v.word')
-			->from('vocabulary', 'v')
-			->where('v.id = ?')
-			->setParameter(0, $this->id);
-		return $qb->execute()->fetch();
-	}
+        return $definitions;
+    }
 
-	protected function _loadFromDbWithWord(){
-		$qb = $this->_conn->createQueryBuilder();
-		$qb->select('v.id', 'v.word')
-			->from('vocabulary', 'v')
-			->where('v.word = ?')
-			->setParameter(0, $this->word);
-		return $qb->execute()->fetch();
-	}
+    protected function _loadFromDbWithId()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('v.id', 'v.word')
+            ->from('vocabulary', 'v')
+            ->where('v.id = ?')
+            ->setParameter(0, $this->id);
 
-	protected function _beginTransaction(){
-		if($this->transaction === false){
-			return;
-		}
+        return $qb->execute()->fetch();
+    }
 
-		$this->_conn->beginTransaction();
-	}
+    protected function _loadFromDbWithWord()
+    {
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('v.id', 'v.word')
+            ->from('vocabulary', 'v')
+            ->where('v.word = ?')
+            ->setParameter(0, $this->word);
 
-	protected function _commit(){
-		if($this->transaction === false){
-			return;
-		}
+        return $qb->execute()->fetch();
+    }
 
-		$this->_conn->commit();
-	}
+    protected function _beginTransaction()
+    {
+        if ($this->transaction === false) {
+            return;
+        }
 
-	protected function _rollback(){
-		if($this->transaction === false){
-			return;
-		}
+        $this->_conn->beginTransaction();
+    }
 
-		$this->_conn->rollback();
-	}
+    protected function _commit()
+    {
+        if ($this->transaction === false) {
+            return;
+        }
 
-	protected function _insert(){
-		$this->_conn->insert('vocabulary',
-					array(
-						'word' => $this->word)
-					);
-		return $this->_conn->lastInsertId();
+        $this->_conn->commit();
+    }
 
-	}
+    protected function _rollback()
+    {
+        if ($this->transaction === false) {
+            return;
+        }
 
-	protected function _update(){
-		$this->_conn->update('vocabulary',
-					array('word' => $this->word),
-					array('id' => $this->id)
-					);
-	}
+        $this->_conn->rollback();
+    }
 
-	protected function _saveDefinitions(){
+    protected function _insert()
+    {
+        $this->_conn->insert('vocabulary',
+                    array(
+                        'word' => $this->word, )
+                    );
 
-		if(!count($this->definitions)){
-			return true;
-		}
+        return $this->_conn->lastInsertId();
+    }
 
-		foreach($this->definitions as $definition){
-			$definition->word_id = $this->id;
-			$definition->save();
-		}
+    protected function _update()
+    {
+        $this->_conn->update('vocabulary',
+                    array('word' => $this->word),
+                    array('id' => $this->id)
+                    );
+    }
 
-		return true;
+    protected function _saveDefinitions()
+    {
+        if (!count($this->definitions)) {
+            return true;
+        }
 
-	}
+        foreach ($this->definitions as $definition) {
+            $definition->word_id = $this->id;
+            $definition->save();
+        }
+
+        return true;
+    }
 }
-
-?>

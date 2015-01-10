@@ -1,20 +1,21 @@
 <?php
 require_once "test_bootstrap.php";
 
-use \ABCMath\ReadingComprehension\ReadingComprehension,
-\ABCMath\ReadingComprehension\Question,
-\ABCMath\Grouping\Keyword;
+use \ABCMath\ReadingComprehension\ReadingComprehension;
+use \ABCMath\Grouping\Keyword;
 
-class ReadingComprehensionTest extends PHPUnit_Framework_TestCase {
+class ReadingComprehensionTest extends PHPUnit_Framework_TestCase
+{
+    protected $dataNoID;
+    public static function setUpBeforeClass()
+    {
+    }
 
-  protected $dataNoID;
-  public static function setUpBeforeClass() {}
-
-  protected function setUp() {
-
-    $this->dataWithID = array(
-      'id'=>1,
-      'full_text'=>"\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
+    protected function setUp()
+    {
+        $this->dataWithID = array(
+      'id' => 1,
+      'full_text' => "\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
     introduction into education would remove the conventionality,
     artificiality, and backward-lookingness which were characteristic;
     of classical studies, but they were gravely disappointed. So, too, in
@@ -53,7 +54,7 @@ method of science is the long and bitter way of personal
     minority of people who are able to acquire some of the techniques
     of science and a still smaller minority who are able to use and
 develop them.",
-      'lines'=>array(
+      'lines' => array(
         0 => '"They\'re trying to kill me!" the boy screamed.The pioneers of the teaching of science imagined that its',
         1 => 'introduction into education would remove the conventionality,',
         2 => 'artificiality, and backward-lookingness which were characteristic;',
@@ -94,9 +95,8 @@ develop them.",
         37 => 'of science and a still smaller minority who are able to use and',
         38 => 'develop them.',
       ),
-      'questions'=>array(
-        0 =>
-        array(
+      'questions' => array(
+        0 => array(
           'id' => '13',
           'reading_comprehension_id' => '1',
           'text' => 'The study of standards for what is right and what is wrong is called _____.',
@@ -107,41 +107,37 @@ c. ethics
 d. technology
 ANS: C',
           'choices' => array(
-            0 =>
-            array(
+            0 => array(
               'id' => '272',
               'reading_comprehension_question_id' => '13',
               'text' => 'pure science',
               'is_answer' => '0',
             ),
-            1 =>
-            array(
+            1 => array(
               'id' => '273',
               'reading_comprehension_question_id' => '13',
               'text' => 'applied science',
               'is_answer' => '0',
             ),
-            2 =>
-            array(
+            2 => array(
               'id' => '275',
               'reading_comprehension_question_id' => '13',
               'text' => 'technology',
               'is_answer' => '0',
             ),
-            3 =>
-            array(
+            3 => array(
               'id' => '274',
               'reading_comprehension_question_id' => '13',
               'text' => 'ethics',
               'is_answer' => '1',
             ),
-          )
+          ),
         ),
-      )
+      ),
     );
 
-    $this->dataNoID = array(
-      'full_text'=>"\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
+        $this->dataNoID = array(
+      'full_text' => "\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
     introduction into education would remove the conventionality,
     artificiality, and backward-lookingness which were characteristic;
     of classical studies, but they were gravely disappointed. So, too, in
@@ -180,7 +176,7 @@ method of science is the long and bitter way of personal
     minority of people who are able to acquire some of the techniques
     of science and a still smaller minority who are able to use and
 develop them.",
-      'lines'=>array(
+      'lines' => array(
         0 => '"They\'re trying to kill me!" the boy screamed.The pioneers of the teaching of science imagined that its',
         1 => 'introduction into education would remove the conventionality,',
         2 => 'artificiality, and backward-lookingness which were characteristic;',
@@ -221,9 +217,8 @@ develop them.",
         37 => 'of science and a still smaller minority who are able to use and',
         38 => 'develop them.',
       ),
-      'questions'=>array(
-        0 =>
-        array(
+      'questions' => array(
+        0 => array(
           'text' => 'The study of standards for what is right and what is wrong is called _____.',
           'original_text' => 'The study of standards for what is right and what is wrong is called _____.
 a. pure science
@@ -232,339 +227,329 @@ c. ethics
 d. technology
 ANS: C',
           'choices' => array(
-            0 =>
-            array(
+            0 => array(
               'text' => 'pure science',
               'is_answer' => '0',
             ),
-            1 =>
-            array(
+            1 => array(
               'text' => 'applied science',
               'is_answer' => '0',
             ),
-            2 =>
-            array(
+            2 => array(
               'text' => 'technology',
               'is_answer' => '0',
             ),
-            3 =>
-            array(
+            3 => array(
               'text' => 'ethics',
               'is_answer' => '1',
             ),
-          )
+          ),
         ),
-      )
+      ),
     );
-  }
+    }
 
   //php phpunit.phar --filter testSave__success ReadingComprehensionTest.php
-  public function testSave__success() {
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+  public function testSave__success()
+  {
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->expects( $this->once() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( '1' ) );
+      $rc->expects($this->once())
+    ->method('_insert')
+    ->will($this->returnValue('1'));
 
-    $rc->expects( $this->never() )
-    ->method( '_update' );
+      $rc->expects($this->never())
+    ->method('_update');
 
-    $rc->expects( $this->exactly( 1 ) )
-    ->method( '_deleteAllLines' );
+      $rc->expects($this->exactly(1))
+    ->method('_deleteAllLines');
 
-    $rc->expects( $this->exactly( 39 ) )
-    ->method( '_saveLines' );
+      $rc->expects($this->exactly(39))
+    ->method('_saveLines');
 
-    $rc->expects( $this->never() )
-    ->method( '_loadFromDB' );
+      $rc->expects($this->never())
+    ->method('_loadFromDB');
 
-    $rc->expects( $this->exactly( 1 ) )
-    ->method( 'saveQuestions' )
-    ->will( $this->returnValue(
-        array( 'success'=>true )
-      ) );
+      $rc->expects($this->exactly(1))
+    ->method('saveQuestions')
+    ->will($this->returnValue(
+        array( 'success' => true )
+      ));
 
-    $rc->load( $this->dataNoID );
-    $result = $rc->save();
+      $rc->load($this->dataNoID);
+      $result = $rc->save();
 
-    $this->assertEquals( $rc->id, '1' );
-    $this->assertEquals( $result['success'], true );
-
+      $this->assertEquals($rc->id, '1');
+      $this->assertEquals($result['success'], true);
   }
 
   //php phpunit.phar --filter testSave__failsAtSavingQuestion ReadingComprehensionTest.php
-  public function testSave__failsAtSavingQuestion() {
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+  public function testSave__failsAtSavingQuestion()
+  {
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->expects( $this->any() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( '1' ) );
+      $rc->expects($this->any())
+    ->method('_insert')
+    ->will($this->returnValue('1'));
 
-    $rc->expects( $this->never() )
-    ->method( '_update' );
+      $rc->expects($this->never())
+    ->method('_update');
 
-    $rc->expects( $this->any() )
-    ->method( '_deleteAllLines' );
+      $rc->expects($this->any())
+    ->method('_deleteAllLines');
 
-    $rc->expects( $this->any() )
-    ->method( '_saveLines' );
+      $rc->expects($this->any())
+    ->method('_saveLines');
 
-    $rc->expects( $this->never() )
-    ->method( '_loadFromDB' );
+      $rc->expects($this->never())
+    ->method('_loadFromDB');
 
-    $rc->expects( $this->any() )
-    ->method( 'saveQuestions' )
-    ->will( $this->returnValue(
-        array( 'success'=>false, 'message'=>'test error' )
-      ) );
+      $rc->expects($this->any())
+    ->method('saveQuestions')
+    ->will($this->returnValue(
+        array( 'success' => false, 'message' => 'test error' )
+      ));
 
     //test failure at saving questions.
-    $rc->load( $this->dataNoID );
-    $result = $rc->save();
-    $this->assertEquals( $result['success'], false );
-    $this->assertEquals( $result['message'], 'test error' );
-
+    $rc->load($this->dataNoID);
+      $result = $rc->save();
+      $this->assertEquals($result['success'], false);
+      $this->assertEquals($result['message'], 'test error');
   }
 
   //php phpunit.phar --filter testSave__failsBecauseNoLines ReadingComprehensionTest.php
-  public function testSave__failsBecauseNoLines() {
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+  public function testSave__failsBecauseNoLines()
+  {
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->expects( $this->any() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( '1' ) );
+      $rc->expects($this->any())
+    ->method('_insert')
+    ->will($this->returnValue('1'));
 
-    $rc->expects( $this->never() )
-    ->method( '_update' );
+      $rc->expects($this->never())
+    ->method('_update');
 
-    $rc->expects( $this->any() )
-    ->method( '_deleteAllLines' );
+      $rc->expects($this->any())
+    ->method('_deleteAllLines');
 
-    $rc->expects( $this->any() )
-    ->method( '_saveLines' );
+      $rc->expects($this->any())
+    ->method('_saveLines');
 
-    $rc->expects( $this->never() )
-    ->method( '_loadFromDB' );
+      $rc->expects($this->never())
+    ->method('_loadFromDB');
 
-    $rc->expects( $this->any() )
-    ->method( 'saveQuestions' )
-    ->will( $this->returnValue(
-        array( 'success'=>false, 'message'=>'test error' )
-      ) );
-
+      $rc->expects($this->any())
+    ->method('saveQuestions')
+    ->will($this->returnValue(
+        array( 'success' => false, 'message' => 'test error' )
+      ));
 
     //test failure at saving lines.
     $this->dataNoID['lines'] = array();
-    $rc->load( $this->dataNoID );
-    $result = $rc->save();
-    $this->assertEquals( $result['success'], false );
-    $this->assertEquals( $result['message'], 'At least one line is required.' );
-
+      $rc->load($this->dataNoID);
+      $result = $rc->save();
+      $this->assertEquals($result['success'], false);
+      $this->assertEquals($result['message'], 'At least one line is required.');
   }
 
   //php phpunit.phar --filter testSave__failsBecauseNoIDReturned ReadingComprehensionTest.php
-  public function testSave__failsBecauseNoIDReturned() {
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+  public function testSave__failsBecauseNoIDReturned()
+  {
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->expects( $this->any() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( NULL ) );
+      $rc->expects($this->any())
+    ->method('_insert')
+    ->will($this->returnValue(null));
 
-    $rc->expects( $this->never() )
-    ->method( '_update' );
+      $rc->expects($this->never())
+    ->method('_update');
 
-    $rc->expects( $this->any() )
-    ->method( '_deleteAllLines' );
+      $rc->expects($this->any())
+    ->method('_deleteAllLines');
 
-    $rc->expects( $this->any() )
-    ->method( '_saveLines' );
+      $rc->expects($this->any())
+    ->method('_saveLines');
 
-    $rc->expects( $this->never() )
-    ->method( '_loadFromDB' );
+      $rc->expects($this->never())
+    ->method('_loadFromDB');
 
-    $rc->expects( $this->any() )
-    ->method( 'saveQuestions' )
-    ->will( $this->returnValue(
-        array( 'success'=>true )
-      ) );
+      $rc->expects($this->any())
+    ->method('saveQuestions')
+    ->will($this->returnValue(
+        array( 'success' => true )
+      ));
 
-    $rc->expects( $this->any() )
-    ->method( '_insert' )
-    ->will( $this->returnValue( NULL ) );
+      $rc->expects($this->any())
+    ->method('_insert')
+    ->will($this->returnValue(null));
 
     //test failure at saving
-    $rc->load( $this->dataNoID );
-    $result = $rc->save();
-    $this->assertEquals( $result['success'], false );
-    $this->assertEquals( $result['message'], 'No reading comprehension ID produced.' );
-
+    $rc->load($this->dataNoID);
+      $result = $rc->save();
+      $this->assertEquals($result['success'], false);
+      $this->assertEquals($result['message'], 'No reading comprehension ID produced.');
   }
 
-
-
   //php phpunit.phar --filter testLoad__fromParameter ReadingComprehensionTest.php
-  public function testLoad__fromParameter() {
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+  public function testLoad__fromParameter()
+  {
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->expects( $this->never() )
-    ->method( '_loadFromDB' );
+      $rc->expects($this->never())
+    ->method('_loadFromDB');
 
-    $rc->load( $this->dataNoID );
+      $rc->load($this->dataNoID);
 
-    $this->assertEquals( $rc->full_text, $this->dataWithID['full_text'] );
-    $this->assertEquals( $rc->id, NULL );
-    $this->assertEquals( count( $rc->lines ), count( $this->dataWithID['lines'] ) );
+      $this->assertEquals($rc->full_text, $this->dataWithID['full_text']);
+      $this->assertEquals($rc->id, null);
+      $this->assertEquals(count($rc->lines), count($this->dataWithID['lines']));
 
-    $export_data = $rc->export();
-    $this->assertEquals( $export_data['full_text'], $this->dataWithID['full_text'] );
-    $this->assertEquals( $export_data['table'], 'reading_comprehension' );
+      $export_data = $rc->export();
+      $this->assertEquals($export_data['full_text'], $this->dataWithID['full_text']);
+      $this->assertEquals($export_data['table'], 'reading_comprehension');
 
-    $this->assertEquals( $rc->questions[0]->id, NULL );
-    $this->assertEquals( $rc->questions[0]->text, $this->dataWithID['questions'][0]['text'] );
+      $this->assertEquals($rc->questions[0]->id, null);
+      $this->assertEquals($rc->questions[0]->text, $this->dataWithID['questions'][0]['text']);
 
-    $this->assertEquals(
+      $this->assertEquals(
       $rc->questions[0]->choices[0]['text'],
       $this->dataWithID['questions'][0]['choices'][0]['text']
     );
   }
 
   //php phpunit.phar --filter testLoad__fromDB ReadingComprehensionTest.php
-  public function testLoad__fromDB() {
-
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+  public function testLoad__fromDB()
+  {
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $rc->expects( $this->once() )
-    ->method( '_loadFromDB' )
-    ->will( $this->returnValue(
+      $rc->expects($this->once())
+    ->method('_loadFromDB')
+    ->will($this->returnValue(
         $this->dataWithID
-      ) );
+      ));
 
-    $rc->load();
+      $rc->load();
 
-    $this->assertEquals( $rc->full_text, $this->dataWithID['full_text'] );
-    $this->assertEquals( $rc->id, $this->dataWithID['id'] );
-    $this->assertEquals( count( $rc->lines ), count( $this->dataWithID['lines'] ) );
+      $this->assertEquals($rc->full_text, $this->dataWithID['full_text']);
+      $this->assertEquals($rc->id, $this->dataWithID['id']);
+      $this->assertEquals(count($rc->lines), count($this->dataWithID['lines']));
 
-    $export_data = $rc->export();
-    $this->assertEquals( $export_data['full_text'], $this->dataWithID['full_text'] );
-    $this->assertEquals( $export_data['table'], 'reading_comprehension' );
+      $export_data = $rc->export();
+      $this->assertEquals($export_data['full_text'], $this->dataWithID['full_text']);
+      $this->assertEquals($export_data['table'], 'reading_comprehension');
 
-    $this->assertEquals( $rc->questions[0]->id, $this->dataWithID['questions'][0]['id'] );
-    $this->assertEquals( $rc->questions[0]->text, $this->dataWithID['questions'][0]['text'] );
+      $this->assertEquals($rc->questions[0]->id, $this->dataWithID['questions'][0]['id']);
+      $this->assertEquals($rc->questions[0]->text, $this->dataWithID['questions'][0]['text']);
 
-    $this->assertEquals(
+      $this->assertEquals(
       $rc->questions[0]->choices[0]['text'],
       $this->dataWithID['questions'][0]['choices'][0]['text']
     );
   }
 
   //php phpunit.phar --filter testSetKeyword__saveAndAdd ReadingComprehensionTest.php
-  public function testSetKeyword__saveAndAdd() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testSetKeyword__saveAndAdd()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $kw->expects( $this->once() )
-    ->method( '_insert' )
-    ->will( $this->returnValue(
+      $kw->expects($this->once())
+    ->method('_insert')
+    ->will($this->returnValue(
         12
-      ) );
+      ));
 
-    $kw->expects( $this->never() )
-    ->method( '_update' );
+      $kw->expects($this->never())
+    ->method('_update');
 
-    $kw->load(
+      $kw->load(
       array(
-        'word'=>'test keyword',
-        'type'=>'' )
+        'word' => 'test keyword',
+        'type' => '', )
     );
-    $rc->load();
-    $rc->addKeyword( $kw );
+      $rc->load();
+      $rc->addKeyword($kw);
 
-    $this->assertEquals( count( $rc->keywords ), 1 );
-    $this->assertEquals( $rc->keywords[0]->word, $kw->word );
-    $this->assertEquals( $rc->keywords[0]->id, 12 );
+      $this->assertEquals(count($rc->keywords), 1);
+      $this->assertEquals($rc->keywords[0]->word, $kw->word);
+      $this->assertEquals($rc->keywords[0]->id, 12);
   }
 
   //php phpunit.phar --filter testSetKeyword__justAdd ReadingComprehensionTest.php
-  public function testSetKeyword__justAdd() {
-    $kw = $this->getMock( '\ABCMath\Grouping\Keyword',
-      array( '_loadFromDb', '_update', '_insert' ) );
+  public function testSetKeyword__justAdd()
+  {
+      $kw = $this->getMock('\ABCMath\Grouping\Keyword',
+      array( '_loadFromDb', '_update', '_insert' ));
 
-    $rc = $this->getMock( '\ABCMath\ReadingComprehension\ReadingComprehension',
+      $rc = $this->getMock('\ABCMath\ReadingComprehension\ReadingComprehension',
       array( '_insert',
         '_update',
         '_loadFromDB',
         '_deleteAllLines',
         '_saveLines',
-        'saveQuestions' ) );
+        'saveQuestions', ));
 
-    $kw->expects( $this->never() )
-    ->method( '_insert' );
+      $kw->expects($this->never())
+    ->method('_insert');
 
-    $kw->expects( $this->never() )
-    ->method( '_update' );
+      $kw->expects($this->never())
+    ->method('_update');
 
-    $kw->load(
+      $kw->load(
       array(
-        'id'=>'1',
-        'word'=>'test keyword',
-        'type'=>'' )
+        'id' => '1',
+        'word' => 'test keyword',
+        'type' => '', )
     );
-    $rc->load();
-    $rc->addKeyword( $kw );
+      $rc->load();
+      $rc->addKeyword($kw);
 
-    $this->assertEquals( count( $rc->keywords ), 1 );
-    $this->assertEquals( $rc->keywords[0]->word, $kw->word );
-    $this->assertEquals( $rc->keywords[0]->id, $kw->id );
+      $this->assertEquals(count($rc->keywords), 1);
+      $this->assertEquals($rc->keywords[0]->word, $kw->word);
+      $this->assertEquals($rc->keywords[0]->id, $kw->id);
   }
-
 }

@@ -1,142 +1,142 @@
 <?php
 namespace ABCMath\Vocabulary;
 
-use \ABCMath\Base,
-	\ABCMath\Meta\Implement\ExamGenerator,
-	\ABCMath\Vocabulary\Word,
-	\ABCMath\Vocabulary\DefinitionManager,
-	\ABCMath\Template\Template;
+use ABCMath\Base;
+use ABCMath\Meta\Implement\ExamGenerator;
+use ABCMath\Vocabulary\Word;
+use ABCMath\Vocabulary\DefinitionManager;
+use ABCMath\Template\Template;
 
-class VocabularyExam extends Base implements ExamGenerator {
+class VocabularyExam extends Base implements ExamGenerator
+{
+    public $formatResult = true;
+    public $template;
 
-	public $formatResult = true;
-	public $template;
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	public function __construct(){
-		parent::__construct();
-	}
+    /*
+    * With the given list of ids, build a test.
+    */
+    public function buildExam($ids)
+    {
+        $exam = array();
 
-	/*
-	* With the given list of ids, build a test.
-	*/
-	public function buildExam($ids){
+        if ($this->formatResult) {
+            $this->template = new Template(Template::FILESYSTEM);
+        }
 
-		$exam = array();
+        if (!count($ids)) {
+            return $exam;
+        }
 
-		if($this->formatResult){
-			$this->template = new Template(Template::FILESYSTEM);
-		}
+        foreach ($ids as $id) {
+            $question = array();
 
-		if(!count($ids)){
-			return $exam;
-		}
+            //get the current word information.
+            $word = new Word();
+            $word->id = $id;
+            $word->load();
 
+            $question['word'] = $word;
 
-		foreach($ids as $id){
+            //load 4 more definitions.
+            $dm = new DefinitionManager();
+            $question['choices'] = $dm->getRandomDefinitions(4);
+            $question = $this->format($question);
+            $exam[] = $this->formatResult ? $this->render($question) : $question;
+        }
 
-			$question = array();
+        return $exam;
+    }
 
-			//get the current word information.
-			$word = new Word();
-			$word->id = $id;
-			$word->load();
+    public function render($formattedResult)
+    {
+        //print_r($formattedResult);
+        $htmlOutput = $this->template->render('Exam/vocabulary.twig', $formattedResult);
 
-			$question['word'] = $word;
+        return $htmlOutput;
+    }
 
-			//load 4 more definitions.
-			$dm = new DefinitionManager();
-			$question['choices'] = $dm->getRandomDefinitions(4);
-			$question = $this->format($question);
-			$exam[]= $this->formatResult ? $this->render($question) : $question;
-		}
+    public function format($rawResult)
+    {
+        $result = array(
+            'id' => $rawResult['word']->id,
+            'word' => $rawResult['word']->word,
+            );
 
-		return $exam;
-	}
+        $solution = $rawResult['word']->definitions[0];
 
-	public function render($formattedResult){
+        $definitions = array();
+        $definitions[] = array(
+            'id' => $solution->id,
+            'vocabulary_id' => $solution->word_id,
+            'parts_of_speech' => $solution->parts_of_speech,
+            'definition' => $solution->definition,
+            );
 
-		//print_r($formattedResult);
-		$htmlOutput = $this->template->render('Exam/vocabulary.twig', $formattedResult);
+        $result['solution'] = $solution->id;
 
-		return $htmlOutput;
+        foreach ($rawResult['choices'] as $choices) {
+            $definitions[] = $choices;
+        }
 
-	}
+        shuffle($definitions);
 
-	public function format($rawResult){
-		$result = array(
-			'id'=>$rawResult['word']->id,
-			'word'=>$rawResult['word']->word
-			);
+        $result['choices'] = $definitions;
 
-		$solution = $rawResult['word']->definitions[0];
+        return $result;
+    }
 
-		$definitions = array();
-		$definitions[] = array(
-			'id' => $solution->id,
-			'vocabulary_id' => $solution->word_id,
-			'parts_of_speech' => $solution->parts_of_speech,
-			'definition' => $solution->definition
-			);
+    /**
+     * Return the sql to get x number of random questions based on keywords.
+     * @param mixed $keyword_id one, or an array of keywords
+     * @param int   $limit
+     */
+    public function getRandomExamSQL($keyword_id, $limit = 10)
+    {
+        $keyword_sql = '';
+        if (is_array($keyword_id)) {
+            $keyword_sql = "WHERE vk.keyword_id IN (".implode(',', $keyword_id).") ";
+        } elseif ($keyword_id) {
+            $keyword_sql = "WHERE vk.keyword_id IN ({$keyword_id}) ";
+        }
 
-		$result['solution'] = $solution->id;
-		
-		foreach($rawResult['choices'] as $choices){
-			$definitions[]= $choices;
-		}
+        return "SELECT v.id FROM vocabulary v ".
+                "LEFT JOIN vocabulary_keyword vk ".
+                    "ON v.id = vk.vocabulary_id ".
+                "INNER JOIN vocabulary_definition vd ".
+                    "ON v.id = vd.vocabulary_id ".
+                $keyword_sql.
+                "ORDER BY RAND() ".
+                "LIMIT {$limit}";
+    }
 
-		shuffle($definitions);
+    /**
+     * Return x number of random questions based on keywords.
+     * @param mixed $keyword_id one, or an array of keywords
+     * @param int   $limit
+     */
+    public function getRandomExamQuestions($keyword_id, $limit = 10)
+    {
+        $stmt = $this->_conn->prepare(
+            $this->getRandomExamSQL($keyword_id, $limit)
+            );
+        $stmt->execute();
 
-		$result['choices'] = $definitions;
+        $result = $stmt->fetchAll();
 
-		return $result;
-	}
+        if (!count($result)) {
+            return array();
+        }
 
-	/**
-	* Return the sql to get x number of random questions based on keywords.
-	* @param mixed $keyword_id one, or an array of keywords
-	* @param int $limit
-	*/
-	public function getRandomExamSQL($keyword_id, $limit=10){
-		$keyword_sql = '';
-		if(is_array($keyword_id)){
-			$keyword_sql = "WHERE vk.keyword_id IN (" . implode(',', $keyword_id) . ") ";
-		}else if($keyword_id){
-			$keyword_sql = "WHERE vk.keyword_id IN ({$keyword_id}) ";
-		}
+        $return = array();
+        foreach ($result as $r) {
+            $return[] = $r['id'];
+        }
 
-		return "SELECT v.id FROM vocabulary v " .
-				"LEFT JOIN vocabulary_keyword vk " .
-					"ON v.id = vk.vocabulary_id " .
-				"INNER JOIN vocabulary_definition vd " .
-					"ON v.id = vd.vocabulary_id " .
-				$keyword_sql .
-				"ORDER BY RAND() " .
-				"LIMIT {$limit}";
-	}
-
-	/**
-	* Return x number of random questions based on keywords.
-	* @param mixed $keyword_id one, or an array of keywords
-	* @param int $limit
-	*/
-	public function getRandomExamQuestions($keyword_id, $limit=10){
-		$stmt = $this->_conn->prepare(
-			$this->getRandomExamSQL($keyword_id, $limit)
-			);
-		$stmt->execute();
-
-		$result = $stmt->fetchAll();
-
-		if(!count($result)){
-			return array();
-		}
-
-		$return = array();
-		foreach($result as $r){
-			$return[]= $r['id'];
-		}
-		return $return;
-	}
-
-
+        return $return;
+    }
 }

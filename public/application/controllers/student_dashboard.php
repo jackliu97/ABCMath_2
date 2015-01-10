@@ -1,174 +1,174 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-use \ABCMath\Course\ABCClassManager,
-	\ABCMath\Course\ABCClass,
-	\ABCMath\Student\Student,
-	\ABCMath\Student\StudentManager,
-	\ABCMath\Db\Datatable;
+<?php if (! defined('BASEPATH')) {
+    exit('No direct script access allowed');
+}
+use \ABCMath\Student\Student;
+use \ABCMath\Student\StudentManager;
+use \ABCMath\Db\Datatable;
 
-class Student_Dashboard extends CI_Controller {
+class Student_Dashboard extends CI_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+        if ($this->User_Model->check_permission('scaffolding') == false) {
+            $this->editable = false;
+        } else {
+            $this->editable = true;
+        }
 
-	public function __construct(){
-		parent::__construct();
-		if($this->User_Model->check_permission('scaffolding') == false){
-			$this->editable = false;
-		}else{
-			$this->editable = true;
-		}
+        $this->semester_id = $this->session->userdata('semester_id');
+    }
 
-		$this->semester_id = $this->session->userdata('semester_id');
-	}
+    public function info($student_id)
+    {
+        $data = array();
+        $student = new Student();
+        $student->setId($student_id);
+        $student->load();
 
-	public function info($student_id){
-		$data = array();
-		$student = new Student();
-		$student->setId($student_id);
-		$student->load();
+        $data['student'] = $student;
+        $data['editable'] = $this->editable;
 
-		$data['student'] = $student;
-		$data['editable'] = $this->editable;
+        $this->load->view('header');
+        $this->load->view('navbar');
+        $this->load->view('dashboard/student', $data);
+        $this->load->view('footer', array(
+                                        'private_js' => array('dashboard/student.js'),
+                                        'datatable' => true,
+                                        ));
+    }
 
-		$this->load->view('header');
-		$this->load->view('navbar');
-		$this->load->view('dashboard/student', $data);
-		$this->load->view('footer', array(
-										'private_js'=> array('dashboard/student.js'),
-										'datatable'=> true
-										));
-	}
+    public function get_classes($student_id)
+    {
+        $result = array('success' => false, 'message' => '');
+        $student = new Student();
+        $student->semester_id = $this->semester_id;
+        $student->setId($student_id);
+        $dt = new Datatable();
+        $dt->sql = $student->getAllClassesSQL();
 
-	public function get_classes($student_id){
+        $dt->columns = array(    'id',
+                                'description',
+                                'subject',
+                                'teacher',
+                                'start_time',
+                                'end_time',
+                                'days', );
 
-		$result = array('success'=>false, 'message'=>'');
-		$student = new Student();
-		$student->semester_id = $this->semester_id;
-		$student->setId($student_id);
-		$dt = new Datatable();
-		$dt->sql = $student->getAllClassesSQL();
+        $result = $dt->processQuery();
 
-		$dt->columns = array(	'id',
-								'description',
-								'subject',
-								'teacher',
-								'start_time',
-								'end_time',
-								'days');
+        if (count($result['aaData'])) {
+            foreach ($result['aaData'] as $key => $row) {
+                foreach ($row as $k => $col) {
+                    if ($k == 0) {
+                        $class_id = $col;
+                    }
 
-		$result = $dt->processQuery();
+                    $result['aaData'][$key][$k] =
+                            "<a href='/class_dashboard/info/{$class_id}' class='pointer'>".
+                            "{$result['aaData'][$key][$k]}</a>";
+                }
+            }
+        }
 
-		
-		if(count($result['aaData'])){
-			foreach($result['aaData'] as $key=>$row){
-				foreach($row as $k=>$col){
-					if($k == 0){
-						$class_id = $col;
-					}
+        $this->load->view('response/datatable', array('json' => $result));
+    }
 
-					$result['aaData'][$key][$k] = 
-							"<a href='/class_dashboard/info/{$class_id}' class='pointer'>" . 
-							"{$result['aaData'][$key][$k]}</a>";
-				}
-			}
-		}
+    public function save_notes()
+    {
+        $student_id = $this->input->post('student_id');
+        $notes = $this->input->post('notes');
+        $note_id = $this->input->post('note_id');
+        $return = array(
+            'success' => true,
+            'students' => array(),
+            );
 
-		$this->load->view('response/datatable', array('json'=>$result));
-	}
+        $student = new Student();
+        $student->id = $student_id;
+        $return = $student->saveNote($notes, $this->User_Model->get_user()->id, $note_id);
 
-	public function save_notes(){
-		$student_id = $this->input->post('student_id');
-		$notes = $this->input->post('notes');
-		$note_id = $this->input->post('note_id');
-		$return = array(
-			'success'=>true,
-			'students'=>array()
-			);
+        $this->load->view('response/json', array('json' => $return));
+    }
 
+    public function delete_note()
+    {
+        $note_id = $this->input->post('note_id');
+        $student = new Student();
 
-		$student = new Student();
-		$student->id = $student_id;
-		$return = $student->saveNote($notes, $this->User_Model->get_user()->id, $note_id);
+        $return = $student->deleteNote($note_id);
 
-		$this->load->view('response/json', array('json'=>$return));
+        $this->load->view('response/json', array('json' => $return));
+    }
 
-	}
+    public function get_one_note()
+    {
+        $note_id = $this->input->post('note_id');
+        $return = array();
+        $student = new Student();
+        $notes = $student->getNote($note_id);
+        $return['success'] = true;
+        $return['notes'] = $notes['notes'];
+        $return['notes_parsed'] = nl2br($notes['notes']);
 
-	public function delete_note(){
-		$note_id = $this->input->post('note_id');
-		$student = new Student();
+        $this->load->view('response/json', array('json' => $return));
+    }
 
-		$return = $student->deleteNote($note_id);
+    public function get_all_notes($student_id)
+    {
+        $result = array('success' => false, 'message' => '');
 
-		$this->load->view('response/json', array('json'=>$return));
-	}
+        $student = new Student();
+        $student->setId($student_id);
 
-	public function get_one_note(){
-		$note_id = $this->input->post('note_id');
-		$return = array();
-		$student = new Student();
-		$notes = $student->getNote($note_id);
-		$return['success'] = true;
-		$return['notes'] = $notes['notes'];
-		$return['notes_parsed'] = nl2br($notes['notes']);
+        $dt = new Datatable();
+        $dt->sql = $student->getAllNotesSQL();
+        $dt->columns = array(    'note_id',
+                                'creation_datetime',
+                                'update_timestamp',
+                                'email',
+                                'notes', );
 
+        $result = $dt->processQuery();
 
-		$this->load->view('response/json', array('json'=>$return));
-	}
+        if (count($result['aaData'])) {
+            foreach ($result['aaData'] as $key => $row) {
+                foreach ($row as $k => $col) {
+                    if ($k == 0) {
+                        $note_id = $col;
+                        $result['aaData'][$key][$k] =
+                            "<button note_id='{$note_id}' class='btn remove_note glyphicon glyphicon-remove' style='width:45px;'>".
+                            "</button>&nbsp;".
+                            "<button note_id='{$note_id}' class='btn note_detail glyphicon glyphicon-chevron-down' style='width:45px;'>".
+                            "</button>";
+                    } else {
+                        $result['aaData'][$key][$k] =
+                            "<a note_id='{$note_id}' class='edit_note'>".
+                            "{$result['aaData'][$key][$k]}</a>";
+                    }
+                }
+            }
+        }
 
-	public function get_all_notes($student_id){		
-		$result = array('success'=>false, 'message'=>'');
-		
-		$student = new Student();
-		$student->setId($student_id);
+        $this->load->view('response/datatable', array('json' => $result));
+    }
 
-		$dt = new Datatable();
-		$dt->sql = $student->getAllNotesSQL();
-		$dt->columns = array(	'note_id',
-								'creation_datetime',
-								'update_timestamp',
-								'email',
-								'notes');
+    public function all_students()
+    {
+        $student_manager = new StudentManager();
+        $all_students = $student_manager->getAllStudentsInfoForDashboard();
+        $return = array(
+            'success' => true,
+            'students' => array(),
+            );
 
-		$result = $dt->processQuery();
+        foreach ($all_students as $student) {
+            $return['students'][] = array(
+                        'label' => $student['student_name'],
+                        'value' => $student['student_id'],
+                        );
+        }
 
-		
-		if(count($result['aaData'])){
-			foreach($result['aaData'] as $key=>$row){
-				foreach($row as $k=>$col){
-					if($k == 0){
-						$note_id = $col;
-						$result['aaData'][$key][$k] = 
-							"<button note_id='{$note_id}' class='btn remove_note glyphicon glyphicon-remove' style='width:45px;'>" . 
-							"</button>&nbsp;" .
-							"<button note_id='{$note_id}' class='btn note_detail glyphicon glyphicon-chevron-down' style='width:45px;'>" . 
-							"</button>";
-						}else{
-							$result['aaData'][$key][$k] = 
-							"<a note_id='{$note_id}' class='edit_note'>" . 
-							"{$result['aaData'][$key][$k]}</a>";
-							}
-				}
-			}
-		}
-
-		$this->load->view('response/datatable', array('json'=>$result));
-
-	}
-
-	public function all_students(){
-		$student_manager = new StudentManager();
-		$all_students = $student_manager->getAllStudentsInfoForDashboard();
-		$return = array(
-			'success'=>true,
-			'students'=>array()
-			);
-
-		foreach($all_students as $student){
-			$return['students'][] = array(
-						'label'=>$student['student_name'],
-						'value'=>$student['student_id']
-						);
-		}
-
-		$this->load->view('response/json', array('json'=>$return));
-	}
-
+        $this->load->view('response/json', array('json' => $return));
+    }
 }
