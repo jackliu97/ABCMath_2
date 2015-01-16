@@ -1,5 +1,6 @@
 ( function($, $C, $M) {
 	'use strict';
+	var tabindex = 1;
 
 	function _saveContents(){
 		var grade_data = [];
@@ -30,7 +31,7 @@
 
 	}
 
-	function _makeInput($span){
+	function _makeInput($span, tabindex){
 		var assignment_id = $span.attr('assignment_id');
 		var student_id = $span.attr('student_id');
 		var grade_id = $span.attr('grade_id');
@@ -44,7 +45,8 @@
 				'grade_id':grade_id,
 				'grade':grade,
 				'value':grade,
-				'size':4
+				'size':4,
+				'tabindex': tabindex
 				})
 			);
 	}
@@ -90,7 +92,8 @@
 				$(this).attr('editing', '1');
 				$('span[assignment_id=' + $(this).attr('assignment_id') + ']')
 					.each( function (index, value){
-						_makeInput($(this));
+						tabindex += 1;
+						_makeInput($(this), tabindex);
 					});
 			}else{
 				if(!confirm('Are you sure you want to undo your changes?')){

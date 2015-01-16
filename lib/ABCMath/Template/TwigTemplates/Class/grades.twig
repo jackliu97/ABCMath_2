@@ -9,10 +9,10 @@
 	</thead>
 
 	<tbody>
-		{% for row in data %}
+		{% for key, row in data %}
 			<tr>
+				<td class="first-col"><label>({{ loop.index }})</label></td>
 				{% for col in row %}
-
 					{% if loop.index == 1 %}
 						{#loop through first column, which is just name#}
 						<td class="first-col"><label><a href="/student_dashboard/info/{{ col.student_id }}" target="_blank">{{ col.student_name }}</a></label></td>

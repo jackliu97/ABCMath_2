@@ -18,12 +18,15 @@ class AttendancePDF extends PDF
     public $lessons;
     public $students;
 
+    protected $_student_count;
+
     public function __construct()
     {
         parent::__construct();
         $this->lessons = array();
         $this->students = array();
         $this->class_data = array();
+        $this->_student_count = 0;
     }
 
     public function Header()
@@ -80,10 +83,16 @@ class AttendancePDF extends PDF
             return false;
         }
 
+        $this->_student_count += 1;
+
         $x = self::X_CHECKBOX_START;
         $delta_x = floor(self::MAX_PAGE_WIDTH / count($this->lessons)); //amount to increment to keep this in one page.
 
-        $this->RotatedText($y, 10, $student->last_name.', '.$student->first_name, 270);
+        $this->RotatedText(
+            $y, 
+            10, 
+            '(' . $this->_student_count . ') ' . $student->last_name.', '.$student->first_name, 
+            270);
 
         //checkboxes starts here.
         $this->Line($y-1, 10, $y-1, $x + 240);
