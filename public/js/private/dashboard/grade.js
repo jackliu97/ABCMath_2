@@ -37,6 +37,7 @@
 		var grade_id = $span.attr('grade_id');
 		var grade = $span.attr('grade');
 
+		var $container = $span.parent();
 		$span.replaceWith(
 			$('<input>').attr({
 				'class':'process_grade',
@@ -49,6 +50,9 @@
 				'tabindex': tabindex
 				})
 			);
+
+		$container.find('input').focus();
+
 	}
 
 	function _undoInput($input){
@@ -68,6 +72,39 @@
 			);
 	}
 
+	function _sibling($obj, direction){
+		if(direction === 'left'){
+			var $sibling = $obj.closest('td').prev();
+		}
+
+		else if(direction === 'right'){
+			var $sibling = $obj.closest('td').next();
+		}
+
+		else if(direction === 'up'){
+			//var index = $obj.closest('tr').index( $obj.closest('td') );
+			//console.log(index);
+			var $tr = $obj.closest('tr');
+			var $td = $obj.closest('td');
+			var $sibling = $tr.prev().find('td:eq(' + $td.index() + ')');
+		}
+
+		else if(direction === 'down'){
+			var $tr = $obj.closest('tr');
+			var $td = $obj.closest('td');
+			var $sibling = $tr.next().find('td:eq(' + $td.index() + ')');
+
+		}else{
+			return false;
+		}
+
+		if($sibling.find('input').empty()){
+			$sibling.find('span').click();
+		}
+
+		$sibling.find('input').focus();
+	}
+
 	$( document ).ready(function() {
 
 		$M.stopCallback = function() {
@@ -77,7 +114,29 @@
 		$M.bind(['mod+s', 'ctrl-s'], function(e){
 			e.preventDefault();
 			_saveContents();
-		});
+		})
+
+		.bind(['down'], function(e){
+			e.preventDefault();
+			_sibling($(e.target), 'down');
+		})
+
+		.bind(['up'], function(e){
+			e.preventDefault();
+			_sibling($(e.target), 'up');
+		})
+
+		.bind(['left'], function(e){
+			e.preventDefault();
+			_sibling($(e.target), 'left');
+		})
+
+		.bind(['right'], function(e){
+			e.preventDefault();
+			_sibling($(e.target), 'right');
+		})
+
+		;
 
 		$('.class_dropdown').on('change', function(){
 			window.location.href='/grade_dashboard/grade/' + $(this).val();
