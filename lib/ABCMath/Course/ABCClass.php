@@ -188,28 +188,28 @@ class ABCClass extends Base
     protected function _getAllGradesRaw()
     {
         $q = "SELECT
-				s.id student_id,
-				s.first_name,
-				s.last_name,
-				a.id assignment_id,
-				a.name assignment_name,
-				at.description assignment_type,
-				l.id lesson_id,
-				l.lesson_number lesson_number,
-				g.id grade_id,
-				g.student_id grade_student_id,
-				g.grade,
+                s.id student_id,
+                s.first_name,
+                s.last_name,
+                a.id assignment_id,
+                a.name assignment_name,
+                at.description assignment_type,
+                l.id lesson_id,
+                l.lesson_number lesson_number,
+                g.id grade_id,
+                g.student_id grade_student_id,
+                g.grade,
                 a.maximum_score
-			FROM
-				students s
-				LEFT JOIN student_class sc ON sc.student_id = s.id
-				LEFT JOIN classes c ON sc.class_id = c.id
-				LEFT JOIN lessons l ON l.class_id = c.id
-				LEFT JOIN assignments a ON a.lesson_id = l.id
-				LEFT JOIN assignment_types at ON a.assignment_type_id = at.id
-				LEFT JOIN grades g ON g.assignment_id = a.id AND g.student_id = s.id
-			WHERE c.id = ?
-			ORDER BY l.id, s.last_name, a.id, l.id";
+            FROM
+                students s
+                LEFT JOIN student_class sc ON sc.student_id = s.id
+                LEFT JOIN classes c ON sc.class_id = c.id
+                LEFT JOIN lessons l ON l.class_id = c.id
+                LEFT JOIN assignments a ON a.lesson_id = l.id
+                LEFT JOIN assignment_types at ON a.assignment_type_id = at.id
+                LEFT JOIN grades g ON g.assignment_id = a.id AND g.student_id = s.id
+            WHERE c.id = ?
+            ORDER BY l.id, s.last_name, a.id, l.id";
 
         $stmt = $this->_conn->prepare($q);
         $stmt->bindValue(1, $this->id);
