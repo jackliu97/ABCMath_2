@@ -76,7 +76,7 @@
 	}
 
 
-	function _makeInput($span, tabindex){
+	function _makeInput($span, tabindex, ignore_focus){
 		var assignment_id = $span.attr('assignment_id');
 		var student_id = $span.attr('student_id');
 		var grade_id = $span.attr('grade_id');
@@ -103,9 +103,9 @@
 				'placeholder': max_score_label
 				})
 			);
-
-		$container.find('input').focus();
-
+		if(ignore_focus !== true){
+			$container.find('input').focus();
+		}
 	}
 
 	function _undoInput($input){
@@ -203,7 +203,7 @@
 				$('span[assignment_id=' + $(this).attr('assignment_id') + ']')
 					.each( function (index, value){
 						tabindex += 1;
-						_makeInput($(this), tabindex);
+						_makeInput($(this), tabindex, true);
 					});
 			}else{
 				if(!confirm('Are you sure you want to undo your changes?')){

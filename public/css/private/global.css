@@ -89,6 +89,7 @@ div.fixed_head{
   overflow-x:scroll;
   overflow-y:visible;
   margin-left:10em;
+  width:100%;
 }
 
 .first-col-fixed{
