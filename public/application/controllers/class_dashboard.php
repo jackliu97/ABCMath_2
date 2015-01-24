@@ -393,6 +393,17 @@ class Class_Dashboard extends CI_Controller
         $this->load->view('response/json', array('json' => $return));
     }
 
+    public function mark_absent()
+    {
+        $student_id = $this->input->post('student_id');
+        $lesson_id = $this->input->post('lesson_id');
+
+        $lesson = new Lesson();
+        $lesson->id = $lesson_id;
+        $return = $lesson->markAbsent($student_id);
+        $this->load->view('response/json', array('json' => $return));
+    }
+
     public function show_grades()
     {
         $class_id = $this->input->post('class_id');

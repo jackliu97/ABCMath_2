@@ -161,6 +161,31 @@
 		} );
 	}
 
+	function attendence_button($container, mode){
+		var $here_button = $container.find('.here_button');
+		var $tardy_button = $container.find('.tardy_button');
+		var $absent_button = $container.find('.absent_button');
+
+		if(mode === 'here'){
+			$here_button.removeClass('btn-default').addClass('btn-success');
+			$tardy_button.removeClass('btn-warning').addClass('btn-default');
+			$absent_button.removeClass('btn-danger').addClass('btn-default');
+		}
+
+		if(mode === 'tardy'){
+			$here_button.removeClass('btn-default').addClass('btn-success');
+			$tardy_button.removeClass('btn-default').addClass('btn-warning');
+			$absent_button.removeClass('btn-danger').addClass('btn-default');
+		}
+
+		if(mode === 'absent'){
+			$here_button.removeClass('btn-success').addClass('btn-default');
+			$tardy_button.removeClass('btn-warning').addClass('btn-default');
+			$absent_button.removeClass('btn-default').addClass('btn-danger');
+		}
+
+	}
+
 	$( document ).ready(function() {
 
 		var class_id = $('#class_id').val();
@@ -298,18 +323,10 @@
 				success: function(data){
 					console.log(data);
 					var $container = $this.closest('.row');
-					var $here_button = $container.find('.here_button');
-					var $tardy_button = $container.find('.tardy_button');
+					
 
 					if(data.success){
-						if(data.present){
-							$here_button.removeClass('btn-default').addClass('btn-success');
-						}
-						else{
-							$here_button.removeClass('btn-success').addClass('btn-default');
-							$tardy_button.removeClass('btn-danger').addClass('btn-default');
-						}
-
+						attendence_button($container, 'here');
 						$this.prop('disabled',false);
 					}else{
 						$C.error(data.message);
@@ -335,23 +352,9 @@
 				success: function(data){
 					console.log(data);
 					var $container = $this.closest('.row');
-					var $here_button = $container.find('.here_button');
-					var $tardy_button = $container.find('.tardy_button');
 					
 					if(data.success){
-						if(data.present){
-							$here_button.removeClass('btn-default').addClass('btn-success');
-						}else{
-							$here_button.removeClass('btn-success').addClass('btn-default');
-							$tardy_button.removeClass('btn-danger').addClass('btn-default');
-						}
-
-						if(data.tardy){
-							$tardy_button.removeClass('btn-default').addClass('btn-danger');
-						}else{
-							$tardy_button.removeClass('btn-danger').addClass('btn-default');
-						}
-
+						attendence_button($container, 'tardy');
 						$this.prop('disabled',false);
 					}else{
 						$C.error(data.message);
@@ -359,6 +362,33 @@
 				}
 			});
 
+		});
+
+		$body.on('click', '.mark_absent', function(){
+			var $this = $(this);
+			var student_id = $this.attr('student_id');
+			var lesson_id = $('#lesson_id').val();
+
+			$this.prop('disabled',true);
+			$.ajax({
+				type:'POST',
+				url:'/class_dashboard/mark_absent',
+				data: {
+					'student_id': student_id,
+					'lesson_id': lesson_id
+				},
+				success: function(data){
+					console.log(data);
+					var $container = $this.closest('.row');
+					
+					if(data.success){
+						attendence_button($container, 'absent');
+						$this.prop('disabled',false);
+					}else{
+						$C.error(data.message);
+					}
+				}
+			});
 		});
 
 		$body.on('click', '.attendance_tab', function(){

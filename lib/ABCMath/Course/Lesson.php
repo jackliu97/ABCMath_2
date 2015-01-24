@@ -88,24 +88,15 @@ class Lesson extends Base
         $return = array(
             'success' => true,
             'message' => '',
-            'present' => false,
+            'present' => true,
             );
 
         $attendance_data = $this->getAttendanceSingleStudent($student_id);
-
         if (!$attendance_data) {
-            //if this never existed, mark as present.
-            $this->_insertAttendance($student_id);
-            $return['present'] = true;
-
-            return $return;
+            $this->_insertAttendance($student_id, 1);
+        }else{
+            $this->_updateAttendance($attendance_data['id'], 1);
         }
-
-        if ($attendance_data['present'] != 1) {
-            $return['present'] = true;
-        }
-
-        $this->_updateAttendance($attendance_data['id'], $return['present']);
 
         return $return;
     }
@@ -116,23 +107,35 @@ class Lesson extends Base
             'success' => true,
             'message' => '',
             'present' => true,
-            'tardy' => false,
+            'tardy' => true,
             );
 
         $attendance_data = $this->getAttendanceSingleStudent($student_id);
         if (!$attendance_data) {
-            //if this never existed, mark as present and late.
-            $this->_insertAttendance($student_id, true);
-            $return['present'] = true;
-            $return['tardy'] = true;
-
-            return $return;
+            $this->_insertAttendance($student_id, 1, true);
+        }else{
+            $this->_updateAttendance($attendance_data['id'], 1, true);
         }
 
-        if (!$attendance_data['tardy']) {
-            $return['tardy'] = true;
+        return $return;
+    }
+
+    public function markAbsent($student_id)
+    {
+        $return = array(
+            'success' => true,
+            'message' => '',
+            'present' => false,
+            'tardy' => false,
+            'absent' => true
+            );
+
+        $attendance_data = $this->getAttendanceSingleStudent($student_id);
+        if (!$attendance_data) {
+            $this->_insertAttendance($student_id, 2);
+        }else{
+            $this->_updateAttendance($attendance_data['id'], 2);
         }
-        $this->_updateAttendance($attendance_data['id'], 1, $return['tardy']);
 
         return $return;
     }
@@ -192,6 +195,7 @@ class Lesson extends Base
 
     protected function _updateAttendance($id, $present, $tardy = false)
     {
+
         try {
             $this->_conn->update('attendance',
                     array(
@@ -206,14 +210,14 @@ class Lesson extends Base
         }
     }
 
-    protected function _insertAttendance($student_id, $tardy = false)
+    protected function _insertAttendance($student_id, $present, $tardy = false)
     {
         try {
             $this->_conn->insert('attendance',
                 array(
                     'lesson_id' => $this->id,
                     'student_id' => $student_id,
-                    'present' => 1,
+                    'present' => $present,
                     'tardy' => ($tardy ? date('c') : null),
                     )
                 );
