@@ -44,10 +44,6 @@
 			success: function(data){
 				if(data.success){
 					$('#detail_body').html(data.html);
-
-					var popover_html = '<a type="button" student_id="{{ student.id }}">H</a>';
-					$('[data-toggle="tooltip"]').tooltip();
-
 				}else{
 					$C.error(data.message);
 				}
@@ -106,6 +102,7 @@
 					$('#assignment_description').val(data.info.description);
 					$('#assignment_type_id').val(data.info.assignment_type_id);
 					$('#assignment_weight').val(data.info.weight);
+					$('.apply_to_all').hide();
 				}else{
 					$C.error(data.message);
 				}
@@ -114,11 +111,14 @@
 	}
 
 	function clear_assignment_data(){
+		$('.apply_to_all').show();
 		$('#assignment_name').val('');
 		$('#assignment_description').val('');
 		$('#assignment_type_id').val('');
 		$('#assignment_id').val('');
 		$('#assignment_weight').val('');
+		$('#maximum_score').val('');
+		$('#apply_to_all').attr('checked', false);
 	}
 
 	function reset_student_datatable(){
@@ -194,6 +194,10 @@
 
 		var class_id = $('#class_id').val();
 		var $body = $('body');
+
+		$body.tooltip({
+			selector: '[data-toggle="tooltip"]'
+			});
 
 		//build left nav bar.
 		build_class_navigation();
@@ -561,7 +565,8 @@
 					'assignment_type_id': $('#assignment_type_id').val(),
 					'maximum_score': $('#maximum_score').val(),
 					'weight': $('#assignment_weight').val(),
-					'lesson_id': $('#lesson_id').val()
+					'lesson_id': $('#lesson_id').val(),
+					'apply_to_all': $('#apply_to_all').is(':checked') ? '1' : '0'
 				},
 				success: function(data){
 					if(data.success){

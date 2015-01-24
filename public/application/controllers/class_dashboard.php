@@ -487,26 +487,43 @@ class Class_Dashboard extends CI_Controller
         $description = $this->input->post('description');
         $weight = $this->input->post('weight');
         $maximum_score = $this->input->post('maximum_score');
+        $apply_to_all = $this->input->post('apply_to_all');
 
-        $assignment = new Assignment();
-        $assignment->id = $id;
-        $assignment->name = $name;
-        $assignment->assignment_type_id = $assignment_type_id;
-        $assignment->description = $description;
-        $assignment->weight = $weight;
-        $assignment->maximum_score = $maximum_score;
-        $assignment->lesson_id = $lesson_id;
+        //we're applying this to all lessons.
+        if($apply_to_all){
+            $lesson = Lesson::get($lesson_id);
+            $lessonManager = new LessonManager();
+            $lessons = $lessonManager->getLessonsByClass($lesson->class_id);
+            foreach($lessons['lessons'] as $lessonObj){
+                $lesson_ids []= $lessonObj->id;
+            }
+        }else{
+            $lesson_ids = array($lesson_id);
+        }
 
-        try {
-            $assignment->save();
-            $result = array(
-                'success' => true,
-                );
-        } catch (Exception $e) {
-            $result = array(
-                'success' => false,
-                'message' => $e->getMessage(),
-                );
+        foreach($lesson_ids as $this_id){
+
+            $assignment = new Assignment();
+            $assignment->id = $id;
+            $assignment->name = $name;
+            $assignment->assignment_type_id = $assignment_type_id;
+            $assignment->description = $description;
+            $assignment->weight = $weight;
+            $assignment->maximum_score = $maximum_score;
+            $assignment->lesson_id = $this_id;
+
+            try {
+                $assignment->save();
+                $result = array(
+                    'success' => true,
+                    );
+            } catch (Exception $e) {
+                $result = array(
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    );
+            }
+
         }
 
         $this->load->view('response/datatable', array('json' => $result));

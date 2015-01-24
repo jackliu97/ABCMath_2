@@ -34,8 +34,8 @@
 					<div class="col-sm-2 assignment_type">
 						{{ assignment.type }}
 					</div>
-					<div class="col-sm-2 assignment_name">
-						{{ assignment.name }}
+					<div class="col-sm-3 assignment_name" data-toggle="tooltip" data-placement="top" title="{{ assignment.name }}">
+						{{ assignment.name [:7] }} ...
 					</div>
 					<div class="col-sm-2 assignment_weight">
 						{{ assignment.weight }}

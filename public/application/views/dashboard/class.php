@@ -208,6 +208,10 @@
           <input class="form-control" id="assignment_weight" name="assignment_weight">
         </div>
 
+        <div class="checkbox apply_to_all">
+          <label><input id="apply_to_all" name="apply_to_all" type="checkbox">Add to all lessons</label>
+        </div>
+
         <div class="form-group">
           <label for="assignment_description">Description:</label>
           <textarea class="form-control" id="assignment_description" name="assignment_description" rows="10"></textarea>

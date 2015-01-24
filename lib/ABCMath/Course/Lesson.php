@@ -23,6 +23,20 @@ class Lesson extends Base
         $this->id = $id;
     }
 
+    public static function get($idOrData){
+
+        $lesson = new Lesson();
+        if(is_array($idOrData)){
+            $lesson->load($idOrData);
+        }else{
+            $lesson->setId($idOrData);
+            $lesson->load();
+        }
+
+        return $lesson;
+
+    }
+
     public function load($data = array())
     {
         if (!count($data)) {
