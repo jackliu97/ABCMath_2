@@ -1,8 +1,14 @@
 ( function($, $C, $M) {
 	'use strict';
 	var tabindex = 1;
+	var ACCEPTABLE_GRADE = ['inc', 'abs']
 
 	function _saveContents(){
+		if(_validateContents() === false){
+			$C.error('You have an invalid grade. The input is marked in red.');
+			return false;
+		}
+
 		var grade_data = [];
 		$('.process_grade').each(function(index, value){
 			var $input = $(value);
@@ -30,6 +36,33 @@
 		});
 
 	}
+
+	function _validateContents(){
+		var all_values_valid = true;
+
+		$('.process_grade').each(function(index, value){
+			var $input = $(value);
+			var input_val = $.trim($input.val());
+
+			if(input_val === ''){
+				return true;
+			}
+
+			if($.isNumeric(input_val)){
+				return true;
+			}
+
+			if(ACCEPTABLE_GRADE.indexOf(input_val) === -1){
+				all_values_valid = false;
+				$input.addClass('invalid-value');
+				return true;
+			}
+
+		});
+
+		return all_values_valid;
+	}
+
 
 	function _makeInput($span, tabindex){
 		var assignment_id = $span.attr('assignment_id');

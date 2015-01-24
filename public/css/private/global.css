@@ -2,6 +2,10 @@ body{
     margin-bottom:100px;
 }
 
+.invalid-value{
+  border:1px solid red;
+}
+
 .edit_mode, .list_mode, .pointer{
     cursor: pointer;
 }

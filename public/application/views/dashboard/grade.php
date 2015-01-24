@@ -33,6 +33,17 @@
 					'id="class_id" class="form-control class_dropdown"');
 			?>
 		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-1"></div>
+	<div class="col-md-2">
+		<ul class="list-group">
+		  <li class="list-group-item list-group-item-info"><b>Types of acceptable grade</b></li>
+		  <li class="list-group-item">1, 2, 3, 4 ..., "abs", "inc"</li>
+		</ul>
+	</div>
 </div>
 <div class="row">
 	<div class="col-md-10">

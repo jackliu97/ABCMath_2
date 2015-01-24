@@ -97,7 +97,7 @@ class AssignmentManager extends Base
 
         $this->_conn->update(
             'grades',
-                array('grade' => intval($grade['grade'])),
+                array('grade' => $grade['grade']),
                 array('id' => $grade['grade_id']));
     }
 
@@ -112,7 +112,7 @@ class AssignmentManager extends Base
                 array(
                     'student_id' => intval($grade['student_id']),
                     'assignment_id' => intval($grade['assignment_id']),
-                    'grade' => intval($grade['grade']),
+                    'grade' => $grade['grade'],
                     )
                 );
     }
