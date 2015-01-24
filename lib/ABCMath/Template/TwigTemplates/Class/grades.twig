@@ -1,4 +1,6 @@
-<table id="gradeContainer" class="rotate_table table-hover">
+
+<div class="fixed_head">
+<table id="gradeContainer" class="rotate_table table-hover table-striped">
 	<thead>
 		<tr>
 			<th>&nbsp;</th>
@@ -12,15 +14,14 @@
 	<tbody>
 		{% for key, row in data %}
 			<tr>
-				<td class="first-col"><label>({{ loop.index }})</label></td>
 				{% for col in row %}
 					{% if loop.index == 1 %}
 						{#loop through first column, which is just name#}
-						<td class="first-col"><label><a href="/student_dashboard/info/{{ col.student_id }}" target="_blank">{{ col.student_name }}</a></label></td>
+						<td class="first-col first-col-fixed"><label><a href="/student_dashboard/info/{{ col.student_id }}" target="_blank">{{ col.student_name }}</a></label></td>
 					{% else %}
 
 						{#loop through rest of columns, which are grades#}
-						<td class="grade_action data-column">
+						<td class="grade_action data-column" lindex="{{ loop.index }}">
 							<span grade_id="{{ col.grade_id }}" student_id="{{ col.student_id }}" assignment_id="{{ col.assignment_id }}" grade="{{ col.grade }}" maximum_score="{{ col.maximum_score }}" lesson_id="{{ col.lesson_id }}">{{ col.grade }}</span>
 						</td>
 					{% endif %}
@@ -30,3 +31,4 @@
 		{% endfor %}
 	</tbody>
 </table>
+</div>

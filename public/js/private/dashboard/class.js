@@ -102,6 +102,7 @@
 					$('#assignment_description').val(data.info.description);
 					$('#assignment_type_id').val(data.info.assignment_type_id);
 					$('#assignment_weight').val(data.info.weight);
+					$('#maximum_score').val(data.info.maximum_score);
 					$('.apply_to_all').hide();
 				}else{
 					$C.error(data.message);

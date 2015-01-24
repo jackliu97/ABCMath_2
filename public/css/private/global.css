@@ -85,6 +85,19 @@ div.dataTable_fixed_10 {
    white-space: nowrap;
 }
 
+div.fixed_head{
+  overflow-x:scroll;
+  overflow-y:visible;
+  margin-left:10em;
+}
+
+.first-col-fixed{
+  position:absolute; 
+  width:10em;
+  left:0;
+  top:auto;
+}
+
 .first-col{
    white-space: nowrap;
 }
@@ -95,14 +108,14 @@ div.dataTable_fixed_10 {
 
 th.rotate {
   /* Something you can count on */
-  height: 140px;
+  height: 150px;
   white-space: nowrap;
 }
 
 th.rotate > div {
   transform: 
     /* Magic Numbers */
-    translate(25px, 51px)
+    translate(-15px, 51px)
     /* 45 is really 360 - 45 */
     rotate(315deg);
   width: 30px;
@@ -117,7 +130,6 @@ th.rotate > div > span {
 table.rotate_table td{
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    width:70px;
     height:40px;
     padding: 5px 0px 5px 5px;
 }

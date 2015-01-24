@@ -469,6 +469,7 @@ class Class_Dashboard extends CI_Controller
             'assignment_type_id' => $assignment->assignment_type_id,
             'description' => $assignment->description,
             'weight' => $assignment->weight,
+            'maximum_score' => $assignment->maximum_score
             );
 
         $result = array(
@@ -489,6 +490,8 @@ class Class_Dashboard extends CI_Controller
         $maximum_score = $this->input->post('maximum_score');
         $apply_to_all = $this->input->post('apply_to_all');
 
+        $lesson_ids = array();
+
         //we're applying this to all lessons.
         if($apply_to_all){
             $lesson = Lesson::get($lesson_id);
@@ -498,7 +501,7 @@ class Class_Dashboard extends CI_Controller
                 $lesson_ids []= $lessonObj->id;
             }
         }else{
-            $lesson_ids = array($lesson_id);
+            $lesson_ids []= $lesson_id;
         }
 
         foreach($lesson_ids as $this_id){
