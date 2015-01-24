@@ -154,7 +154,8 @@ class ABCClass extends Base
                                                     'student_id' => $data['student_id'],
                                                     'assignment_id' => $data['assignment_id'],
                                                     'lesson_id' => $data['lesson_id'],
-                                                    'lesson_number' => $data['lesson_number'], );
+                                                    'lesson_number' => $data['lesson_number'],
+                                                    'maximum_score' => $data['maximum_score'], );
         }
 
         foreach ($tmpData as $data) {
@@ -197,7 +198,8 @@ class ABCClass extends Base
 				l.lesson_number lesson_number,
 				g.id grade_id,
 				g.student_id grade_student_id,
-				g.grade
+				g.grade,
+                a.maximum_score
 			FROM
 				students s
 				LEFT JOIN student_class sc ON sc.student_id = s.id

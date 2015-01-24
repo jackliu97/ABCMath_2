@@ -49,6 +49,17 @@
 			}
 
 			if($.isNumeric(input_val)){
+
+				if(input_val > $input.attr('maximum_score')){
+					all_values_valid = false;
+					$input.addClass('invalid-value');
+				}
+
+				if(input_val < 0){
+					all_values_valid = false;
+					$input.addClass('invalid-value');
+				}
+
 				return true;
 			}
 
@@ -69,6 +80,12 @@
 		var student_id = $span.attr('student_id');
 		var grade_id = $span.attr('grade_id');
 		var grade = $span.attr('grade');
+		var maximum_score = $span.attr('maximum_score');
+		var max_score_label = 'No max';
+
+		if(maximum_score !== '0'){
+			max_score_label = 'Max ' + maximum_score;
+		}
 
 		var $container = $span.parent();
 		$span.replaceWith(
@@ -79,8 +96,10 @@
 				'grade_id':grade_id,
 				'grade':grade,
 				'value':grade,
+				'maximum_score':maximum_score,
 				'size':4,
-				'tabindex': tabindex
+				'tabindex': tabindex,
+				'placeholder': max_score_label
 				})
 			);
 

@@ -21,7 +21,7 @@
 
 						{#loop through rest of columns, which are grades#}
 						<td class="grade_action data-column">
-							<span grade_id="{{ col.grade_id }}" student_id="{{ col.student_id }}" assignment_id="{{ col.assignment_id }}" grade="{{ col.grade }}" lesson_id="{{ col.lesson_id }}">{{ col.grade }}</span>
+							<span grade_id="{{ col.grade_id }}" student_id="{{ col.student_id }}" assignment_id="{{ col.assignment_id }}" grade="{{ col.grade }}" maximum_score="{{ col.maximum_score }}" lesson_id="{{ col.lesson_id }}">{{ col.grade }}</span>
 						</td>
 					{% endif %}
 
