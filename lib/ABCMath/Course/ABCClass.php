@@ -18,6 +18,20 @@ class ABCClass extends Base
         parent::__construct();
     }
 
+    public static function get($idOrData){
+
+        $class = new ABCClass();
+        if(is_array($idOrData)){
+            $class->load($idOrData);
+        }else{
+            $class->setId($idOrData);
+            $class->load();
+        }
+
+        return $class;
+
+    }
+
     public function setId($id)
     {
         $this->id = $id;

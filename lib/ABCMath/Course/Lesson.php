@@ -3,6 +3,7 @@ namespace ABCMath\Course;
 
 use ABCMath\Base;
 use ABCMath\Course\AssignmentManager;
+use ABCMath\Course\ABCClass;
 use ABCMath\Attachment\Attachment;
 
 class Lesson extends Base

@@ -290,6 +290,7 @@ class Class_Dashboard extends CI_Controller
         $lesson_id = $this->input->post('lesson_id');
         $data = array();
         $data['lesson_id'] = $lesson_id;
+        $data['single_batch_hw'] = true;
 
         $studentManager = new StudentManager();
         $studentManager->class_id = $class_id;
@@ -300,9 +301,14 @@ class Class_Dashboard extends CI_Controller
             $currentLesson = new Lesson();
             $currentLesson->id = $lesson_id;
             $currentLesson->load();
+
+            $class = ABCClass::get($currentLesson->class_id);
+            if(in_array($class->subject_id, array(10, 15))){
+                $data['single_batch_hw'] = false;
+            }
+
             $data['currentLesson'] = $currentLesson;
             $attendanceData = $currentLesson->getAttendance();
-
             foreach ($data['students'] as $k => $student) {
                 $data['students'][$k]->present =
                     isset($attendanceData[$student->id]['present']) ?

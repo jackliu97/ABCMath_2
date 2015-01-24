@@ -9,15 +9,22 @@
 		{% for student in students %}
 			<li class="list-group-item">
 				<div class="row">
-					<div class="col-sm-4">
+					<div class="col-sm-3">
 						{{ student.first_name }} {{ student.last_name }}
 					</div>
 					<div class="col-sm-8">
 						<a type="button" student_id="{{ student.id }}" class="here_button mark_present btn btn-{% if student.present == 1 %}success{% else %}default{% endif %}">H</a>
 						<a type="button" student_id="{{ student.id }}" class="tardy_button mark_tardy btn btn-{% if student.tardy == '' %}default{% else %}warning{% endif %}">L</a>
 						<a type="button" student_id="{{ student.id }}" class="absent_button mark_absent btn btn-{% if student.present == 2 %}danger{% else %}default{% endif %}">A</a>
-					</div>
 
+						{% if single_batch_hw %}
+							<a student_id="{{ student.id }}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Homework">HW</a>
+						{% else %}
+							<a student_id="{{ student.id }}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Verbal">VR</a>
+							<a student_id="{{ student.id }}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Math">MT</a>
+							<a student_id="{{ student.id }}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Essay">ES</a>
+						{% endif %}
+					</div>
 				</div>
 			</li>
 		{% endfor %}

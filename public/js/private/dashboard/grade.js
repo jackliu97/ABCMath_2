@@ -49,8 +49,9 @@
 			}
 
 			if($.isNumeric(input_val)){
+				input_val = parseFloat(input_val);
 
-				if(input_val > $input.attr('maximum_score')){
+				if(input_val > parseFloat($input.attr('maximum_score'))){
 					all_values_valid = false;
 					$input.addClass('invalid-value');
 				}

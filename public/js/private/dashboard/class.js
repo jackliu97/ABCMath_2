@@ -44,6 +44,10 @@
 			success: function(data){
 				if(data.success){
 					$('#detail_body').html(data.html);
+
+					var popover_html = '<a type="button" student_id="{{ student.id }}">H</a>';
+					$('[data-toggle="tooltip"]').tooltip();
+
 				}else{
 					$C.error(data.message);
 				}
@@ -510,6 +514,7 @@
 				}
 			});
 		});
+
 
 		$('#attachment_form').on('submit', function(event){
 			event.stopPropagation();
