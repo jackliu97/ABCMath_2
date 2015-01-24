@@ -35,15 +35,6 @@ class admin extends CI_Controller
                                         ));
     }
 
-    public function set_semester_id()
-    {
-        $semester_id = $this->input->post('semester_id');
-        $this->session->set_userdata('semester_id', $semester_id);
-        $this->load->view('response/json', array('json' => array('success' => true)));
-
-        return true;
-    }
-
     public function entity_detail($id = null)
     {
         $data = array();

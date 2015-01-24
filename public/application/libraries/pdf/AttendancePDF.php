@@ -98,7 +98,17 @@ class AttendancePDF extends PDF
         $this->Line($y-1, 10, $y-1, $x + 240);
 
         foreach ($this->lessons as $lesson) {
-            $this->RotatedText($y, $x, '[   ]', 270);
+            $attendance = $lesson->getAttendance();
+            $present = '   ';
+            if(isset($attendance[$student->id]) && $attendance[$student->id]['present'] == 1){
+                if(!$attendance[$student->id]['tardy']){
+                    $present = 'X';
+                }else{
+                    $present = 'L';
+                }
+            }
+
+            $this->RotatedText($y, $x, "[{$present}]", 270);
             $x += $delta_x;
         }
     }

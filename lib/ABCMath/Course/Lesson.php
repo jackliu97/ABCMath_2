@@ -10,6 +10,8 @@ class Lesson extends Base
     public $id;
     public $assignments;
 
+    public static $cache;
+
     public function __construct()
     {
         parent::__construct();
@@ -42,6 +44,11 @@ class Lesson extends Base
      */
     public function getAttendance()
     {
+
+        if(isset(self::$cache['attendance_' . $this->id])){
+            return self::$cache['attendance_' . $this->id];
+        }
+
         $qb = $this->_conn->createQueryBuilder();
         $qb->select('student_id, present, tardy')
             ->from('attendance', 'a')
@@ -57,6 +64,7 @@ class Lesson extends Base
             $return[$row['student_id']] = $row;
         }
 
+        self::$cache['attendance_' . $this->id] = $return;
         return $return;
     }
 
