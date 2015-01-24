@@ -37,6 +37,7 @@
 			"bProcessing": true,
 			"bServerSide": true,
 			"bLengthChange": false,
+			"stateSave": true,
 			"sAjaxSource": '/admin_dashboard/get_students/' + type,
 			"fnDrawCallback": function( oSettings ) {
 				$('#students_table_wrapper').find('input').addClass('form-control dataTables_form_override');
@@ -58,6 +59,7 @@
 			"bProcessing": true,
 			"bServerSide": true,
 			"bLengthChange": false,
+			"stateSave": true,
 			"sAjaxSource": '/admin_dashboard/get_classes/' + class_status,
 			"fnDrawCallback": function( oSettings ) {
 				$('#classes_table_wrapper').find('input').addClass('form-control dataTables_form_override');

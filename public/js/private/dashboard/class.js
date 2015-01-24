@@ -147,6 +147,7 @@
 			"bLengthChange": false,
 			"bPaginate":pagination,
 			"sAjaxSource": source,
+			"stateSave": true,
 			"fnDrawCallback": function( oSettings ) {
 				$('#students_table_wrapper').find('input').addClass('form-control dataTables_form_override');
 				$('#students_table_wrapper').find('select').addClass('form-control dataTables_form_override');

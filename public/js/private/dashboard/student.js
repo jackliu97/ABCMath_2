@@ -46,6 +46,7 @@
 			"bServerSide": true,
 			"bLengthChange": false,
 			"sAjaxSource": source,
+			"stateSave": true,
 			"fnDrawCallback": function( oSettings ) {
 				$('#classes_table_wrapper').find('input').addClass('form-control dataTables_form_override');
 				$('#classes_table_wrapper').find('select').addClass('form-control dataTables_form_override');
@@ -61,6 +62,7 @@
 			"bProcessing": true,
 			"bServerSide": true,
 			"bLengthChange": false,
+			"stateSave": true,
 			"sAjaxSource": '/student_dashboard/get_all_notes/' + $('#student_id').val(),
 			"fnDrawCallback": function( oSettings ) {
 				$('#note_table_wrapper').find('input').addClass('form-control dataTables_form_override');
