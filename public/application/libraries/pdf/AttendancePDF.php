@@ -99,12 +99,12 @@ class AttendancePDF extends PDF
 
         foreach ($this->lessons as $lesson) {
             $attendance = $lesson->getAttendance();
-            $present = '   ';
+            $present = '     ';
             if(isset($attendance[$student->id]) && $attendance[$student->id]['present'] == 1){
                 if(!$attendance[$student->id]['tardy']){
-                    $present = 'X';
+                    $present = ' X ';
                 }else{
-                    $present = 'L';
+                    $present = ' L ';
                 }
             }
 
