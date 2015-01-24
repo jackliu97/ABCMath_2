@@ -82,8 +82,6 @@
 		}
 
 		else if(direction === 'up'){
-			//var index = $obj.closest('tr').index( $obj.closest('td') );
-			//console.log(index);
 			var $tr = $obj.closest('tr');
 			var $td = $obj.closest('td');
 			var $sibling = $tr.prev().find('td:eq(' + $td.index() + ')');

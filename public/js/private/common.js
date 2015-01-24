@@ -71,7 +71,7 @@ var COMMON = (function ( $ ) {
 			var semester_id = $('#semester_id').val();
 			$.ajax({
 				type:'POST',
-				url:'/admin/set_semester_id',
+				url:'/common/set_semester_id',
 				data: {'semester_id': semester_id},
 				success: function(data){
 					location.reload();
