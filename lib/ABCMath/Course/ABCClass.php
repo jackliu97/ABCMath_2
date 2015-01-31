@@ -219,7 +219,8 @@ class ABCClass extends Base
             }
 
             $headerData[$data['student_id']][] =
-                array('title' => "<span class='badge'>{$data['lesson_number']}</span>&nbsp;".
+                array('title' => "<span class='label label-danger delete_assignment' assignment_id='{$data['assignment_id']}'>-</span>&nbsp;" . 
+                    "<span class='badge'>{$data['lesson_number']}</span>&nbsp;".
                     $data['assignment_name'] . ' (' . $data['maximum_score'] . ')',
                     'assignment_id' => $data['assignment_id'],
                     'student_id' => $data['student_id'],
