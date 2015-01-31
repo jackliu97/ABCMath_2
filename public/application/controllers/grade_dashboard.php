@@ -39,7 +39,6 @@ class Grade_Dashboard extends CI_Controller
         $class->load();
         $data['class'] = $class;
         $data['class_options'] = $class_manager->getAllClasses('options');
-
         $data['body_html'] = $this->_template->render(
             'Class/grades.twig',
             $class->getAllGrades()

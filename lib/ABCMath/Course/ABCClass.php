@@ -65,6 +65,36 @@ class ABCClass extends Base
         return $formattedData;
     }
 
+    public function getAllGradesForReport( $student_id ){
+        $grades = $this->_getAllGradesRaw( $student_id );
+        $output = array();
+
+        foreach($grades as $grade){
+            $lesson_id = $grade['lesson_id'];
+            $assignment_type = $grade['assignment_type'];
+
+            if(!isset($output[$lesson_id])){
+                $output[$lesson_id] = array();
+            }
+            $output[$lesson_id]['lesson_number'] = $grade['lesson_number'];
+            $output[$lesson_id]['lesson_date'] = $grade['lesson_date'];
+            $output[$lesson_id]['present'] = $grade['present'];
+            $output[$lesson_id]['tardy'] = $grade['tardy'];
+
+            if(!isset($output[$lesson_id][$assignment_type])){
+                $output[$lesson_id][$assignment_type] = array();
+            }
+
+            $output[$lesson_id][$assignment_type][] = array(
+                'name'=> $grade['assignment_name'],
+                'grade'=> $grade['grade'],
+                'maximum_score'=>$grade['maximum_score']
+                );
+
+        }
+        return $output;
+    }
+
     public function removeStudent($student_id)
     {
         try {
@@ -199,8 +229,15 @@ class ABCClass extends Base
         return array_pop($headerData);
     }
 
-    protected function _getAllGradesRaw()
+    protected function _getAllGradesRaw($student_id=null)
     {
+        $wheres = array('c.id = ?');
+        $values = array(1=>$this->id);
+        if($student_id !== null){
+            $wheres []= 's.id = ?';
+            $values[]= $student_id;
+        }
+
         $q = "SELECT
                 s.id student_id,
                 s.first_name,
@@ -210,10 +247,13 @@ class ABCClass extends Base
                 at.description assignment_type,
                 l.id lesson_id,
                 l.lesson_number lesson_number,
+                DATE_FORMAT(l.lesson_date, '%b %d, %Y') lesson_date,
                 g.id grade_id,
                 g.student_id grade_student_id,
                 g.grade,
-                a.maximum_score
+                a.maximum_score,
+                atn.present,
+                atn.tardy
             FROM
                 students s
                 LEFT JOIN student_class sc ON sc.student_id = s.id
@@ -222,11 +262,16 @@ class ABCClass extends Base
                 LEFT JOIN assignments a ON a.lesson_id = l.id
                 LEFT JOIN assignment_types at ON a.assignment_type_id = at.id
                 LEFT JOIN grades g ON g.assignment_id = a.id AND g.student_id = s.id
-            WHERE c.id = ?
-            ORDER BY l.id, s.last_name, a.id, l.id";
+                LEFT JOIN attendance atn ON atn.lesson_id = l.id AND atn.student_id = s.id
+            WHERE " . implode(' AND ', $wheres) . "
+            ORDER BY l.id, s.last_name, a.id";
 
         $stmt = $this->_conn->prepare($q);
-        $stmt->bindValue(1, $this->id);
+
+        foreach($values as $k=>$v){
+            $stmt->bindValue($k, $v);
+        }
+
         $stmt->execute();
 
         return $stmt->fetchAll();

@@ -14,6 +14,20 @@ class Student extends Base
         $this->_dbData = array();
     }
 
+    public static function get($idOrData){
+
+        $student = new Student();
+        if(is_array($idOrData)){
+            $student->load($idOrData);
+        }else{
+            $student->setId($idOrData);
+            $student->load();
+        }
+
+        return $student;
+
+    }
+
     public function __get($key)
     {
         return isset($this->_rawData[$key]) ? $this->_rawData[$key] : null;
