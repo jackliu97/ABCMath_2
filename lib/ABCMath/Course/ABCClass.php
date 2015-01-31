@@ -247,7 +247,7 @@ class ABCClass extends Base
                 at.description assignment_type,
                 l.id lesson_id,
                 l.lesson_number lesson_number,
-                DATE_FORMAT(l.lesson_date, '%b %d, %Y') lesson_date,
+                l.lesson_date lesson_date,
                 g.id grade_id,
                 g.student_id grade_student_id,
                 g.grade,

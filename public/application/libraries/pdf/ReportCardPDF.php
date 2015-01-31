@@ -104,9 +104,18 @@ class ReportCardPDF extends PDF
             return false;
         }
 
+        $now = new DateTime();
+
         foreach($this->grades as $lesson_id => $lesson){
             $lesson_number = $lesson['lesson_number'];
-            $lesson_date = $lesson['lesson_date'];
+            $lesson_date = new DateTime($lesson['lesson_date']);
+            $lesson_date_formatted = $lesson_date->format('M j, Y');
+
+            //only need to show reports for lesson up to today.
+            if($now <= $lesson_date){
+                continue;
+            }
+
             $attendance = '';
             $lesson_shown = false;
             $attendance_shown = false;
@@ -132,17 +141,15 @@ class ReportCardPDF extends PDF
                     $grade = '';
                     if($assignment['grade']){
                         $grade = $assignment['grade'] . ' / ' . $assignment['maximum_score'];
-                    }else{
-                        if($attendance === ''){
-                            continue;
-                        }
                     }
+
+
 
                     $this->Cell(10);
 
                     if($lesson_shown === false){
                         $this->Cell(15, 7, "#{$lesson_number}", 1, 0, 'C');
-                        $this->Cell(25, 7, $lesson_date, 1, 0, 'C');
+                        $this->Cell(25, 7, $lesson_date_formatted, 1, 0, 'C');
                         $this->Cell(20, 7, $attendance, 1, 0, 'C');
                         $lesson_shown = true;
                     }else{
