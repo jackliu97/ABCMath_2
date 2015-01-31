@@ -193,29 +193,61 @@
 			window.location.href='/grade_dashboard/grade/' + $(this).val();
 			return false;
 		});
+		$('#gradeContainer').on('click', '.delete_assignment', function(){
 
-		$('#gradeContainer').on('click', '.header', function(){
-			var $this = $(this);
-			var editing = $this.attr('editing');
-
-			if(editing != 1){
-				$(this).attr('editing', '1');
-				$('span[assignment_id=' + $(this).attr('assignment_id') + ']')
-					.each( function (index, value){
-						tabindex += 1;
-						_makeInput($(this), tabindex, true);
-					});
-			}else{
-				if(!confirm('Are you sure you want to undo your changes?')){
-					return false;
-				}
-				$(this).attr('editing', '0');
-				$('input[assignment_id=' + $(this).attr('assignment_id') + ']')
-					.each( function (index, value){
-						_undoInput($(this));
-					});
+			if(!confirm('Are you sure you want to delete this assignment?')){
+				return false;
 			}
+			var $this = $(this);
+			var assignment_id = $this.attr('assignment_id');
+			$.ajax({
+				type:'POST',
+				url:'/class_dashboard/delete_assignment',
+				data: {
+					'assignment_id': $(this).attr('assignment_id')
+				},
+				success: function(data){
+					if(data.success){
+						$this.closest('table').find('span[assignment_id="' + assignment_id + '"]').each(function(){
+							$(this).closest('td').remove();
+						});
+
+						$this.closest('table').find('input[assignment_id="' + assignment_id + '"]').each(function(){
+							$(this).closest('td').remove();
+						});
+
+						$this.closest('th').remove();
+					}else{
+						$C.error(data.message, $('#assignment_error'));
+						return false;
+					}
+				}
+			});
+
 		});
+
+		// $('#gradeContainer').on('click', '.header', function(){
+		// 	var $this = $(this);
+		// 	var editing = $this.attr('editing');
+
+		// 	if(editing != 1){
+		// 		$(this).attr('editing', '1');
+		// 		$('span[assignment_id=' + $(this).attr('assignment_id') + ']')
+		// 			.each( function (index, value){
+		// 				tabindex += 1;
+		// 				_makeInput($(this), tabindex, true);
+		// 			});
+		// 	}else{
+		// 		if(!confirm('Are you sure you want to undo your changes?')){
+		// 			return false;
+		// 		}
+		// 		$(this).attr('editing', '0');
+		// 		$('input[assignment_id=' + $(this).attr('assignment_id') + ']')
+		// 			.each( function (index, value){
+		// 				_undoInput($(this));
+		// 			});
+		// 	}
+		// });
 
 
 		$('#gradeContainer').on('click', '.grade_action', function(){
