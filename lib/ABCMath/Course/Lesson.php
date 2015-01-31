@@ -98,6 +98,66 @@ class Lesson extends Base
         return $qb->execute()->fetch();
     }
 
+    public function getAttendanceData($attendance_id, $data_type){
+        $qb = $this->_conn->createQueryBuilder();
+        $qb->select('ad.id, ad.data')
+            ->from('attendance_data', 'ad')
+            ->where('ad.attendance_id = ? AND ad.type=?')
+            ->setParameter(0, $attendance_id)
+            ->setParameter(1, $data_type);
+
+        return $qb->execute()->fetch();
+    }
+
+    /**
+    * Checks to see if an attendance record exist, if yes we return attenance id.
+    * if not, we create and return attendance id.
+    *
+    * @param Integer $student_id
+    * @return array
+    */
+    public function touchAttendance($student_id){
+        $attendance = $this->getAttendanceSingleStudent($student_id);
+        if (!$attendance) {
+            $attendance = $this->_insertAttendance($student_id, 1);
+            if($attendance['success'] === false){
+                return $attendance;
+            }
+        }
+
+        return $attendance['id'];
+    }
+
+    /**
+    * Attendance data becomes a toggle. It's either on or off.
+    * Returned true if turned on, false if turned off.
+    * 
+    * @param Integer $attendance_id
+    * @param String $data_type
+    * @return boolean
+    */
+    public function toggleAttendanceData($attendance_id, $data_type){
+
+        $attendance_data = $this->getAttendanceData($attendance_id, $data_type);
+        if (!$attendance_data) {
+            //if data doesn't exist, we turn it on on insert.
+            $attendance_data = $this->_insertAttendanceData($attendance_id, $data_type, 1);
+            return true;
+        }else{
+            if($attendance_data['data'] == 0){
+                //if this is off, we turn it on.
+                $this->_updateAttendanceData($attendance_id, $data_type, 1);
+                return true;
+            }else{
+                //else we turn it off.
+                $this->_updateAttendanceData($attendance_id, $data_type, 0);
+                return false;
+            }
+        }
+
+        return false;
+    }
+
     public function takeAttendance($student_id)
     {
         $return = array(
@@ -236,6 +296,44 @@ class Lesson extends Base
                     'tardy' => ($tardy ? date('c') : null),
                     )
                 );
+            $id = $this->_conn->lastInsertId();
+
+            return array('success' => true, 'id'=>$id);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
+
+    protected function _insertAttendanceData($attendance_id, $data_type, $data)
+    {
+        try {
+            $this->_conn->insert('attendance_data',
+                array(
+                    'attendance_id' => $attendance_id,
+                    'type' => $data_type,
+                    'data' => $data
+                    )
+                );
+            $id = $this->_conn->lastInsertId();
+
+            return array('success' => true, 'id'=>$id);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            return array('success' => false, 'message' => $e->getMessage());
+        }
+    }
+
+    protected function _updateAttendanceData($attendance_id, $data_type, $data)
+    {
+
+        try {
+            $this->_conn->update('attendance_data',
+                    array(
+                        'data' => $data
+                        ),
+                array(
+                    'attendance_id' => $attendance_id,
+                    'type' => $data_type
+                    ));
 
             return array('success' => true);
         } catch (\Doctrine\DBAL\DBALException $e) {

@@ -410,6 +410,22 @@ class Class_Dashboard extends CI_Controller
         $this->load->view('response/json', array('json' => $return));
     }
 
+    public function attendance_data()
+    {
+        $student_id = $this->input->post('student_id');
+        $lesson_id = $this->input->post('lesson_id');
+        $data_type = $this->input->post('data_type');
+
+        $lesson = new Lesson();
+        $lesson->id = $lesson_id;
+        $attendance_id = $lesson->touchAttendance($student_id);
+        $result['success'] = true;
+        $result['data_type'] = $data_type;
+        $result['data_value'] = $lesson->toggleAttendanceData($attendance_id, $data_type);
+
+        $this->load->view('response/json', array('json' => $result));
+    }
+
     public function show_grades()
     {
         $class_id = $this->input->post('class_id');

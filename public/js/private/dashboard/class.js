@@ -405,6 +405,35 @@
 			});
 		});
 
+		$body.on('click', '.attendance_data', function(){
+			var $this = $(this);
+			var data_type = $this.attr('data-type');
+			var student_id = $this.attr('student_id');
+			var lesson_id = $('#lesson_id').val();
+
+			$this.prop('disabled',true);
+			$.ajax({
+				type:'POST',
+				url:'/class_dashboard/attendance_data',
+				data: {
+					'student_id': student_id,
+					'lesson_id': lesson_id,
+					'data_type': data_type
+				},
+				success: function(data){
+					var $container = $this.closest('.row');
+					
+					if(data.success){
+						//attendence_button($container, 'absent');
+						$this.prop('disabled',false);
+					}else{
+						$C.error(data.message);
+					}
+				}
+			});
+
+		})
+
 		$body.on('click', '.attendance_tab', function(){
 			reset_detail($(this));
 			show_attendance();
