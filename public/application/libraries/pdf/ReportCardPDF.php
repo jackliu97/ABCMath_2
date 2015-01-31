@@ -29,11 +29,15 @@ class ReportCardPDF extends PDF
         $this->class      = false;
         $this->types      = false;
         $this->attendance = false;
+        $this->logo_url   = false;
     }
 
     public function Header()
-    {
-        //$this->Image(base_url().'images/icons/abcmath_logo.jpg', self::MARGIN, 15, 20, 20);
+    {   
+        if($this->logo_url !== false){
+            $this->Image($this->logo_url, self::MARGIN, 15, 20, 20);
+        }
+        
         $this->Ln(5);
         $this->SetFont('Arial', 'B', 12);
         $this->Cell(5);
@@ -41,14 +45,17 @@ class ReportCardPDF extends PDF
 
         $this->SetFont('Arial', 'B', 10);
         $this->Cell(5);
-        $this->Cell(0, 8, "{$this->class->term_id}", 0, 1, 'C');
-        $this->Cell(0, 8, "{$this->class->external_id}", 0, 1, 'C');
+        $semister = $this->class->getSemester();
+        $this->Cell(0, 8, $semister['description'], 0, 1, 'C');
+        $this->Cell(0, 8, $this->class->description, 0, 1, 'C');
     }
 
     public function Footer()
     {
         $this->SetFont('Arial', 'B', 5);
         //$this->Text(self::MARGIN, 270, "ABCMath");
+        // Page number
+        $this->Cell(0,10,'Page '.$this->PageNo(),0,0,'C');
     }
 
     /**********

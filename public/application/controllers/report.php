@@ -81,6 +81,7 @@ class Report extends CI_Controller {
             $types = $assignment->getAssignmentTypes();
 
             $this->load->library('pdf/ReportCardPDF');
+            $this->reportcardpdf->logo_url = base_url().'images/abcmath_logo.jpg';
             $this->reportcardpdf->SetStudent($student);
             $this->reportcardpdf->SetClass($class);
             $this->reportcardpdf->SetGrades($grades);
@@ -89,6 +90,7 @@ class Report extends CI_Controller {
             $this->reportcardpdf->AddPage();
             $this->reportcardpdf->DrawGradesHeader();
             $this->reportcardpdf->DrawGrades();
+
         }
 
         $this->reportcardpdf->Output();
