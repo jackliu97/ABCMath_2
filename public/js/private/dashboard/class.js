@@ -295,6 +295,10 @@
 			window.open('/grade_dashboard/grade/' + $(this).attr('class_id'));
 		});
 
+		$body.on('click', '.report_cards', function(){
+			window.open('/report/bulk_report_cards/' + $(this).attr('class_id'));
+		});
+
 		$body.on('keyup', 'input.filter_class', function(){
 			var pattern = $(this).val();
 			$(".class_list").show();

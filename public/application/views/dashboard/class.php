@@ -134,7 +134,7 @@
       <ul class="nav nav-pills class_detail_tab" role="tablist">
         <li><a action="show_attendance" class="pointer attendance_tab is_tab" class_id="<?php echo $class->id;?>">Attendance</a></li>
         <li><a action="print_attendance" class="pointer print_attendance_tab is_tab" class_id="<?php echo $class->id;?>">Print Attendance</a></li>
-
+        <li><a class="pointer report_cards" class_id="<?php echo $class->id;?>">Print Report Cards</a></li>
         <li><a action="show_assignment" class="pointer assignment_tab is_tab" class_id="<?php echo $class->id;?>">Assignments</a></li>
         <li><a action="show_attachment" class="pointer attachment_tab is_tab" class_id="<?php echo $class->id;?>">Attachments</a></li>
         <li><a class="pointer grade_tab" class_id="<?php echo $class->id;?>">Grade</a></li>
