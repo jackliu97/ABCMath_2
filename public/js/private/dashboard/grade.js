@@ -49,12 +49,12 @@
 			}
 
 			if($.isNumeric(input_val)){
-				input_val = parseFloat(input_val);
+				// input_val = parseFloat(input_val);
 
-				if(input_val > parseFloat($input.attr('maximum_score'))){
-					all_values_valid = false;
-					$input.addClass('invalid-value');
-				}
+				// if(input_val > parseFloat($input.attr('maximum_score'))){
+				// 	all_values_valid = false;
+				// 	$input.addClass('invalid-value');
+				// }
 
 				if(input_val < 0){
 					all_values_valid = false;
@@ -85,7 +85,7 @@
 		var max_score_label = 'No max';
 
 		if(maximum_score !== '0'){
-			max_score_label = 'Max ' + maximum_score;
+			max_score_label = maximum_score;
 		}
 
 		var $container = $span.parent();

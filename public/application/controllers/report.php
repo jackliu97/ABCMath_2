@@ -47,16 +47,11 @@ class Report extends CI_Controller {
         $assignment = new AssignmentManager();
         $types = $assignment->getAssignmentTypes();
 
-
-
-
         $this->load->library('pdf/ReportCardPDF');
         $this->reportcardpdf->SetStudent($student);
         $this->reportcardpdf->SetClass($class);
         $this->reportcardpdf->SetGrades($grades);
         $this->reportcardpdf->SetTypes($types);
-
-        
 
         $this->reportcardpdf->AddPage();
         $this->reportcardpdf->DrawGradesHeader();
@@ -70,6 +65,8 @@ class Report extends CI_Controller {
     * Export all reports for a single class.
     */
     public function bulk_report_cards($class_id){
+        
+        $class = ABCClass::get($class_id);
 
         $this->Classes_Model->class_id = $class_id;
         $student_ids = $this->Classes_Model->select_students_id_only();
