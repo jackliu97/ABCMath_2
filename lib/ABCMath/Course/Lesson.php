@@ -64,12 +64,24 @@ class Lesson extends Base
             return self::$cache['attendance_' . $this->id];
         }
 
-        $qb = $this->_conn->createQueryBuilder();
-        $qb->select('student_id, present, tardy')
-            ->from('attendance', 'a')
-            ->where('a.lesson_id = ?')
-            ->setParameter(0, $this->id);
-        $data = $qb->execute()->fetchAll();
+        $query = "SELECT 
+                        a.id attendance_id,
+                        a.lesson_id lesson_id,
+                        a.student_id student_id,
+                        a.present present,
+                        a.tardy tardy,
+                        group_concat(ad.type separator ',') attandance_types,
+                        group_concat(ad.data separator ',') attandance_data
+                    FROM attendance a
+                    LEFT JOIN attendance_data ad ON a.id = ad.`attendance_id`
+                    WHERE a.lesson_id = ?
+                    GROUP BY a.id";
+
+        $stmt = $this->_conn->prepare($query);
+        $stmt->bindValue(1, $this->id);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        
         if (!$data) {
             return array();
         }

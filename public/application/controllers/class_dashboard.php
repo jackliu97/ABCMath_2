@@ -309,13 +309,30 @@ class Class_Dashboard extends CI_Controller
 
             $data['currentLesson'] = $currentLesson;
             $attendanceData = $currentLesson->getAttendance();
+
+            //print_r($attendanceData);
+
             foreach ($data['students'] as $k => $student) {
-                $data['students'][$k]->present =
-                    isset($attendanceData[$student->id]['present']) ?
-                    $attendanceData[$student->id]['present'] : null;
-                $data['students'][$k]->tardy =
-                    isset($attendanceData[$student->id]['tardy']) ?
-                    $attendanceData[$student->id]['tardy'] : null;
+                if(!isset($attendanceData[$student->id])){
+                    continue;
+                }
+
+                $stuData = $attendanceData[$student->id];
+
+                $data['students'][$k]->present = element('present', $stuData, null);
+                $data['students'][$k]->tardy = element('tardy', $stuData, null);
+
+                $attTypes = explode(',', element('attandance_types', $stuData, null));
+                $attData = explode(',', element('attandance_data', $stuData, null));
+
+                if(!count($attTypes)){
+                    return;
+                }
+
+                foreach($attTypes as $i=>$type){
+                    $data['students'][$k]->{$type} = element($i, $attData, null);
+                }
+
             }
         }
 

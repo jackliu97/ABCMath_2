@@ -18,11 +18,11 @@
 						<a type="button" student_id="{{ student.id }}" class="absent_button mark_absent btn btn-{% if student.present == 2 %}danger{% else %}default{% endif %}">A</a>
 
 						{% if single_batch_hw %}
-							<a student_id="{{ student.id }}" class="btn btn-default attendance_data" data-toggle="tooltip" data-placement="top" data-type="homework" title="Homework">HW</a>
+							<a student_id="{{ student.id }}" class="btn btn-{% if student.homework == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="homework" title="Homework">HW</a>
 						{% else %}
-							<a student_id="{{ student.id }}" class="btn btn-default attendance_data" data-toggle="tooltip" data-placement="top" data-type="verbal" title="Verbal">VR</a>
-							<a student_id="{{ student.id }}" class="btn btn-default attendance_data" data-toggle="tooltip" data-placement="top" data-type="math" title="Math">MT</a>
-							<a student_id="{{ student.id }}" class="btn btn-default attendance_data" data-toggle="tooltip" data-placement="top" data-type="essay" title="Essay">ES</a>
+							<a student_id="{{ student.id }}" class="btn btn-{% if student.verbal == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="verbal" title="Verbal">VR</a>
+							<a student_id="{{ student.id }}" class="btn btn-{% if student.math == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="math" title="Math">MT</a>
+							<a student_id="{{ student.id }}" class="btn btn-{% if student.essay == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="essay" title="Essay">ES</a>
 						{% endif %}
 					</div>
 				</div>

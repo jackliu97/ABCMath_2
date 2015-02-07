@@ -30,11 +30,19 @@ class Student extends Base
 
     public function __get($key)
     {
+        if(empty($key)){
+            return;
+        }
+        
         return isset($this->_rawData[$key]) ? $this->_rawData[$key] : null;
     }
 
     public function __set($key, $value)
     {
+        if(empty($key)){
+            return;
+        }
+
         $this->{$key} = $value;
         $this->_rawData[$key] = $value;
     }

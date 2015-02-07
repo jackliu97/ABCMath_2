@@ -424,6 +424,12 @@
 					var $container = $this.closest('.row');
 					
 					if(data.success){
+						console.log(data);
+						if(data.data_value){
+							$this.removeClass('btn-default').addClass('btn-primary');
+						}else{
+							$this.removeClass('btn-primary').addClass('btn-default');
+						}
 						//attendence_button($container, 'absent');
 						$this.prop('disabled',false);
 					}else{
