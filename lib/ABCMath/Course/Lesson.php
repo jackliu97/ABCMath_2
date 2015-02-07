@@ -137,7 +137,7 @@ class Lesson extends Base
     public function touchAttendance($student_id){
         $attendance = $this->getAttendanceSingleStudent($student_id);
         if (!$attendance) {
-            $attendance = $this->_insertAttendance($student_id, 1);
+            $attendance = $this->_insertAttendance($student_id, 0);
             if($attendance['success'] === false){
                 return $attendance;
             }

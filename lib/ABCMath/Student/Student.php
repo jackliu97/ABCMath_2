@@ -2,6 +2,7 @@
 namespace ABCMath\Student;
 
 use ABCMath\Base;
+use ABCMath\Course\Lesson;
 
 class Student extends Base
 {
@@ -98,6 +99,12 @@ class Student extends Base
     public function saveNote($notes, $user_id, $note_id = '', $lesson_id=NULL)
     {
 
+        if(!empty($lesson_id)){
+            $lesson = Lesson::get($lesson_id);
+            $lesson->touchAttendance($this->id);
+        }
+
+
         if (empty($note_id)) {
             return $this->_insertNote($notes, $user_id, $lesson_id);
         } else {
@@ -107,16 +114,21 @@ class Student extends Base
 
     protected function _insertNote($notes, $user_id, $lesson_id=null)
     {
+
+        $params = array(
+            'student_id' => $this->id,
+            'user_id' => $user_id,
+            'notes' => $notes,
+            'creation_datetime' => date('c'),
+            );
+
+        if(!empty($lesson_id)){
+            $params['lesson_id'] = $lesson_id;
+        }
+
         try {
-            $this->_conn->insert('notes',
-                    array(
-                        'student_id' => $this->id,
-                        'user_id' => $user_id,
-                        'lesson_id' => $lesson_id,
-                        'notes' => $notes,
-                        'creation_datetime' => date('c'),
-                        )
-                );
+
+            $this->_conn->insert('notes',$params);
 
             return array(
                 'success' => true,

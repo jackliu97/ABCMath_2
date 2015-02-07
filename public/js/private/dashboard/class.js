@@ -584,7 +584,7 @@
 			var note_id = $(this).attr('note-id');
 			$.ajax({
 				type:'POST',
-				url:'/student_dashboard/get_one_note',
+				url:'/note_controller/get_one_note',
 				data: {
 					'note_id': note_id
 				},
@@ -610,7 +610,7 @@
 
 			$.ajax({
 				type:'POST',
-				url:'/student_dashboard/save_notes',
+				url:'/note_controller/save_notes',
 				data: {
 					'student_id': student_id,
 					'lesson_id': lesson_id,

@@ -63,7 +63,7 @@
 			"bServerSide": true,
 			"bLengthChange": false,
 			"stateSave": true,
-			"sAjaxSource": '/student_dashboard/get_all_notes/' + $('#student_id').val(),
+			"sAjaxSource": '/note_controller/get_all_notes/' + $('#student_id').val(),
 			"fnDrawCallback": function( oSettings ) {
 				$('#note_table_wrapper').find('input').addClass('form-control dataTables_form_override');
 				$('#note_table_wrapper').find('select').addClass('form-control dataTables_form_override');
@@ -139,7 +139,7 @@
 
 			$.ajax({
 				type:'POST',
-				url:'/student_dashboard/get_one_note',
+				url:'/note_controller/get_one_note',
 				data: {
 					'note_id': note_id
 				},
@@ -177,7 +177,7 @@
 
 			$.ajax({
 				type:'POST',
-				url:'/student_dashboard/get_one_note',
+				url:'/note_controller/get_one_note',
 				data: {
 					'note_id': note_id
 				},
@@ -208,7 +208,7 @@
 			var note_id = $(this).attr('note_id');
 			$.ajax({
 				type:'POST',
-				url:'/student_dashboard/delete_note',
+				url:'/note_controller/delete_note',
 				data: {
 					'note_id': note_id
 				},
@@ -229,7 +229,7 @@
 		$('#note_form').on('submit', function(){
 			$.ajax({
 				type:'POST',
-				url:'/student_dashboard/save_notes',
+				url:'/note_controller/save_notes',
 				data: {
 					'student_id': $('#student_id').val(),
 					'note_id': $('#note_id').val(),
