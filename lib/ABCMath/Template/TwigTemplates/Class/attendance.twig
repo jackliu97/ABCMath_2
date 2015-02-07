@@ -14,21 +14,21 @@
 					</div>
 					<div class="col-sm-8">
 						<input type="hidden" class="student_id" name="student_id" value="{{ student.id }}">
-						<a type="button" class="here_button mark_present btn btn-{% if student.present == 1 %}success{% else %}default{% endif %}" data-toggle="tooltip" data-placement="top" data-type="here" title="Here">H</a>
+						<a type="button" class="here_button mark_present btn btn-{% if student.present == 1 %}success{% else %}default{% endif %}" data-toggle="tooltip" data-placement="top" data-type="here" title="Here"><span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></a>
 
-						<a type="button" class="tardy_button mark_tardy btn btn-{% if student.tardy == '' %}default{% else %}warning{% endif %}" data-toggle="tooltip" data-placement="top" data-type="late" title="Late">L</a>
+						<a type="button" class="tardy_button mark_tardy btn btn-{% if student.tardy == '' %}default{% else %}warning{% endif %}" data-toggle="tooltip" data-placement="top" data-type="late" title="Late"><b>L</b></a>
 
-						<a type="button" class="absent_button mark_absent btn btn-{% if student.present == 2 %}danger{% else %}default{% endif %}" data-toggle="tooltip" data-placement="top" data-type="absent" title="Absent">A</a>
+						<a type="button" class="absent_button mark_absent btn btn-{% if student.present == 2 %}danger{% else %}default{% endif %}" data-toggle="tooltip" data-placement="top" data-type="absent" title="Absent"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
 
 						{% if single_batch_hw %}
-							<a class="btn btn-{% if student.homework == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="homework" title="Homework">HW</a>
+							<a class="btn btn-{% if student.homework == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="homework" title="Homework"><b>HW</b></a>
 						{% else %}
-							<a class="btn btn-{% if student.verbal == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="verbal" title="Verbal">VR</a>
-							<a class="btn btn-{% if student.math == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="math" title="Math">MT</a>
-							<a class="btn btn-{% if student.essay == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="essay" title="Essay">ES</a>
+							<a class="btn btn-{% if student.verbal == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="verbal" title="Verbal"><b>V</b></a>
+							<a class="btn btn-{% if student.math == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="math" title="Math"><b>M</b></a>
+							<a class="btn btn-{% if student.essay == 1 %}primary{% else %}default{% endif %} attendance_data" data-toggle="tooltip" data-placement="top" data-type="essay" title="Essay"><b>E</b></a>
 						{% endif %}
 
-						<a type="button" note-id="{{ student.note_id }}" class="open_notes btn btn-default" data-toggle="popover" data-placement="right" data-content="{% if student.notes != '' %}{{ student.notes[:25] }}{% else %}Click to add new notes...{% endif %}">N</a>
+						<a type="button" note-id="{{ student.note_id }}" class="open_notes btn btn-{% if student.notes != '' %}info{% else %}default{% endif %}" data-toggle="popover" data-placement="right" data-content="{{ student.notes[:25] }}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
 
 					</div>
 				</div>

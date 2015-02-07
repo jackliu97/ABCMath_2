@@ -97,11 +97,6 @@ class Student extends Base
 
     public function saveNote($notes, $user_id, $note_id = '', $lesson_id=NULL)
     {
-        if (empty($notes)) {
-            return array(
-                'success' => false,
-                'message' => 'Note is blank. Please write something.', );
-        }
 
         if (empty($note_id)) {
             return $this->_insertNote($notes, $user_id, $lesson_id);
