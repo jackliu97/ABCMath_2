@@ -252,3 +252,8 @@
   </div>
 </div>
 
+
+<?php echo $note_modal;?>
+
+
+

@@ -4,9 +4,12 @@
 use \ABCMath\Student\Student;
 use \ABCMath\Student\StudentManager;
 use \ABCMath\Db\Datatable;
+use \ABCMath\Template\Template;
 
 class Student_Dashboard extends CI_Controller
 {
+
+    protected $_template;
     public function __construct()
     {
         parent::__construct();
@@ -15,7 +18,7 @@ class Student_Dashboard extends CI_Controller
         } else {
             $this->editable = true;
         }
-
+        $this->_template = new Template(Template::FILESYSTEM);
         $this->semester_id = $this->session->userdata('semester_id');
     }
 
@@ -28,6 +31,9 @@ class Student_Dashboard extends CI_Controller
 
         $data['student'] = $student;
         $data['editable'] = $this->editable;
+        $data['note_modal'] = $this->_template->render(
+            'Modal/note.twig',
+            array('modal_title'=>'Notes for ' . $student->first_name));
 
         $this->load->view('header');
         $this->load->view('navbar');
@@ -77,6 +83,7 @@ class Student_Dashboard extends CI_Controller
     public function save_notes()
     {
         $student_id = $this->input->post('student_id');
+        $lesson_id = $this->input->post('lesson_id');
         $notes = $this->input->post('notes');
         $note_id = $this->input->post('note_id');
         $return = array(
@@ -86,7 +93,7 @@ class Student_Dashboard extends CI_Controller
 
         $student = new Student();
         $student->id = $student_id;
-        $return = $student->saveNote($notes, $this->User_Model->get_user()->id, $note_id);
+        $return = $student->saveNote($notes, $this->User_Model->get_user()->id, $note_id, $lesson_id);
 
         $this->load->view('response/json', array('json' => $return));
     }

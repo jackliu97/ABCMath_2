@@ -33,7 +33,7 @@ class Student extends Base
         if(empty($key)){
             return;
         }
-        
+
         return isset($this->_rawData[$key]) ? $this->_rawData[$key] : null;
     }
 
@@ -95,7 +95,7 @@ class Student extends Base
         return array('success' => true);
     }
 
-    public function saveNote($notes, $user_id, $note_id = '')
+    public function saveNote($notes, $user_id, $note_id = '', $lesson_id=NULL)
     {
         if (empty($notes)) {
             return array(
@@ -104,25 +104,29 @@ class Student extends Base
         }
 
         if (empty($note_id)) {
-            return $this->_insertNote($notes, $user_id);
+            return $this->_insertNote($notes, $user_id, $lesson_id);
         } else {
             return $this->_updateNote($note_id, $notes, $user_id);
         }
     }
 
-    protected function _insertNote($notes, $user_id)
+    protected function _insertNote($notes, $user_id, $lesson_id=null)
     {
         try {
             $this->_conn->insert('notes',
                     array(
                         'student_id' => $this->id,
                         'user_id' => $user_id,
+                        'lesson_id' => $lesson_id,
                         'notes' => $notes,
                         'creation_datetime' => date('c'),
                         )
                 );
 
-            return array('success' => true, 'message' => 'Note successfully inserted');
+            return array(
+                'success' => true,
+                'note_id' => $this->_conn->lastInsertId(),
+                'message' => 'Note successfully inserted');
         } catch (\Doctrine\DBAL\DBALException $e) {
             return array('success' => false, 'message' => $e->getMessage());
         }
@@ -139,7 +143,10 @@ class Student extends Base
                         ),
                 array('id' => $note_id));
 
-            return array('success' => true, 'message' => 'Note successfully updated');
+            return array(
+                'success' => true,
+                'note_id' => $note_id,
+                'message' => 'Note successfully updated');
         } catch (\Doctrine\DBAL\DBALException $e) {
             return array('success' => false, 'message' => $e->getMessage());
         }

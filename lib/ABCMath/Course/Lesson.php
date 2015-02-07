@@ -65,23 +65,29 @@ class Lesson extends Base
         }
 
         $query = "SELECT 
-                        a.id attendance_id,
-                        a.lesson_id lesson_id,
-                        a.student_id student_id,
-                        a.present present,
-                        a.tardy tardy,
-                        group_concat(ad.type separator ',') attandance_types,
-                        group_concat(ad.data separator ',') attandance_data
-                    FROM attendance a
-                    LEFT JOIN attendance_data ad ON a.id = ad.`attendance_id`
-                    WHERE a.lesson_id = ?
-                    GROUP BY a.id";
+                    a.id attendance_id,
+                    a.lesson_id lesson_id,
+                    a.student_id student_id,
+                    a.present present,
+                    a.tardy tardy,
+                    group_concat(ad.type separator ',') attandance_types,
+                    group_concat(ad.data separator ',') attandance_data,
+                    n.id note_id,
+                    n.notes
+                FROM attendance a
+                LEFT JOIN attendance_data ad 
+                    ON a.id = ad.`attendance_id`
+                LEFT JOIN notes n 
+                    ON a.`lesson_id` = n.`lesson_id`
+                    AND a.`student_id` = n.`student_id`
+                WHERE a.lesson_id = ?
+                GROUP BY a.id";
 
         $stmt = $this->_conn->prepare($query);
         $stmt->bindValue(1, $this->id);
         $stmt->execute();
         $data = $stmt->fetchAll();
-        
+
         if (!$data) {
             return array();
         }

@@ -192,6 +192,11 @@
 
 	}
 
+	function reset_note(){
+		$('#notes').val('');
+		$('#note_id').val('');
+	}
+
 	$( document ).ready(function() {
 
 		var class_id = $('#class_id').val();
@@ -199,6 +204,11 @@
 
 		$body.tooltip({
 			selector: '[data-toggle="tooltip"]'
+			});
+
+		$body.popover({
+			selector: '[data-toggle="popover"]',
+			trigger: 'hover'
 			});
 
 		//build left nav bar.
@@ -323,7 +333,7 @@
 
 		$body.on('click', '.mark_present', function(){
 			var $this = $(this);
-			var student_id = $this.attr('student_id');
+			var student_id = $this.parent().find("[name='student_id']").val();
 			var lesson_id = $('#lesson_id').val();
 
 			$this.prop('disabled',true);
@@ -352,7 +362,7 @@
 
 		$body.on('click', '.mark_tardy', function(){
 			var $this = $(this);
-			var student_id = $this.attr('student_id');
+			var student_id = $this.parent().find("[name='student_id']").val();
 			var lesson_id = $('#lesson_id').val();
 
 			$this.prop('disabled',true);
@@ -380,7 +390,7 @@
 
 		$body.on('click', '.mark_absent', function(){
 			var $this = $(this);
-			var student_id = $this.attr('student_id');
+			var student_id = $this.parent().find("[name='student_id']").val();
 			var lesson_id = $('#lesson_id').val();
 
 			$this.prop('disabled',true);
@@ -408,7 +418,7 @@
 		$body.on('click', '.attendance_data', function(){
 			var $this = $(this);
 			var data_type = $this.attr('data-type');
-			var student_id = $this.attr('student_id');
+			var student_id = $this.parent().find("[name='student_id']").val();
 			var lesson_id = $('#lesson_id').val();
 
 			$this.prop('disabled',true);
@@ -558,6 +568,67 @@
 					}
 				}
 			});
+		});
+
+		$body.on('click', '.open_notes', function(){
+			reset_note();
+
+			var $note_modal = $('#new_note_modal');
+			var $this = $(this);
+			var student_id = $this.parent().find("[name='student_id']").val();
+			var lesson_id = $('#lesson_id').val()
+			$note_modal.modal('show');
+			$note_modal.find("input[name='note_modal_student_id']").val(student_id);
+			$note_modal.find("input[name='note_modal_lesson_id']").val(lesson_id);
+
+			var note_id = $(this).attr('note-id');
+			$.ajax({
+				type:'POST',
+				url:'/student_dashboard/get_one_note',
+				data: {
+					'note_id': note_id
+				},
+				success: function(data){
+					if(data.success){
+						$('#notes').val(data.notes);
+						$('#note_id').val(note_id);
+					}else{
+						$C.error(data.message, $('#notes_error'));
+						return false;
+					}
+				}
+			});
+			return false;
+
+		});
+
+		$('#note_form').on('submit', function(event){
+
+			var $note_modal = $('#new_note_modal');
+			var student_id = $note_modal.find("input[name='note_modal_student_id']").val();
+			var lesson_id = $note_modal.find("input[name='note_modal_lesson_id']").val();
+
+			$.ajax({
+				type:'POST',
+				url:'/student_dashboard/save_notes',
+				data: {
+					'student_id': student_id,
+					'lesson_id': lesson_id,
+					'note_id': $('#note_id').val(),
+					'notes': $('#notes').val()
+				},
+				success: function(data){
+					if(data.success){
+						$('#new_note_modal').modal('hide');
+						show_attendance();
+					}else{
+						$C.error(data.message, $('#notes_error'));
+						return false;
+					}
+				}
+			});
+			return false;
+
 		});
 
 

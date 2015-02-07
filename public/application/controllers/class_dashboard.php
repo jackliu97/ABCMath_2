@@ -67,6 +67,10 @@ class Class_Dashboard extends CI_Controller
         $data['lessons'] = $lessonInfo['lessons'];
         $data['lesson_id'] = $lesson_id;
         $data['class_options'] = $class_manager->getAllClasses('options');
+        $data['note_modal'] = $this->_template->render(
+            'Modal/note.twig',
+            array('modal_title'=>'Attendance Notes')
+            );
 
         $this->load->view('header');
         $this->load->view('navbar');
@@ -75,6 +79,18 @@ class Class_Dashboard extends CI_Controller
                                         'private_js' => array('dashboard/class.js'),
                                         'datatable' => true,
                                         ));
+    }
+
+    public function get_attendance_note(){
+        $note_id = $this->input->post('note_id');
+        $return = array();
+        $student = new Student();
+        $notes = $student->getNote($note_id);
+        $return['success'] = true;
+        $return['notes'] = $notes['notes'];
+        $return['notes_parsed'] = nl2br($notes['notes']);
+
+        $this->load->view('response/json', array('json' => $return));
     }
 
     public function unregister()
@@ -321,6 +337,8 @@ class Class_Dashboard extends CI_Controller
 
                 $data['students'][$k]->present = element('present', $stuData, null);
                 $data['students'][$k]->tardy = element('tardy', $stuData, null);
+                $data['students'][$k]->note_id = element('note_id', $stuData, null);
+                $data['students'][$k]->notes = element('notes', $stuData, null);
 
                 $attTypes = explode(',', element('attandance_types', $stuData, null));
                 $attData = explode(',', element('attandance_data', $stuData, null));
@@ -427,11 +445,26 @@ class Class_Dashboard extends CI_Controller
         $this->load->view('response/json', array('json' => $return));
     }
 
+    public function attendance_note(){
+        $student_id = $this->input->post('student_id');
+        $lesson_id = $this->input->post('lesson_id');
+        $notes = $this->input->post('notes');
+        $result = array();
+
+        $lesson = new Lesson();
+        $lesson->id = $lesson_id;
+        $attendance_id = $lesson->touchAttendance($student_id);
+
+        $this->load->view('response/json', array('json' => $result));
+
+    }
+
     public function attendance_data()
     {
         $student_id = $this->input->post('student_id');
         $lesson_id = $this->input->post('lesson_id');
         $data_type = $this->input->post('data_type');
+        $result = array();
 
         $lesson = new Lesson();
         $lesson->id = $lesson_id;
