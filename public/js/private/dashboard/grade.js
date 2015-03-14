@@ -2,6 +2,7 @@
 	'use strict';
 	var tabindex = 1;
 	var ACCEPTABLE_GRADE = ['inc', 'abs']
+	var changes_made = false;
 
 	function _saveContents(){
 		if(_validateContents() === false){
@@ -19,6 +20,8 @@
 				'grade':$input.val()
 			});
 		});
+
+		$(window).unbind('beforeunload');
 
 		$.ajax({
 			type:'POST',
@@ -156,6 +159,12 @@
 		$sibling.find('input').focus();
 	}
 
+	function bindWarning(){
+		$(window).bind('beforeunload', function() {
+			return 'You have attempted to make an update.';
+		} );
+	}
+
 	$( document ).ready(function() {
 
 		$M.stopCallback = function() {
@@ -251,6 +260,7 @@
 
 
 		$('#gradeContainer').on('click', '.grade_action', function(){
+			bindWarning();
 			_makeInput($(this).find('span'));
 
 			return false;
