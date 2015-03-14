@@ -1,6 +1,5 @@
 <div class="row pad-top">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-5">
+<div class="col-md-5 col-md-offset-1">
 <form role="form" id="save_permission">
   <div class="row">
   <div class="col-md-10 form-group">

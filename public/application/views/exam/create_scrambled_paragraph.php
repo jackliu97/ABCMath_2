@@ -1,7 +1,6 @@
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-5">
+  <div class="col-md-5 col-md-offset-1">
     <button type="button" class="display_text btn btn-default">Display as Text</button>
     <button type="button" class="display_pdf btn btn-default" examid="<?php echo $exam_id;?>">Display as PDF</button>
   </div>
@@ -9,8 +8,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-5">
+  <div class="col-md-5 col-md-offset-1">
     &nbsp;
   </div>
   <div class="col-md-1">&nbsp;</div>
@@ -18,7 +16,7 @@
 
 <div id="text_question_container" style="display:none;">
   <div class="row">
-      <div class="col-md-1">&nbsp;</div><div class="col-md-8">
+      <div class="col-md-8 col-md-offset-1">
         <textarea id="question_textarea" cols="200" rows="50"></textarea>
       </div>
     </div>

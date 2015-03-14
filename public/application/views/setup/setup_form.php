@@ -1,6 +1,5 @@
 <div class="row">
-<div class="col-sm-1"></div>
-<div class="col-sm-3">
+<div class="col-sm-3 col-sm-offset-1">
 
 <div class="form-group">
 	<button class="btn btn-default sample_student_csv">Sample XLSX File</button>
@@ -19,8 +18,7 @@
 <br/>
 
 <div class="row">
-<div class="col-sm-1"></div>
-<div class="col-sm-5">
+<div class="col-sm-5 col-sm-offset-1">
 <div id="alert_container"></div>
 </div>
 </div>

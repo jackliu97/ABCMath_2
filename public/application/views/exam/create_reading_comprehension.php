@@ -1,18 +1,13 @@
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-5">
+  <div class="col-md-5 col-md-offset-1">
     <button type="button" class="display_pdf btn btn-default" examid="<?php echo $exam_id;?>">Display as PDF</button>
   </div>
 </div>
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-5">
-    &nbsp;
-  </div>
-  <div class="col-md-1">&nbsp;</div>
+  <div class="col-md-5 col-md-offset-1">&nbsp;</div>
 </div>
 
 <div id="question_container">

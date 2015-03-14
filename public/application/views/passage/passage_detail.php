@@ -3,8 +3,7 @@
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-5">
+<div class="col-md-5 col-md-offset-1">
 <form role="form" id="add_passage_form">
   <input type="hidden" name="article_id" id="article_id" value="<?php echo $article_id;?>">
   <div class="form-group">

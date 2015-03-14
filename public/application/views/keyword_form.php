@@ -1,7 +1,6 @@
 <form class="keyword-form" role="form" id="keyword_form">
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-lg-10">
+  <div class="col-lg-10 col-md-offset-1">
     <div class="input-group">
       <div class="input-group-btn">
 
@@ -30,8 +29,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-10">Key words: <div id="keyword_container">
+  <div class="col-md-10 col-md-offset-1">Key words: <div id="keyword_container">
     <?php if(isset($existing_keyword) && count($existing_keyword)):?>
     <?php foreach($existing_keyword as $id=>$word):?>
       <span class="label label-default selected_keyword" keywordid="<?php echo $id;?>"><?php echo $word;?></span>

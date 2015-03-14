@@ -1,6 +1,5 @@
 <div class="row">
-	<div class="col-md-1">&nbsp;</div>
-	<div class="col-md-10">
+	<div class="col-md-10 col-md-offset-1">
 		<h3>
 			<a class="add_new_field" entity_id="<?php echo $table_id?>" >
 				<span class="glyphicon glyphicon-plus"></span>

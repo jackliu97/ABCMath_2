@@ -1,6 +1,5 @@
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-10">
+  <div class="col-md-10 col-md-offset-1">
   <div class="btn-group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
       Filter by keyword&nbsp;
@@ -26,8 +25,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-10">Key words: <div id="keyword_container">
+  <div class="col-md-10 col-md-offset-1">Key words: <div id="keyword_container">
   </div></div>
   <div class="col-md-1">&nbsp;</div>
 </div>

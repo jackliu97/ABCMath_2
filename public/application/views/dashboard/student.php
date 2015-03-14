@@ -3,8 +3,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-   <div class="col-md-10">
+   <div class="col-md-10 col-md-offset-1">
     <h3>
       <?php echo $student->first_name . ' ' . $student->last_name;?>
       <?php if($editable):?>
@@ -17,8 +16,7 @@
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-10">
+<div class="col-md-10 col-md-offset-1">
   <div class="panel panel-success">
    <div class="panel-heading">
     <h3 class="panel-title"><?php echo $student->first_name?>'s Information</h3>
@@ -113,8 +111,7 @@
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-10">
+<div class="col-md-10 col-md-offset-1">
   <div class="panel panel-info">
     <div class="panel-heading" id="class_collapsable">
        <h3 class="panel-title"><?php echo $student->first_name?>'s Classes</h3>
@@ -131,8 +128,7 @@
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-10">
+<div class="col-md-10 col-md-offset-1">
   <div class="panel panel-warning">
     <div class="panel-heading" id="notes_collapsable">
        <h3 class="panel-title"><?php echo $student->first_name?>'s Notes</h3>

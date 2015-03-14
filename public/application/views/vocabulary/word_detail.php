@@ -4,10 +4,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-1">
-        &nbsp;
-    </div>
-    <div class="col-md-5">
+    <div class="col-md-5 col-md-offset-1">
         <form role="form" id="add_passage_form">
             <input type="hidden" name="word_id" id="word_id" value="<?php echo $word_id;?>">
             <div class="form-group">

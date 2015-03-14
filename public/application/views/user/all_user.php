@@ -1,7 +1,6 @@
 
 <div class="row pad-top">
-	<div class="col-md-1">&nbsp;</div>
-	<div class="col-md-3">
+	<div class="col-md-3 col-md-offset-1">
 		<a type="button" class="btn btn-default btn-sm" href="/user/create_user">
 			<span class="glyphicon glyphicon-plus"></span>&nbsp;New User
 		</a>
@@ -9,8 +8,7 @@
 </div>
 
 <div class="row pad-top">
-	<div class="col-md-1">&nbsp;</div>
-	<div class="col-md-3">
+	<div class="col-md-3 col-md-offset-1">
 		<ul class="list-group">
 			<?php if(count($users)):?>
 			<?php foreach($users as $id=>$email):?>

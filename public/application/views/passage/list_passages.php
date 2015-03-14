@@ -1,6 +1,5 @@
 <div class="row">
-	<div class="col-md-1">&nbsp;</div>
-	<div class="col-md-10">
+	<div class="col-md-10 col-md-offset-1">
 		<h3>
 			<a href="/passage/add_passage">
 				<span class="glyphicon glyphicon-plus"></span>
@@ -11,8 +10,7 @@
 </div>
 
 <div class="row">
-	<div class="col-md-1">&nbsp;</div>
-	<div id="col-md-10">
+	<div id="col-md-10 col-md-offset-1">
 	<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="passage_table">
 		<thead>
 			<tr>

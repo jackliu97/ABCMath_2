@@ -1,7 +1,6 @@
 <form role="form" id="group_form">
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-lg-10">
+  <div class="col-lg-10 col-md-offset-1">
     <div class="input-group">
       <div class="input-group-btn">
 
@@ -30,8 +29,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-  <div class="col-md-10">Groups: <div id="group_container">
+  <div class="col-md-10 col-md-offset-1">Groups: <div id="group_container">
     <?php if(isset($existing_group) && count($existing_group)):?>
     <?php foreach($existing_group as $id=>$group):?>
       <span class="label label-default selected_group" groupid="<?php echo $id;?>"><?php echo $group;?></span>
@@ -46,8 +44,7 @@
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-5">
+<div class="col-md-5 col-md-offset-1">
 <form role="form" id="import_word_form">
   <div class="form-group">
     <label>Import CSV wordfile.</label>

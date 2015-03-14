@@ -3,15 +3,13 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-   <div class="col-md-2">
+   <div class="col-md-2 col-md-offset-1">
     <h3>Hello <?php echo $teacher->first_name . ' ' . $teacher->last_name;?></h3>
   </div>
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-2">
+<div class="col-md-2 col-md-offset-1">
   <input type="hidden" name="teacher_id" id="teacher_id" value="<?php echo $teacher->id;?>">
   <div class="well">
     <div class="form-group">

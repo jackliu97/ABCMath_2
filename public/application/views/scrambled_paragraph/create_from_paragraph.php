@@ -1,6 +1,5 @@
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-5">
+<div class="col-md-5 col-md-offset-1">
 <form role="form" id="scrambled_paragraph_form">
   <div class="form-group">
     <label>Input Paragraph</label>
