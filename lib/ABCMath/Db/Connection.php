@@ -19,9 +19,10 @@ class Connection
             self::$_config = new Configuration();
             $connectionParams = array(
                 'dbname'    => DB_DATABASE,
-                'user'        => DB_USERNAME,
-                'password'    => DB_PASSWORD,
-                'host'        => DB_HOSTNAME,
+                'user'      => DB_USERNAME,
+                'password'  => DB_PASSWORD,
+                'host'      => DB_HOSTNAME,
+                'port'      => DB_PORT,
                 'driver'    => 'pdo_mysql',
             );
         }

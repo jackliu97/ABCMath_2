@@ -21,19 +21,20 @@ class Class_Dashboard extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
         if ($this->User_Model->check_login() == false) {
             $this->session->sess_destroy();
             header('Location: /login');
         }
 
-        $this->_template = new Template(Template::FILESYSTEM);
-        if ($this->User_Model->check_permission('scaffolding') == false) {
-            $this->editable = false;
-        } else {
+        $this->editable = false;
+
+        if($this->User_Model->in_group('Administrator') || 
+            $this->User_Model->in_group('Manager') ||
+            $this->User_Model->in_group('Teacher Assistance')){
             $this->editable = true;
         }
 
+        $this->_template = new Template(Template::FILESYSTEM);
         $this->semester_id = $this->session->userdata('semester_id');
     }
 
@@ -79,6 +80,56 @@ class Class_Dashboard extends CI_Controller
                                         'private_js' => array('dashboard/class.js'),
                                         'datatable' => true,
                                         ));
+    }
+
+    public function classes(){
+        $data = array();
+        $this->load->view('header');
+        $this->load->view('navbar');
+        $this->load->view('dashboard/all_classes', $data);
+        $this->load->view('footer', array(
+                                        'private_js' => array('dashboard/all_classes.js'),
+                                        'datatable' => true,
+                                        ));
+    }
+
+    public function get_classes($status = 'all_classes')
+    {
+        $active_classes = false;
+        if ($status === 'active_classes') {
+            $active_classes = true;
+        }
+
+        $result = array('success' => false, 'message' => '');
+        $class_manager = new ABCClassManager();
+        $class_manager->semester_id = $this->semester_id;
+        $dt = new Datatable();
+        $dt->sql = $class_manager->getAllClassesSQL($active_classes);
+        $dt->columns = array(    'id',
+                                'external_id',
+                                'description',
+                                'subject',
+                                'teacher',
+                                'start_time',
+                                'end_time',
+                                'days', );
+
+        $result = $dt->processQuery();
+
+        if (count($result['aaData'])) {
+            foreach ($result['aaData'] as $key => $row) {
+                foreach ($row as $k => $col) {
+                    if ($k == 0) {
+                        $class_id = $col;
+                    }
+                    $result['aaData'][$key][$k] =
+                        "<a href='/class_dashboard/info/{$class_id}'>".
+                        "{$result['aaData'][$key][$k]}</a>";
+                }
+            }
+        }
+
+        $this->load->view('response/datatable', array('json' => $result));
     }
 
     public function get_attendance_note(){

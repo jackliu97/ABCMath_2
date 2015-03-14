@@ -129,6 +129,7 @@ class User_Model extends CI_Model
             // Get the current active/logged in user
             $user = Sentry::getUser();
             $groups = $user->getGroups();
+
             $return = array();
 
             if (count($groups)) {
@@ -163,6 +164,27 @@ class User_Model extends CI_Model
 
             return $user->hasAnyAccess($permissions);
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
+            return false;
+        }
+    }
+
+    public function in_group($group_name){
+
+        try{
+            $user = Sentry::getUser();
+            $group = Sentry::findGroupByName($group_name);
+
+            if ($user->inGroup($group)){
+                return true;
+            }
+            return false;
+        }
+        catch (Cartalyst\Sentry\Users\UserNotFoundException $e)
+        {
+            return false;
+        }
+        catch (Cartalyst\Sentry\Groups\GroupNotFoundException $e)
+        {
             return false;
         }
     }

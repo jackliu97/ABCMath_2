@@ -13,11 +13,19 @@ class Student_Dashboard extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        if ($this->User_Model->check_permission('scaffolding') == false) {
-            $this->editable = false;
-        } else {
+        if (($this->User_Model->check_login() === false)) {
+            $this->session->sess_destroy();
+            header('Location: /login');
+        }
+
+        $this->editable = false;
+
+        if($this->User_Model->in_group('Administrator') || 
+            $this->User_Model->in_group('Manager') ||
+            $this->User_Model->in_group('Teacher Assistance')){
             $this->editable = true;
         }
+
         $this->_template = new Template(Template::FILESYSTEM);
         $this->semester_id = $this->session->userdata('semester_id');
     }
@@ -42,6 +50,61 @@ class Student_Dashboard extends CI_Controller
                                         'private_js' => array('dashboard/student.js'),
                                         'datatable' => true,
                                         ));
+    }
+
+    public function students(){
+        $data = array();
+
+        $this->load->view('header');
+        $this->load->view('navbar');
+        $this->load->view('dashboard/all_students', $data);
+        $this->load->view('footer', array(
+                                        'private_js' => array(
+                                            'dashboard/all_students.js'
+                                            ),
+                                        'datatable' => true,
+                                        ));
+    }
+
+    public function get_students($type = '')
+    {
+        $method = "getAll{$type}StudentsSQL";
+        $student_manager = new StudentManager();
+        $dt = new Datatable();
+        $dt->sql = $student_manager->{$method}(new DateTime('now'));
+        $dt->columns = array(    'student_id',
+                                'external_id',
+                                'name',
+                                'email',
+                                'telephone',
+                                'cellphone',
+                                'class_name', );
+        $result = $dt->processQuery();
+
+        if (count($result['aaData'])) {
+            foreach ($result['aaData'] as $key => $row) {
+                foreach ($row as $k => $col) {
+                    if ($k == 0) {
+                        $student_id = $col;
+                    }
+                    $result['aaData'][$key][$k] =
+                        "<a href='/student_dashboard/info/{$student_id}'>".
+                        "{$result['aaData'][$key][$k]}</a>";
+                }
+            }
+        }
+
+        $this->load->view('response/datatable', array('json' => $result));
+    }
+
+    public function check_student()
+    {
+        $student_id = $this->input->post('student_id');
+        $student = new Student();
+        $student->setId($student_id);
+        $return = array('success' => $student->load());
+
+        $this->load->view('response/json', array('json' => $return));
     }
 
     public function get_classes($student_id)

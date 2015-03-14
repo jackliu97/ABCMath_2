@@ -41,16 +41,24 @@ class Navigation extends Base
         $this->user = $user_model;
     }
 
+    public function display_quicklinks()
+    {
+        $html = '';
+        //logout
+        $html .= $this->_template->render('Navigation/quicklinks.twig', array());
+        return $html;
+    }
+
     public function display_sections()
     {
         $html = '';
 
-        //logout
-        $html .= $this->_template->render('Navigation/logout.twig', array());
-
         //sections
         $this->build_sections();
         $html .= implode('', $this->_sections);
+
+        //logout
+        $html .= $this->_template->render('Navigation/logout.twig', array());
 
         return $html;
     }

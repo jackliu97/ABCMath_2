@@ -16,11 +16,27 @@ class landing extends CI_Controller
 
     public function index()
     {
+
         $this_group = $this->User_Model->get_groups();
-        if (in_array('Teacher', $this_group)) {
-            header('Location: /teacher_dashboard');
-        } else {
-            header('Location: /admin_dashboard');
+        $header = '/login';
+
+        if(in_array('Administrator', $this_group)){
+            $header = '/admin_dashboard';
         }
+
+        else if(in_array('Manager', $this_group)){
+            $header = '/manager_dashboard';
+        }
+
+        else if(in_array('Teacher Assistance', $this_group)){
+            $header = '/ta_dashboard';
+        }
+
+        else{
+            //logout.
+            $this->session->sess_destroy();
+        }
+
+        header("Location: {$header}");
     }
 }
