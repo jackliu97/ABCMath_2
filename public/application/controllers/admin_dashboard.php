@@ -32,7 +32,11 @@ class Admin_Dashboard extends CI_Controller
         $this->load->view('navbar');
         $this->load->view('dashboard/admin', $data);
         $this->load->view('footer', array(
-                                        'private_js' => array('dashboard/admin.js'),
+                                        'private_js' => array(
+                                            'dashboard/all_classes.js',
+                                            'dashboard/all_students.js',
+                                            'dashboard/admin.js'
+                                            ),
                                         'datatable' => true,
                                         ));
     }

@@ -11,7 +11,6 @@
             '<th>Name</th>' + 
             '<th>Email</th>' + 
             '<th>Home Phone</th>' + 
-            '<th>Cell Phone</th>' + 
             '<th>Class Name</th>' + 
             '</tr></thead><tbody></tbody></table>');
     }
@@ -41,7 +40,8 @@
         $('#all_students').addClass('active');
 
         reset_student_datatable();
-        get_students('');
+        get_students('registered');
+        console.log('registered');
 
 
         $('.datatable_student_container').on('click', '.student_detail', function(){
@@ -56,7 +56,7 @@
             $('.student_panel').find('button').removeClass('active');
             $(this).addClass('active');
             reset_student_datatable();
-            get_students('');
+            get_students('registered');
             return false;
         });
 

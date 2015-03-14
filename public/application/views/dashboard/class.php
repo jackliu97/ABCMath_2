@@ -7,8 +7,7 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-1">&nbsp;</div>
-     <div class="col-sm-10">
+     <div class="col-sm-10 col-sm-offset-1">
       <h3>
         <?php echo $class->external_id;?>
         <?php if($editable):?>
@@ -29,9 +28,8 @@
     </div>
   </div>
 
-  <div class="row">
-  <div class="col-sm-1">&nbsp;</div>
-  <div class="col-sm-10">
+<div class="row">
+  <div class="col-sm-10 col-sm-offset-1">
     <div class="panel panel-success">
      <div class="panel-heading">
       <h3 class="panel-title"><?php echo $class->external_id?>'s Information</h3>
@@ -102,30 +100,10 @@
     </div>
 
   </div>
-  </div>
-
-<div class="row">
-  <div class="col-sm-1">&nbsp;</div>
-  <div class="col-sm-10">
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $class->external_id?>'s Students</h3>
-      </div>
-      <div class="panel-body student_panel">
-        <p>
-          <a type="button" id="registered_students" class="btn btn-default">Registered Students</a>
-          <a type="button" id="add_students" class="btn btn-default">Add Students To Class</a>
-        </p>
-        <p><div class="datatable_student_container table-responsive"></div></p>
-       </div>
-
-    </div>
-  </div>
 </div>
 
-  <div class="row">
-  <div class="col-sm-1">&nbsp;</div>
-  <div class="col-sm-10">
+<div class="row">
+  <div class="col-sm-10 col-sm-offset-1">
     <div class="panel panel-info">
      <div class="panel-heading">
       <h3 class="panel-title"><?php echo $class->external_id?>'s Details</h3>
@@ -165,7 +143,25 @@
      </div>
    </div>
   </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-10 col-sm-offset-1">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $class->external_id?>'s Students</h3>
+      </div>
+      <div class="panel-body student_panel">
+        <p>
+          <a type="button" id="registered_students" class="btn btn-default">Registered Students</a>
+          <a type="button" id="add_students" class="btn btn-default">Add Students To Class</a>
+        </p>
+        <p><div class="datatable_student_container table-responsive"></div></p>
+       </div>
+
+    </div>
   </div>
+</div>
 
 </div>
 </div>

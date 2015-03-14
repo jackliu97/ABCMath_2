@@ -54,7 +54,7 @@ var COMMON = (function ( $ ) {
 			var student_id = $('#student_name').val();
 			$.ajax({
 				type:'POST',
-				url:'/admin_dashboard/check_student',
+				url:'/student_dashboard/check_student',
 				data: {'student_id': student_id},
 				success: function(data){
 					if(data.success){

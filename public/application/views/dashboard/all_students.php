@@ -3,15 +3,13 @@
 </div>
 
 <div class="row">
-  <div class="col-md-1">&nbsp;</div>
-   <div class="col-md-10">
+   <div class="col-md-10 col-md-offset-1">
     <h3>All Students</h3>
   </div>
 </div>
 
 <div class="row">
-<div class="col-md-1">&nbsp;</div>
-<div class="col-md-10 student_panel">
+<div class="col-md-10 col-md-offset-1 student_panel">
   <div class="panel panel-success">
    <div class="panel-heading">
     <h3 class="panel-title">Student List</h3>

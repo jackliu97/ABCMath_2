@@ -68,8 +68,9 @@ class Student_Dashboard extends CI_Controller
 
     public function get_students($type = '')
     {
-        $method = "getAll{$type}StudentsSQL";
+        $method = "getAll{$type}StudentsSQL";        
         $student_manager = new StudentManager();
+        $student_manager->semester_id = $this->semester_id;
         $dt = new Datatable();
         $dt->sql = $student_manager->{$method}(new DateTime('now'));
         $dt->columns = array(    'student_id',
@@ -77,7 +78,6 @@ class Student_Dashboard extends CI_Controller
                                 'name',
                                 'email',
                                 'telephone',
-                                'cellphone',
                                 'class_name', );
         $result = $dt->processQuery();
 

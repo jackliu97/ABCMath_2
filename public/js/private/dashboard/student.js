@@ -36,7 +36,7 @@
 
 	function get_classes(all_classes){
 		if(all_classes === true){
-			var source = '/admin_dashboard/get_classes/';
+			var source = '/class_dashboard/get_classes/';
 		}else{
 			var source = '/student_dashboard/get_classes/' + $('#student_id').val();
 		}
@@ -276,7 +276,7 @@
 			var student_id = $('#student_name').val();
 			$.ajax({
 				type:'POST',
-				url:'/admin_dashboard/check_student',
+				url:'/student_dashboard/check_student',
 				data: {'student_id': student_id},
 				success: function(data){
 					if(data.success){
