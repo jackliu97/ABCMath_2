@@ -185,7 +185,7 @@
     </div>
 
     <div class="col-sm-2">
-        <label>Grade (Current or Going to)</label>
+        <label>Grade (Year)</label>
         <div class="form-group input-group-lg">
             <?php
                 $options = array(
