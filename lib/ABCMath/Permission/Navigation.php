@@ -83,6 +83,7 @@ class Navigation extends Base
         if (!$this->check_user()) {
             throw new \InvalidArgumentException('Invalid User type.');
         }
+        $this->_sections[] = $this->_template->render('Navigation/register.twig', $active);
 
         //display users scaffolding link.
         if ($this->user->check_permission(array('admin'))) {

@@ -42,6 +42,7 @@
   <div class="form-group">
     <div class="col-lg-offset-2 col-lg-10">
       <button type="submit" class="btn btn-default">Sign in</button>
+      <a href="/register" target="_blank" class="btn btn-default">Registration Form</a>
     </div>
   </div>
 </form>
