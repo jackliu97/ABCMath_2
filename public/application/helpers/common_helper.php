@@ -1,5 +1,19 @@
 <?php
 
+if ( ! function_exists( 'array_get' ) ) {
+	function array_get( $array, $key, $default=NULL, $nestDelimiter='.' ) {
+		if ( is_null( $key ) ) return $array;
+		if ( isset( $array[$key] ) ) return $array[$key];
+		foreach ( explode( $nestDelimiter, $key ) as $segment ) {
+			if ( ! is_array( $array ) || ! array_key_exists( $segment, $array ) ) {
+				return $default;
+			}
+			$array = $array[$segment];
+		}
+		return $array;
+	}
+}
+
 if ( ! function_exists('convert_smart_quotes'))
 {
 	function convert_smart_quotes($string) 
@@ -194,6 +208,54 @@ if ( ! function_exists('time_dropdown_options'))
 		}
 		
 		return $time;
+	}
+}
+
+if ( ! function_exists('month_options'))
+{
+	function month_options(){
+		return array(
+			''=>'Pick a month',
+			'1'=>'January',
+			'2'=>'February',
+			'3'=>'March',
+			'4'=>'April',
+			'5'=>'May',
+			'6'=>'June',
+			'7'=>'July',
+			'8'=>'August',
+			'9'=>'September',
+			'10'=>'October',
+			'11'=>'November',
+			'12'=>'December',
+			);
+	}
+}
+
+if ( ! function_exists('day_options'))
+{
+	function day_options(){
+		$options = array(''=>'Pick a day',);
+		for($i = 1; $i<=31; $i++){
+			$options[$i] = $i;
+		}
+
+		return $options;
+	}
+}
+
+if ( ! function_exists('year_dob_options'))
+{
+	function year_dob_options( $backward=25 ){
+		$current_year = (int)date('Y')-4;
+		$options = array(''=>'Pick a year',);
+
+		for($i = 1; $i<$backward; $i++){
+			$current_year -= 1;
+			$options[$current_year] = $current_year;
+		}
+
+		return $options;
 	}
 }
 

@@ -71,6 +71,40 @@ class ABCClassManager extends Base
         }
     }
 
+    public function getClassForRegistration($type=null)
+    {
+
+        $stmt = $this->_conn->prepare($this->getClassForRegistrationSQL());
+        $stmt->execute();
+        $classes = $stmt->fetchAll();
+
+        if ($type === null) {
+            return $classes;
+        }
+
+        if($type === 'options'){
+            $options = array(''=>'Pick a class');
+            foreach ($classes as $class) {
+                $options[$class['id']] = $class['name'];
+            }
+            return $options;
+        }
+
+    }
+
+    public function getClassForRegistrationSQL(){
+        $sql = "SELECT 
+                    c.id id,
+                    CONCAT(s.description, ' ', c.description) name,
+                    s.start_date
+                FROM classes c
+                INNER JOIN semesters s ON c.term_id = s.id
+                WHERE s.end_date >= NOW()
+                ORDER BY s.start_date DESC, c.description ASC";
+
+        return $sql;
+    }
+
     public function getAllClassesSQL($active_only = false)
     {
         $where = array();
