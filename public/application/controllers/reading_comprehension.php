@@ -14,12 +14,10 @@ class Reading_Comprehension extends CI_Controller
     {
         parent::__construct();
 
-        if ($this->User_Model->check_permission(
-            array(
-                'reading_comprehension.view',
-                'reading_comprehension.edit', )
-            ) == false) {
-            header('Location: /landing');
+        if (($this->User_Model->check_login() === false) || 
+            ($this->User_Model->in_group('Administrator') === false)) {
+            $this->session->sess_destroy();
+            header('Location: /login');
         }
 
         $this->session->set_userdata('section', 'reading_comprehension');
@@ -32,6 +30,15 @@ class Reading_Comprehension extends CI_Controller
         $this->load->view('header');
         $this->load->view('navbar');
         $this->load->view('footer');
+    }
+
+    public function parse(){
+        $paragraph = $this->input->post('paragraph');
+        $questions = $this->input->post('questions');
+
+        $reading = ReadingComprehension::parse($paragraph, $questions);
+        $result = array('success' => true, 'parsed_result'=>$reading);
+        $this->load->view('response/datatable', array('json' => $result));
     }
 
     public function create($id = '')
@@ -125,43 +132,18 @@ class Reading_Comprehension extends CI_Controller
 
     public function save()
     {
-        $reading_comprehension = new ReadingComprehension();
-        $data = array();
-        $data['id'] = $this->input->post('reading_comprehension_id');
-        $data['full_text'] = $this->input->post('paragraph');
-        $data['lines'] = $this->input->post('lines');
-        $data['questions'] = array();
+        $paragraph = $this->input->post('paragraph');
         $questions = $this->input->post('questions');
+
+        $reading = ReadingComprehension::parse($paragraph, $questions);
+        $reading['id'] = $this->input->post('reading_comprehension_id');
         $keywords = $this->input->post('keyword');
 
-        if (count($questions)) {
-            foreach ($questions as $question) {
-                $q_data = array();
-                $q_data['id'] = isset($question['id']) ? $question['id'] : '';
-                $q_data['reading_comprehension_id'] = $data['id'];
-                $q_data['text'] = $question['question'];
-                $q_data['original_text'] = $question['original_text'];
-                $q_data['choices'] = array();
 
-                if (count($question['choice'])) {
-                    foreach ($question['choice'] as $k => $choice) {
-                        $c_data = array();
-                        $c_data['text'] = $choice;
-                        if ($k == $question['is_answer']) {
-                            $c_data['is_answer'] = '1';
-                        } else {
-                            $c_data['is_answer'] = '0';
-                        }
-                        $q_data['choices'][] = $c_data;
-                    }
-                }
-
-                $data['questions'][] = $q_data;
-            }
-        }
-
-        $reading_comprehension->load($data);
+        $reading_comprehension = new ReadingComprehension();
+        $reading_comprehension->load($reading);
         $result = $reading_comprehension->save();
+
 
         /*
         * Keywords Logic.
@@ -178,7 +160,7 @@ class Reading_Comprehension extends CI_Controller
             $this->load->view('response/json', array('json' => $result));
         } else {
             $result['success'] = false;
-            $result['message'] = 'Save failed!';
+            $result['message'] = empty($result['message']) ? 'Save failed!' : $result['message'];
             $this->load->view('response/json', array('json' => $result));
         }
 

@@ -179,19 +179,24 @@ class Scrambled_Paragraph extends CI_Controller
     public function save()
     {
         $keywords = $this->input->post('keyword');
-        $full_text = $this->input->post('paragraph');
-        $lines = $this->input->post('pieces');
+        $paragraph = $this->input->post('paragraph');
+        $type = $this->input->post('type');
+        if($type === 'paragraph'){
+            $pieces = ScrambledParagraph::createFromParagraph($paragraph);
+        }else{
+            $pieces = ScrambledParagraph::createFromQuestion($paragraph);
+        }
         $id = $this->input->post('scrambled_paragraph_id');
 
-        $paragraph = new ScrambledParagraph();
+        $sp = new ScrambledParagraph();
 
         $data = array();
         $data['id'] = $id;
-        $data['full_text'] = $full_text;
+        $data['full_text'] = $paragraph;
         $data['lines'] = array();
 
-        if (count($lines)) {
-            foreach ($lines as $order_id => $text) {
+        if (count($pieces)) {
+            foreach ($pieces as $order_id => $text) {
                 $data['lines'][] = array(
                     'order_id' => $order_id,
                     'text' => $text,
@@ -199,24 +204,25 @@ class Scrambled_Paragraph extends CI_Controller
             }
         }
 
-        $paragraph->load($data);
-        $result = $paragraph->save();
+        $sp->load($data);
+        $result = $sp->save();
 
         /*
         * Keywords Logic.
         */
+
         $this->keywordManager->load($keywords);
-        $this->keywordManager->bind('scrambled_paragraph', $paragraph->id);
+        $this->keywordManager->bind('scrambled_paragraph', $sp->id);
 
         if ($result['success']) {
             $result['success'] = true;
-            $result['scrambled_paragraph_id'] = $paragraph->id;
-            $this->load->view('response/json', array('json' => $result));
+            $result['scrambled_paragraph_id'] = $sp->id;
         } else {
             $result['success'] = false;
             $result['message'] = $e->getMessage();
-            $this->load->view('response/json', array('json' => $result));
         }
+
+        $this->load->view('response/json', array('json' => $result));
     }
 
     public function create_exam()
@@ -250,11 +256,26 @@ class Scrambled_Paragraph extends CI_Controller
             $paragraph->delete();
             $result['success'] = true;
             $result['removed_id'] = $paragraph->id;
-            $this->load->view('response/json', array('json' => $result));
         } catch (Exception $e) {
             $result['success'] = false;
             $result['message'] = $e->getMessage();
-            $this->load->view('response/json', array('json' => $result));
         }
+        $this->load->view('response/json', array('json' => $result));
     }
+
+    public function parse()
+    {
+        $result = array();
+        $paragraph = $this->input->post('paragraph');
+        $type = $this->input->post('type');
+        $result['success'] = true;
+
+        if($type === 'paragraph'){
+            $result['pieces'] = ScrambledParagraph::createFromParagraph($paragraph);
+        }else{
+            $result['pieces'] = ScrambledParagraph::createFromQuestion($paragraph);
+        }
+        $this->load->view('response/json', array('json' => $result));
+    }
+
 }

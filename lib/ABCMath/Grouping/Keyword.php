@@ -49,9 +49,10 @@ class Keyword extends Base implements Element
 
     public function bind($table, $external_id)
     {
-        $this->_conn->insert("{$table}_keyword",
-                    array(    "{$table}_id" => $external_id,
-                            'keyword_id' => $this->id, )
+        $this->_conn->insert(
+                    "{$table}_keyword",
+                    array("{$table}_id" => $external_id,
+                          'keyword_id' => $this->id, )
                     );
 
         return $this->_conn->lastInsertId();

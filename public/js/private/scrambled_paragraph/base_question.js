@@ -13,60 +13,44 @@
 
 
 		$('#parse').on('click', function(){
-			$('#split_result').empty();
+			$.ajax({
+				type:'POST',
+				url:'/scrambled_paragraph/parse',
+				data: {
+					'type': 'question',
+					'paragraph': $('#paragraph').val()
+				},
+				success: function(data){
 
-			var text_split = $('#paragraph').val().split(/\n[ABCDEabcde]. /);
-			var text_sentences = [];
-			var split_html = '';
-			var answer = [];
+					if(data.success){
 
-			//set lead sentence.
-			text_sentences.push(text_split[0]);
+						var $container = $('#split_result');
+						var $ul = $('<ol>');
 
-			//if last line contains the answer "ANS: A, B, C, D, E", we sepeate it here.
-			var last_line = text_split.pop().split('ANS: ');
-			text_split.push(last_line[0].replace('\n\r'));
+						for(var i=0, l=data.pieces.length; i<l; i++){
+							$ul.append($('<li>', {
+								'text':data.pieces[i]
+							}));
+						}
 
-			//if "ANS: ..." is provided, we format it into array format.
-			//else it's not provided, assume a, b, c, d, e.
-			if(last_line.length == 2){
-				answer = last_line[1].split(', ');
-			}else{
-				answer = ['A', 'B', 'C', 'D', 'E'];
-			}
+						$container.empty();
+						$container.append($ul);
 
-
-			$.each(answer, function(ind, val){
-				text_sentences.push(text_split[alpha_to_num(val)]);
-			});
-
-			$.each(text_sentences, function(index, value){
-				var letter = '';
-				if(index > 0){
-					letter = '<span class="label label-primary">' + num_to_alpha(index) + '</span>';
+					}else{
+						alert(data.message);
+					}
 				}
-
-				split_html += '<p>' + letter + '&nbsp;<span class="parsed">' + value + '</p>';
-
 			});
-			$('#paragraph_original').val(text_sentences.join(''));
-			$('#split_result').append(split_html);
-
 
 		});
 
 		$('#scrambled_paragraph_form').submit(function(){
 
 			var submit_data = {
-				'paragraph': $('#paragraph_original').val(),
+				'type': 'question',
+				'paragraph': $('#paragraph').val(),
 				'scrambled_paragraph_id': $('#scrambled_paragraph_id').val()
 			};
-
-			submit_data['pieces'] = [];
-
-			$.each($('.parsed'), function(index, value){
-				submit_data['pieces'].push($(value).text());
-			});
 
 			submit_data['keyword'] = [];
 			$.each($('.selected_keyword'), function(index, value){

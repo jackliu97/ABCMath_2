@@ -25,6 +25,52 @@ class ReadingComprehension extends ElementBase implements Element
         $this->questions = array();
     }
 
+    public static function parse($paragraph, array $questions){
+
+        $result = array(
+            'full_text' => $paragraph,
+            'lines' => array(),
+            'questions' => array()
+            );
+        $result['lines'] = array_map('trim', explode("\n", $paragraph));
+
+        if(!count($questions)){
+            return $result;
+        }
+
+        foreach($questions as $question){
+            $result['questions'][] = self::parseQuestion($question);
+        }
+
+        return $result;
+    }
+
+    public static function parseQuestion($question){
+        $question_text = $question['question'];
+
+        $question_results = array(
+            'original_text'=>$question_text,
+            'text'=>'',
+            'choices'=>array()
+            );
+        $question_pieces = preg_split('/\\n[a-p]\.|(\\nANS:)/i', $question_text);
+        $question_results['text'] = trim(array_shift($question_pieces));
+
+        $answer = trim(strtolower(array_pop($question_pieces)));
+        $answer_index = ord($answer) - 97;
+
+        foreach($question_pieces as $k=>$choices){
+            $choice_pieces = array(
+                'text'=>trim($choices),
+                'is_answer'=>($k == $answer_index) ? '1' : '0'
+
+                );
+            $question_results['choices'][] = $choice_pieces;
+        }
+
+        return $question_results;
+    }
+
     /**
      * loads data. Questions gets loaded separately.
      * if no params are passed, we load data from database. ID must be passed.
@@ -45,7 +91,7 @@ class ReadingComprehension extends ElementBase implements Element
             $data = $this->_loadFromDB();
         }
 
-        if (!count($data)) {
+        if (empty($data)) {
             $this->log('No data found.');
 
             return false;
@@ -73,11 +119,13 @@ class ReadingComprehension extends ElementBase implements Element
      */
     public function save()
     {
+        $is_new = false;
         $this->_conn->beginTransaction();
 
         //start saving rc related stuff.
         if (!$this->id) {
             $this->id = $this->_insert();
+            $is_new = true;
         } else {
             $this->_update();
         }
@@ -124,7 +172,7 @@ class ReadingComprehension extends ElementBase implements Element
 
         $this->_conn->commit();
 
-        return array('success' => true);
+        return array('success' => true, 'is_new'=>$is_new);
     }
 
     public function delete()
@@ -138,18 +186,25 @@ class ReadingComprehension extends ElementBase implements Element
 
     public function saveQuestions()
     {
+
+        $qm = new QuestionManager($this->id);
+        if( $qm->deleteAll() === false ){
+            return array('success'=> false);
+        }
+        
         if (!count($this->questions)) {
             return array(
-                'success' => false,
-                'message' => 'at least one question is required.', );
+                'success' => true,
+                'message' => 'All existing questions removed.'
+                );
         }
 
         foreach ($this->questions as $question) {
             $question->reading_comprehension_id = $this->id;
             $result = $question->save();
             if (!$result['success']) {
-                $this->log("Failed at saving question: [{$result['message']}]");
-
+                $result['message'] = "Failed at saving question: [{$result['message']}]";
+                $this->log($result['message']);
                 return $result;
             }
         }

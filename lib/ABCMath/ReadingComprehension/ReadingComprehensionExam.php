@@ -3,12 +3,66 @@ namespace ABCMath\ReadingComprehension;
 
 use ABCMath\Base;
 use ABCMath\Meta\Implement\ExamGenerator;
+use ABCMath\ReadingComprehension\ReadingComprehension;
 
 class ReadingComprehensionExam extends Base implements ExamGenerator
 {
+
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public static function getExamById(array $ids)
+    {
+        $questions = array();
+        $examContainer = new ReadingComprehensionExam();
+
+        if(empty($ids)){
+            return array();
+        }
+
+
+        foreach($ids as $id){
+            $rc = new ReadingComprehension($id);
+            $rc->load();
+            $questions[] = $examContainer->makeRTF($rc);
+        }
+
+        return $questions;
+    }
+
+    public function makeRTF(ReadingComprehension $rc)
+    {
+
+        $data = array();
+        $data['id'] = $rc->id;
+        $data['lines'] = $rc->lines;
+        $data['questions'] = array();
+
+        if(count($rc->questions)){
+            foreach($rc->questions as $question){
+                $q = array();
+                $q['text'] = $question->text;
+                $q['choices'] = array();
+                shuffle($question->choices);
+
+                $answer = '';
+                foreach($question->choices as $k=>$choice){
+                    $c = $choice;
+                    $letter = chr($k + 97);
+                    $q['choices'][$letter] = $c;
+                    if($c['is_answer'] == 1){
+                        $answer = $letter;
+                    }
+
+                }
+                $q['answer'] = $answer;
+                $data['questions'][] = $q;
+            }
+        }
+
+        return $data;
     }
 
     /**

@@ -1,4 +1,4 @@
-( function($) {
+( function($, $C) {
 	'use strict';
 
 	function remove_question_action(obj){
@@ -10,52 +10,51 @@
 		return String.fromCharCode(ord + i);
 	}
 
-	function build_submit_data(){
-		var paragraph = $('#paragraph').val();
-		var questions = $('#parsed_result').find('.question_info');
-		var data = {'paragraph':paragraph, 
-					'reading_comprehension_id':$('#reading_comprehension_id').val()};
-
-
-		data['lines'] = [];
-		data['questions'] = [];
-
-		$.each(paragraph.split('\n'), function(ind, val){
-			data['lines'].push(val.trim());
-		});
-
-		$.each(questions, function(ind, val){
-			var q = {};
-			var $val = $(val);
-			var ans = $val.find('.answer').html().trim();
-			q['id'] = $val.find('.question_id').val();
-			q['question'] = $val.find('.question').html();
-			q['choice'] = [];
-			q['original_text'] = $val.find('textarea').val();
-			
-			$.each($val.find('.choice'), function(i, v){
-				q['choice'].push($(v).text().trim());
-				if(num_to_alpha(i+1) == ans){
-					q['is_answer'] = i;
-				}
-			});
-			data['questions'].push(q);
-		});
-
-		data['keyword'] = [];
-			$.each($('.selected_keyword'), function(index, value){
-				data['keyword'].push(
-										{
-											'id':$(value).attr('keywordid'),
-											'word':$(value).text()
-										});
-			});
-
-		return data;
-	}
-
 	function alp_to_number(alp){
 		return string.charCodeAt(alp.toLowerCase()) - 64;
+	}
+
+	function show_parsed(data){
+		var html = '<div class="row"><div class="col-sm-10 col-sm-offset-1"><span class="label label-success">Verify that the line numbers are correct</span></div></div>';
+		var count = 1;
+
+		$.each(data.lines, function(ind, val){
+				if($.trim(val) === ''){
+					return;
+				}
+
+				var line = count;
+				if(count % 5==0){
+					line = '<span class="label label-danger">' + count + '</span>';
+				}else{
+					line = '<span class="label label-default">' + count + '</span>';
+				}
+
+				html += '<div class="row">';
+				html += '<div class="col-sm-1 text-right">'+ line + '</div>';
+				html += '<div class="col-sm-10 line">'+ val + '</div>';
+				html += '</div>';
+				count += 1;
+			});
+
+		$.each(data.questions, function(ind, val){
+			html += '<div class="row">';
+			html += '<div class="col-md-7"><i><b>Question '+ (ind+1) + '&nbsp;</b></i><p class="question">' + val.text + '</p></div>';
+
+			$.each(val.choices, function(cind, cval){
+				var answer = '';
+				if(cval.is_answer == '1'){
+					answer = '<span class="label label-danger">Answer</span>&nbsp;';
+				}
+
+				html += '<div class="col-md-7"><i>'+ num_to_alpha(cind+1) + '.&nbsp;</i>' + answer + cval.text + '</div>';
+			});
+
+			html += '</div>';
+		});
+
+		$('#parsed_result').empty();
+		$('#parsed_result').append(html);
 	}
 
 	$( document ).ready(function() {
@@ -90,90 +89,78 @@
 		});
 
 		$('.parse').on('click', function(){
-			var paragraph = $('#paragraph').val().split('\n');
-			var questions = $('#question_container').find('.questions');
-			var html = '';
-			var line = '';
-			var count = 0;
-			$.each(paragraph, function(ind, val){
-				if($.trim(val) == ''){
-					return;
-				}
 
-				count += 1;
+			var submit_data = {
+					'paragraph': $('#paragraph').val(),
+					'questions': []
+				};
 
-				if(count % 5==0){
-					line = 'Line ' + count;
-				}else{
-					line = '';
-				}
-
-				html += '<div class="row">';
-				html += '<div class="col-md-2 text-right"><b><i>'+ line + '</i></b></div>';
-				html += '<div class="col-md-10 line">'+ val + '</div>';
-				html += '</div>';
+			$.each($('#question_container').find('.questions'), function(ind, val){
+				submit_data['questions'].push({
+					question_id: $(val).find('.question_id').val(),
+					question: $(val).find('textarea').val()
+					});
 			});
 
-
-			$.each(questions, function(ind, val){
-
-				var original_text = $(val).find('textarea').val();
-				var question_id = $(val).find('.question_id').val();
-				var question = '';
-				var choices = [];
-				var answer = '';
-
-				if(!original_text){
-					return false;
-				}
-
-
-				$.each(original_text.split('\n'), function(i, p){
-					p = $.trim(p);
-					var head = $.trim(p.substring(0, 3));
-
-					if(head.match(/[a-zA-Z]\./g) != null){ //match "a.", "b.", "c.", ... etc.
-						choices.push($.trim(p.substring(3, p.length)));
-
-					}else if(head.match(/ANS/g) != null){ //match anything that starts with "ANS"
-						answer = $.trim(p.substring(4, p.length)).toUpperCase();
-
-					}else{
-						question += p;
-
+			$.ajax({
+				type:'POST',
+				url:'/reading_comprehension/parse',
+				data: submit_data,
+				success: function(data){
+					if(data.success){
+						show_parsed(data.parsed_result);
 					}
-
-				});
-
-				html += '<div class="row question_info">';
-				html += '<div class="col-md-7"><i><b>Question '+ (ind+1) + '&nbsp;</b></i><p class="question">' + question + '</p></div>';
-				
-				$.each(choices, function(i, v){
-					var ans = '';
-					html += '<div class="col-md-7"><i>'+ num_to_alpha(i+1) + '.&nbsp;</i><span class="choice">' + v + '</span></div>';
-				});
-				html += '<input type="hidden" class="question_id" value="' + question_id + '">';
-				html += '<textarea class="original_text" style="display:none;">' + original_text + '</textarea>';
-
-				html += '<div class="col-md-7"><i>ANSWER:&nbsp;</i><span class="answer">' + answer + '</span></div></div>';
+				}
 			});
-
-			$('#parsed_result').empty();
-			$('#parsed_result').append(html);
-
-
 		});
 
 		$('.save').on('click', function(){
+
+			var submit_data = {
+					'reading_comprehension_id': $('#reading_comprehension_id').val(),
+					'paragraph': $('#paragraph').val(),
+					'questions': [],
+					'keyword': []
+				};
+
+			$.each($('#question_container').find('.questions'), function(ind, val){
+
+				var question = $(val).find('textarea').val();
+				if(question === ''){
+					return true;
+				}
+
+				submit_data['questions'].push(
+					{
+						'question_id': $(val).find('.question_id').val(),
+						'question': question
+					}
+						);
+			});
+
+			$.each($('.selected_keyword'), function(index, value){
+				submit_data['keyword'].push(
+										{
+											'id':$(value).attr('keywordid'),
+											'word':$(value).text()
+										});
+			});
+
+
 			$.ajax({
 				type:'POST',
 				url:'/reading_comprehension/save',
-				data: build_submit_data(),
+				data: submit_data,
 				success: function(data){
 
 					if(data.success){
-						window.location = "/reading_comprehension/list_all";
+						if(data.is_new === true){
+							window.location = "/reading_comprehension/create/" + data.reading_comprehension_id;
+						}else{
+							$C.success('Question successfully saved!');
+						}
 					}else{
+						$C.error(data.message);
 						console.log(data.message);
 					}
 				}
@@ -251,4 +238,4 @@
 		});
 	});
 
-}(jQuery) );
+}(jQuery, COMMON) );

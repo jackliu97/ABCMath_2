@@ -135,6 +135,118 @@ ANS: C',
         ),
       ),
     );
+  
+    $this->paragraph = "\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
+    introduction into education would remove the conventionality,
+    artificiality, and backward-lookingness which were characteristic;
+    of classical studies, but they were gravely disappointed. So, too, in
+their time had the humanists thought that the study of the classical
+    authors in the original would banish at once the dull pedantry and
+    superstition of mediaeval scholasticism. The professional
+    schoolmaster was a match for both of them, and has almost
+    managed to make the understanding of chemical reactions as dull
+and as dogmatic an affair as the reading of Virgil's Aeneid.
+    The chief claim for the use of science in education is that it
+    teaches a child something about the actual universe in which he is
+    living, in making him acquainted with the results of scientific
+ discovery, and at the same time teaches him how to think logically
+    and inductively by studying scientific method. A certain limited
+    success has been reached in the first of these aims, but practically
+    none at all in the second. Those privileged members of the
+    community who have been through a secondary or public school
+ education may be expected to know something about the
+    elementary physics and chemistry of a hundred years ago, but they
+    probably know hardly more than any bright boy can pick up from
+    an interest in wireless or scientific hobbies out of school hours.
+    As to the learning of scientific method, the whole thing is palpably
+ a farce. Actually, for the convenience of teachers and the
+    requirements of the examination system, it is necessary that the
+    pupils not only do not learn scientific method but learn precisely
+    the reverse, that is, to believe exactly what they are told and to
+    reproduce it when asked, whether it seems nonsense to them or
+ not. The way in which educated people respond to such quackeries
+    as spiritualism or astrology, not to say more dangerous ones such
+    as racial theories or currency myths, shows that fifty years of
+    education in the method of science in Britain or Germany has
+    produced no visible effect whatever. The only way of learning the
+method of science is the long and bitter way of personal
+    experience, and, until the educational or social systems are altered
+    to make this possible, the best we can expect is the production of a
+    minority of people who are able to acquire some of the techniques
+    of science and a still smaller minority who are able to use and
+develop them.";
+    $this->questions = array(
+              0 => 'The study of standards for what is right and what is wrong is called _____.
+a. pure sciencedd
+b. applied science
+c. ethicsee
+d. technologyffff
+ANS: C',
+  1 => 'Technology has allowed humans to produce more food and reduce the chance of starvation by
+individuals in some countries. How has this advance created additional problems?
+a. The technology has allowed populations to continue to grow, creating the need for additional food.
+b. The technology caused salts to be deposited in soils.
+c. The technology caused the false belief that the problem was solved forever.
+d. All of these.
+e. Final choice.
+ANS: c',
+  2 => 'The narrator would most likely describe Mr. Pontellier\'s conduct during the evening as
+
+
+A. typically generous
+B. justifiably impatient
+C. passionate and irrational
+D. patronizing and self-centered
+E. concerned and gentle
+ANS:C',
+  3 => 'The study of standards for what is right and what is wrong is called _____.
+a. pure science
+b. applied science
+c. ethics
+d. technology
+ANS: C',
+  4 => 'The study of standards for what is right and what is wrong is called _____.
+a. pure science
+b. applied science
+c. ethics
+d. technology
+ANS: C',
+  5 => 'The study of standards for what is right and what is wrong is called _____.
+a. pure science
+b. applied science
+c. ethics
+d. technology
+ANS: C',
+  6 => 'The study of standards for what is right and what is wrong is called _____.
+a. pure science
+b. applied science
+c. ethics
+d. technology
+ANS: C',
+  7 => 'The study of standards for what is right and what is wrong is called _____.
+a. pure scienceaaa
+b. applied science
+c. ethics
+d. technology
+ANS: C',
+  8 => 'Technology has allowed humans to produce more food and reduce the chance of starvation by
+individuals in some countries. How has this advance created additional problems?
+a. The technology has allowed populations to continue to grow, creating the need for additional food.
+b. The technology caused salts to be deposited in soils.
+c. The technology caused the false belief that the problem was solved forever.
+d. All of these.
+e. Final choice.
+ANS: c',
+  9 => 'The narrator would most likely describe Mr. Pontellier\'s conduct during the evening as
+
+
+A. typically generous
+B. justifiably impatient
+C. passionate and irrational
+D. patronizing and self-centered
+E. concerned and gentle
+ANS:C',
+            );
 
         $this->dataNoID = array(
       'full_text' => "\"They're trying to kill me!\" the boy screamed.The pioneers of the teaching of science imagined that its
@@ -247,7 +359,44 @@ ANS: C',
         ),
       ),
     );
-    }
+  }
+
+  //php phpunit.phar --filter test__parse__paragraph ReadingComprehensionTest.php
+  public function test__parse__paragraph(){
+    $result = ReadingComprehension::parse($this->paragraph, $this->questions);
+
+    print_r($result);
+  }
+
+  //php phpunit.phar --filter test__parse__question1 ReadingComprehensionTest.php
+  public function test__parse__question1(){
+    $question = 'The narrator would most likely describe Mr. Pontellier\'s conduct during the evening as
+
+
+A. typically generous
+B. justifiably impatient
+C. passionate and irrational
+D. patronizing and self-centered
+E. concerned and gentle
+ANS:C';
+    $result = ReadingComprehension::parseQuestion($question);
+    $this->assertEquals(count($result['choices']), 5);
+    $this->assertEquals($result['choices'][2]['is_answer'], 1);
+  }
+
+  //php phpunit.phar --filter test__parse__question2 ReadingComprehensionTest.php
+  public function test__parse__question2(){
+    $question = 'The study of standards for what is right and what is wrong is called _____.
+a. pure science
+b. applied science
+c. ethics
+d. technology
+ANS: C';
+
+    $result = ReadingComprehension::parseQuestion($question);
+    $this->assertEquals($result['choices'][2]['is_answer'], 1);
+
+  }
 
   //php phpunit.phar --filter testSave__success ReadingComprehensionTest.php
   public function testSave__success()

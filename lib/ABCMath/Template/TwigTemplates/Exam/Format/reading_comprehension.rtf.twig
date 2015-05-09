@@ -1,0 +1,21 @@
+
+{% for exam in exams %}
+Reading Comprehension {{exam.id}}
+Multiple choice
+
+NARRBEGIN: RC{{exam.id}}
+{% for line in exam.lines %}
+{% if loop.index % 5 == 0 %}{{ loop.index }} {% else %}   {% endif %}{{line|raw}}
+{% endfor %}
+NARREND
+
+{% for question in exam.questions %}
+{{loop.index}}. {{question.text}}
+
+{% for key, choice in question.choices %}
+{{key}}. {{choice.text}}
+{% endfor %}
+ANS: {{question.answer|capitalize}} NAR: RC{{exam.id}}
+
+{% endfor %}
+{% endfor %}

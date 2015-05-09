@@ -7,12 +7,11 @@
     <textarea class="form-control" cols="80" rows="20" id="paragraph"><?php echo (isset($paragraph_text) ? $paragraph_text : '');?></textarea>
   </div>
   <a id="parse" class="btn btn-default">Parse</a>
-  <a id="split" class="btn btn-default">Split</a>
   <button type="submit" class="btn btn-default">Save</button>
 </form>
 </div>
 <div class="col-md-5">
-	<label>Split result</label>
+	<label>Parsed result</label>
 	<span id="split_result">
 	</span>
 </div>

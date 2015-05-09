@@ -20,6 +20,21 @@ class ScrambledParagraph extends ElementBase implements Element
         $this->lines = array();
     }
 
+    /**
+    * Breaks a paragraph up into sentences.
+    * @param string $paragraph
+    * @return array
+    */
+    public static function createFromParagraph($paragraph){
+        $sentences = preg_split('/(?<=[.?!])\s+(?=[a-z])/i', $paragraph);
+        return $sentences;
+    }
+
+    public static function createFromQuestion($question){
+        $sentences = preg_split('/\n[ABCDEabcde]. /', $question);
+        return $sentences;
+    }
+
     public function load($data = array())
     {
         if (!count($data)) {

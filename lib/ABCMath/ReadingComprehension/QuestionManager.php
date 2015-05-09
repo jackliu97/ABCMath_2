@@ -42,8 +42,16 @@ class QuestionManager extends Base
             throw new Exception('ID is required in order to delete.');
         }
 
-        $this->_conn->delete("reading_comprehension_question",
-                array("reading_comprehension_id" => $this->reading_comprehension_id));
+        try{
+            $this->_conn->delete('reading_comprehension_question',
+                array('reading_comprehension_id' => $this->reading_comprehension_id));
+        }catch(Exception $e){
+            return false;
+        }
+
+        return true;
+
+        
     }
 
     private function _loadFromDb()

@@ -179,29 +179,33 @@ class Navigation extends Base
         $subsection = $this->current_uri->segment(1);
         $active = array("{$subsection}_active" => 'active');
 
-        if ($this->user->check_permission(array('passage.edit', 'passage.view'))) {
+        if ($this->user->in_group('Administrator')) {
             $this->_subsections[] = $this->_template->render(
                 'Navigation/Subnavigation/material__passage.twig',
                 $active);
         }
 
-        if ($this->user->check_permission(array('vocabulary.edit', 'vocabulary.view'))) {
+        if ($this->user->in_group('Administrator')) {
             $this->_subsections[] = $this->_template->render(
                 'Navigation/Subnavigation/material__vocabulary.twig',
                 $active);
         }
 
-        if ($this->user->check_permission(
-            array('scrambled_paragraph.edit', 'scrambled_paragraph.view'))) {
+        if ($this->user->in_group('Administrator')) {
             $this->_subsections[] = $this->_template->render(
                 'Navigation/Subnavigation/material__scrambled_paragraph.twig',
                 $active);
         }
 
-        if ($this->user->check_permission(
-            array('reading_comprehension.edit', 'reading_comprehension.view'))) {
+        if ($this->user->in_group('Administrator')) {
             $this->_subsections[] = $this->_template->render(
                 'Navigation/Subnavigation/material__reading_comprehension.twig',
+                $active);
+        }
+
+        if ($this->user->in_group('Administrator')) {
+            $this->_subsections[] = $this->_template->render(
+                'Navigation/Subnavigation/material__create_exam.twig',
                 $active);
         }
     }
@@ -219,7 +223,7 @@ class Navigation extends Base
 
         //material sub sections are still material.
         if (in_array($this->current_uri->segment(1),
-            array('passage', 'vocabulary', 'scrambled_paragraph', 'reading_comprehension'))) {
+            array('passage', 'vocabulary', 'scrambled_paragraph', 'reading_comprehension', 'create_exam'))) {
             $this->current_section = 'material';
         }
 

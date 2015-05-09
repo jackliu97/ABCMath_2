@@ -2,6 +2,7 @@
 require_once "test_bootstrap.php";
 
 use \ABCMath\ScrambledParagraph\Paragraph;
+use \ABCMath\ScrambledParagraph\ScrambledParagraph;
 
 class ScrambledParagraphTest extends PHPUnit_Framework_TestCase
 {
@@ -104,6 +105,76 @@ class ScrambledParagraphTest extends PHPUnit_Framework_TestCase
                 'text' => 'But the other two were choices made by the Obama administration to pursue some kind of a diplomatic breakthrough with Iran and to try to resolve the Arab-Israeli peace process. If there\'s movement on all three fronts, maybe he will end up deserving that Noble Peace Prize that he was awarded..',
             ),
         );
+    }
+
+    //php phpunit.phar --filter testCreateFromParagraph ScrambledParagraphTest.php
+    public function testCreateFromParagraph__normalParagraph(){
+        $testData = 'Getting Started with Doctrine This guide covers getting started with the ' . 
+        'Doctrine ORM. After working through the guide you should know: How to install and ' . 
+        'configure Doctrine by connecting it to a database Mapping PHP objects to database ' . 
+        'tables Generating a database schema from PHP objects Using the EntityManager to insert, ' . 
+        'update, delete and find objects in the database. Guide Assumptions This ' . 
+        'guide is designed for beginners that haven’t worked with Doctrine ORM before. ' . 
+        'There are some prerequesites for the tutorial that have to be installed: PHP 5.4 ' . 
+        'or above Composer Package Manager (Install Composer) The code of this tutorial ' . 
+        'is available on Github.';
+        
+
+        $result = ScrambledParagraph::createFromParagraph($testData);
+        $this->assertEquals(count($result), 4);
+        $this->assertEquals(
+            $result[0], 
+            'Getting Started with Doctrine This guide covers getting ' . 
+            'started with the Doctrine ORM.');
+        $this->assertEquals(
+            $result[3],
+            'There are some prerequesites for the tutorial that have to be installed: ' . 
+            'PHP 5.4 or above Composer Package Manager (Install Composer) The code of ' . 
+            'this tutorial is available on Github.');
+    }
+
+    //php phpunit.phar --filter testCreateFromParagraph__dotsParagraph ScrambledParagraphTest.php
+    public function testCreateFromParagraph__dotsParagraph(){
+        $testData = 'Getting Started with Doctrine This guide covers getting started with the ' . 
+        'Doctrine ORM. After working through Mr. Steven, the guide you should know: How to install and ' . 
+        'configure Doctrine by connecting it to a database Mapping PHP objects to database ' . 
+        'tables Generating a database schema from PHP objects Using the EntityManager to insert, ' . 
+        'update, delete and find objects in the database. Guide Assumptions This ' . 
+        'guide is designed for beg...inners that haven’t worked with Doctrine ORM before. ' . 
+        'There are some prerequesites for the tutorial that have to be installed: PHP 5.4 ' . 
+        'or above Composer Package Manager (Install Composer) The code of this tutorial ' . 
+        'is available on Github...';
+        
+
+        $result = ScrambledParagraph::createFromParagraph($testData);
+
+        $this->assertEquals(count($result), 4);
+        $this->assertEquals(
+            $result[0], 
+            'Getting Started with Doctrine This guide covers getting ' . 
+            'started with the Doctrine ORM.');
+        $this->assertEquals(
+            $result[2],
+            'Guide Assumptions This guide is designed for beg...inners ' . 
+            'that haven’t worked with Doctrine ORM before.'
+            );
+        $this->assertEquals(
+            $result[3],
+            'There are some prerequesites for the tutorial that have to be installed: ' . 
+            'PHP 5.4 or above Composer Package Manager (Install Composer) The code of ' . 
+            'this tutorial is available on Github...');
+    }
+
+    //php phpunit.phar --filter testCreateFromQuestion__normalQuestion ScrambledParagraphTest.php
+    public function testCreateFromQuestion__normalQuestion(){
+        $testData = "A lot of U.S. analysts have suggested that, if there is a breakthrough, and potentially there could be a breakthrough between the U.S. and Iran right now, the international sanctions led by the U.S. have really made a dent on the life of the people of Iran, and maybe that's going to be a major factor in convincing the Iranian people and President Rouhani that maybe it's time for a change. There's no question that that has played a huge role.
+A. The White House did an internal study where they tried to understand Iranian behavior over the last 30 years, and they found that the Iranians moved and were more conciliatory. But almost always when they faced pressure that it was actually a rational behavior, but you had to pressure them.
+B. And so they put together this very impressive international set of sanctions. That's why they took it through the U.N. Now here's the twist - the sanctions have been put in place by law, by Congress.
+C. The president does not have the ability to unilaterally waive those sanctions. So if the Iranians start complying, doing the kinds of things he's talking about - transparency, verifiable acts - he actually doesn't have the ability to deliver the carrots, if one may call them that, to the Iranians.
+D. So he's now going to be placed in a very awkward position where he can encourage this process, but it's not clear that he can actually...we all worry about Rouhani being able to deliver.
+E. The Iranians, I'm sure very smart about this, are wondering whether Obama can deliver. On the edges, he does have a little flexibility, .";
+        $result = ScrambledParagraph::createFromQuestion($testData);
+        print_r($result);
     }
 
     //php phpunit.phar --filter testLoad__fromParameter ScrambledParagraphTest.php

@@ -4,15 +4,29 @@
 	function set_words(word_data){
 
 		if(word_data.length == 1){
+			window.word_list.push({
+				'word': word_data[0].trim().toLowerCase()
+			});
 			return '<p><span class="word">' + word_data[0].trim().toLowerCase() + '</span></p>';
 		}
 
 		if(word_data.length == 2){
+			window.word_list.push({
+				'word': word_data[0].trim().toLowerCase(),
+				'definition': word_data[1].trim()
+			});
+
 			return '<p><b><span class="word">' + word_data[0].trim().toLowerCase() + '</span></b>&nbsp;' + 
 								'<span class="definition">'+ word_data[1].trim() + '</span></p>';
 		}
 
 		if(word_data.length == 3){
+			window.word_list.push({
+				'word': word_data[0].trim().toLowerCase(),
+				'parts_of_speech': word_data[1].trim(),
+				'definition': word_data[2].trim()
+			});
+
 			return '<p><b><span class="word">' + word_data[0].trim().toLowerCase() + '</span></b>&nbsp;' + 
 								'(<span class="usage">' + word_data[1].trim() + '</span>)&nbsp;' + 
 								'<span class="definition">'+ word_data[2].trim() + '</span></p>';
@@ -39,6 +53,8 @@
 			var parse_html = [];
 			var error = ['<p>Bad Format detected, please fix these lines and try again.</p>'];
 			var count = 0;
+			window.word_list = [];
+
 			$.each($('#word_text').val().split(/\n/), function(ind, val){
 				var word_data = val.split(/\t/);
 				parse_html.push(set_words(word_data));
@@ -72,29 +88,19 @@
 										});
 			});
 
-			/*
-			* Create batches and push into word_batches.
-			*/
-			$.each($('#parse_result').find('p'), function(index, value){
-				var $v = $(value);
-				if($v.find('.word').html() == undefined){
-					return true;
-				}
-				word = {
-					'word': $v.find('.word').html(),
-					'parts_of_speech': $v.find('.usage').html(),
-					'definition': $v.find('.definition').html()
-				}
+			for(var i=0, l=window.word_list.length; i<l; i++){
 
-				submit_data['words'].push(word);
-				count += 1;
-				if(count % BATCH_SIZE == 0){
+				console.log(window.word_list[i]);
+
+				submit_data['words'].push( window.word_list[i] );
+				if((i+1) % BATCH_SIZE == 0){
 					word_batches.push(submit_data);
 					submit_data = {'words':[],
 									'keyword':submit_data['keyword']
 									};
 				}
-			});
+			}
+
 			word_batches.push(submit_data);
 			
 			var batch_size = word_batches.length;
