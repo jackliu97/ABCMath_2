@@ -1,3 +1,4 @@
+public/files/downloads/*
 */config/development
 */logs/log-*.php
 */logs/!index.html
@@ -9,3 +10,4 @@ lib/ABCMath/Template/Cache/*
 lib/vendor/*
 lib/composer.phar
 .DS_Store
+

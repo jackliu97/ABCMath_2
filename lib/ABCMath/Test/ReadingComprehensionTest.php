@@ -2,6 +2,7 @@
 require_once "test_bootstrap.php";
 
 use \ABCMath\ReadingComprehension\ReadingComprehension;
+use \ABCMath\ReadingComprehension\ReadingComprehensionList;
 use \ABCMath\Grouping\Keyword;
 
 class ReadingComprehensionTest extends PHPUnit_Framework_TestCase
@@ -700,5 +701,16 @@ ANS: C';
       $this->assertEquals(count($rc->keywords), 1);
       $this->assertEquals($rc->keywords[0]->word, $kw->word);
       $this->assertEquals($rc->keywords[0]->id, $kw->id);
+  }
+
+  //php phpunit.phar --filter testExamList ReadingComprehensionTest.php
+  public function testExamList(){
+    $list = new ReadingComprehensionList();
+    $listing = $list->fetchAll();
+
+    print_r($listing);
+    print_r($list->nextPage()->fetchAll());
+    print_r($list->nextPage()->fetchAll());
+    print_r($list->nextPage()->fetchAll());
   }
 }

@@ -7,33 +7,33 @@
             var id_list = $('#reading_comprehension_id_list').val().split(',');
             var format = $('#build_format').val();
 
-
-            console.log('/create_exam/reading_comprehension/' + id_list.join('_') + '/' + format);
-
-            window.open('/create_exam/reading_comprehension/' + id_list.join('_') + '/' + format, '_blank');
+            //window.open('/create_exam/reading_comprehension/' + id_list.join('_') + '/' + format, '_blank');
             
             
 
-            /*var submit_data = {
+            var submit_data = {
                 id_list: $('#reading_comprehension_id_list').val(),
                 format: $('#build_format').val()
             }
+
+            var popupWindow = window.open();
 
             $.ajax({
                     type:'POST',
                     url:'/create_exam/reading_comprehension',
                     data: submit_data,
                     success: function(data){
-
+                        console.log(data);
                         if(data.success){
-                            console.log(data);
-                            $C.success('Test successfully built');
+                            $C.success('Test successfully built. File ID: ' + data.file_id );
+                            popupWindow.location.href = '/file/download/' + data.file_id;
+
                         }else{
                             $C.error(data.message);
                         }
                     }
                 });
-*/
+
 
             return false;
         });

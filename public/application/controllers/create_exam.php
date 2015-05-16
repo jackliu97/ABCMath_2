@@ -4,7 +4,9 @@
 
 use \ABCMath\Grouping\KeywordManager;
 use \ABCMath\ReadingComprehension\ReadingComprehensionExam;
+use \ABCMath\ReadingComprehension\ReadingComprehensionList;
 use \ABCMath\Template\Template;
+use \ABCMath\File\FileManager;
 
 class Create_Exam extends CI_Controller
 {
@@ -36,21 +38,55 @@ class Create_Exam extends CI_Controller
                                         ));
     }
 
-    public function reading_comprehension($id_list, $format='rtf'){
+    public function reading_comprehension(){
 
-        $id_array = explode('_', $id_list);
-        $exam = ReadingComprehensionExam::getExamById($id_array);
+        $id_list = $this->input->post('id_list');
+        $format = $this->input->post('format');
+        $return = array('success' => true);
 
+        $formattedExam = '';
+        $templatePath = 'Exam/Format/reading_comprehension.txt.twig';
 
-        $formattedExam = $this->_template->render(
-            'Exam/Format/reading_comprehension.rtf.twig',
-            array('exams'=>$exam)
-            );
+        log_message('debug', $format);
 
-        $this->load->helper('download');
-        $filename = 'reading_comprehension_' . implode('_', $id_array) . '.rtf';
+        if(empty(trim($id_list))){
+            $list = new ReadingComprehensionList();
+            $listing = $list->fetchAll();
 
-        force_download($filename, $formattedExam);
+            do{
+                $exam = ReadingComprehensionExam::getExamById($listing);
+                $formattedExam .= $this->_template->render($templatePath, array('exams'=>$exam));
+                $listing = $list->nextPage()->fetchAll();
+            }while (!empty($listing));
+
+            $filename = 'reading_comprehension_' . date('Y_m_d_h_i_s') . ".{$format}";
+
+        }else{
+
+            $id_array = explode('_', $id_list);
+            $exam = ReadingComprehensionExam::getExamById($id_array);
+            $formattedExam = $this->_template->render($templatePath, array('exams'=>$exam));
+            $filename = 'reading_comprehension_' . implode('_', $id_array) . ".{$format}";
+        }
+
+        $filePath = "./files/downloads/{$filename}";
+
+        $this->load->helper('file');
+        if(!write_file($filePath, $formattedExam)){
+
+            $return['success'] = false;
+            $return['message'] = 'Failed to write file.';
+
+        }else{
+
+            $fm = new FileManager();
+            $fm->set($filePath);
+            $id = $fm->save();
+
+            $return['file_id'] = $id;
+        }
+
+        $this->load->view('response/json', array('json' => $return));
 
 
 
