@@ -15,6 +15,12 @@ class ReportCardPDF extends PDF
 {
     const MARGIN = 15;
 
+    const HEADER_CELL_HEIGHT = 4;
+    const BODY_CELL_HEIGHT = 4;
+
+    const HEADER_FONT = 7;
+    const BODY_FONT = 7;
+
     public $grades;
     public $student;
     public $class;
@@ -39,7 +45,7 @@ class ReportCardPDF extends PDF
         }
         
         $this->Ln(5);
-        $this->SetFont('Arial', 'B', 12);
+        $this->SetFont('Arial', 'B', 10);
         $this->Cell(5);
         $this->Cell(0, 8, "ABCMath report card for {$this->student->first_name}  {$this->student->last_name}", 0, 1, 'C');
 
@@ -93,19 +99,19 @@ class ReportCardPDF extends PDF
 
     public function DrawGradesHeader()
     {
-        $this->SetFont('Arial', 'B', 9);
+        $this->SetFont('Arial', 'B', self::HEADER_FONT);
         $this->Ln();
         $this->Cell(10);
-        $this->Cell(15, 7, 'Lesson', 1, 0, 'C');
-        $this->Cell(25, 7, 'Date', 1, 0, 'C');
-        $this->Cell(20, 7, 'Attendance', 1, 0, 'C');
-        $this->Cell(80, 7, 'Assignment', 1, 0, 'C');
-        $this->Cell(20, 7, 'Score', 1, 1, 'C');
+        $this->Cell(15, self::HEADER_CELL_HEIGHT, 'Lesson', 1, 0, 'C');
+        $this->Cell(25, self::HEADER_CELL_HEIGHT, 'Date', 1, 0, 'C');
+        $this->Cell(20, self::HEADER_CELL_HEIGHT, 'Attendance', 1, 0, 'C');
+        $this->Cell(80, self::HEADER_CELL_HEIGHT, 'Assignment', 1, 0, 'C');
+        $this->Cell(20, self::HEADER_CELL_HEIGHT, 'Score', 1, 1, 'C');
     }
 
     public function DrawGrades()
     {
-        $this->SetFont('Arial', '', 9);
+        $this->SetFont('Arial', '', self::BODY_FONT);
 
         if(!count($this->grades)){
             return false;
@@ -155,23 +161,23 @@ class ReportCardPDF extends PDF
                     $this->Cell(10);
 
                     if($lesson_shown === false){
-                        $this->Cell(15, 7, "#{$lesson_number}", 1, 0, 'C');
-                        $this->Cell(25, 7, $lesson_date_formatted, 1, 0, 'C');
-                        $this->Cell(20, 7, $attendance, 1, 0, 'C');
+                        $this->Cell(15, self::BODY_CELL_HEIGHT, "#{$lesson_number}", 1, 0, 'C');
+                        $this->Cell(25, self::BODY_CELL_HEIGHT, $lesson_date_formatted, 1, 0, 'C');
+                        $this->Cell(20, self::BODY_CELL_HEIGHT, $attendance, 1, 0, 'C');
                         $lesson_shown = true;
                     }else{
-                        $this->Cell(60, 7, '', 1, 0, 'C');
+                        $this->Cell(60, self::BODY_CELL_HEIGHT, '', 1, 0, 'C');
                     }
 
                     $this->Cell(
                         80, 
-                        7, 
+                        self::BODY_CELL_HEIGHT, 
                         $type . ', ' . $assignment['name'],
                         1,
                         0,
                         'L');
 
-                    $this->Cell(20, 7, $grade, 1, 1, 'C');
+                    $this->Cell(20, self::BODY_CELL_HEIGHT, $grade, 1, 1, 'C');
                 }
 
             }
