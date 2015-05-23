@@ -139,7 +139,6 @@ class Reading_Comprehension extends CI_Controller
         $reading['id'] = $this->input->post('reading_comprehension_id');
         $keywords = $this->input->post('keyword');
 
-
         $reading_comprehension = new ReadingComprehension();
         $reading_comprehension->load($reading);
         $result = $reading_comprehension->save();

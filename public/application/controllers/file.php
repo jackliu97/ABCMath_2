@@ -21,7 +21,7 @@ class File extends CI_Controller
 
     public function index(){}
 
-    public function download($id){        
+    public function download($id){
         $fm = new FileManager();
         $file_path = $fm->load($id);
         $file_name = array_pop(explode('/', $file_path));

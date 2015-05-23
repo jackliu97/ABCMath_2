@@ -11,6 +11,10 @@ if(isset($datatable)){
 	echo '<script src="/js/jquery.dataTables.min.js" type="text/javascript"></script>';
 }
 
+if(isset($handsontable)){
+    echo '<script src="/js/jquery.handsontable.full.min.js" type="text/javascript"></script>';
+}
+
 if(isset($private_js)){
 
 	foreach($private_js as $js){

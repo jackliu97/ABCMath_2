@@ -8,6 +8,7 @@ class QuestionManager extends Base
 {
     public $reading_comprehension_id;
     public $questions;
+    public $deleteOnly;
 
     public function __construct($reading_comprehension_id = null)
     {
@@ -23,6 +24,11 @@ class QuestionManager extends Base
 
     public function load($data = array())
     {
+
+        if($this->deleteOnly === true){
+            return true;
+        }
+
         if (!count($data)) {
             $data = $this->_loadFromDb();
         }

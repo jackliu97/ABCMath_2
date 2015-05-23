@@ -38,6 +38,16 @@ class Create_Exam extends CI_Controller
                                         ));
     }
 
+    public function scrambled_paragraph(){
+        $id_list = $this->input->post('id_list');
+        $format = $this->input->post('format');
+        $return = array('success' => true);
+
+        $formattedExam = '';
+        $templatePath = 'Exam/Format/reading_comprehension.txt.twig';
+
+    }
+
     public function reading_comprehension(){
 
         $id_list = $this->input->post('id_list');
@@ -47,30 +57,31 @@ class Create_Exam extends CI_Controller
         $formattedExam = '';
         $templatePath = 'Exam/Format/reading_comprehension.txt.twig';
 
-        log_message('debug', $format);
-
         if(empty(trim($id_list))){
+            
             $list = new ReadingComprehensionList();
             $listing = $list->fetchAll();
 
             do{
+                
                 $exam = ReadingComprehensionExam::getExamById($listing);
                 $formattedExam .= $this->_template->render($templatePath, array('exams'=>$exam));
                 $listing = $list->nextPage()->fetchAll();
+
             }while (!empty($listing));
 
-            $filename = 'reading_comprehension_' . date('Y_m_d_h_i_s') . ".{$format}";
+            $exam_questions = 'all';
 
         }else{
 
             $id_array = explode('_', $id_list);
             $exam = ReadingComprehensionExam::getExamById($id_array);
             $formattedExam = $this->_template->render($templatePath, array('exams'=>$exam));
-            $filename = 'reading_comprehension_' . implode('_', $id_array) . ".{$format}";
+            $exam_questions = implode('_', $id_array);
         }
 
-        $filePath = "./files/downloads/{$filename}";
-
+        $filePath = './files/downloads/reading_comprehension_' . 
+                        $exam_questions . '_' . date('Y_m_d_h_i_s') . ".{$format}";
         $this->load->helper('file');
         if(!write_file($filePath, $formattedExam)){
 
@@ -82,13 +93,10 @@ class Create_Exam extends CI_Controller
             $fm = new FileManager();
             $fm->set($filePath);
             $id = $fm->save();
-
             $return['file_id'] = $id;
+
         }
 
         $this->load->view('response/json', array('json' => $return));
-
-
-
     }
 }

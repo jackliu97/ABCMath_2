@@ -25,7 +25,7 @@ class ReadingComprehension extends ElementBase implements Element
         $this->questions = array();
     }
 
-    public static function parse($paragraph, array $questions){
+    public static function parse($paragraph, $questions=array()){
 
         $result = array(
             'full_text' => $paragraph,
@@ -34,7 +34,7 @@ class ReadingComprehension extends ElementBase implements Element
             );
         $result['lines'] = array_map('trim', explode("\n", $paragraph));
 
-        if(!count($questions)){
+        if(!is_array($questions) || !count($questions)){
             return $result;
         }
 
@@ -109,7 +109,12 @@ class ReadingComprehension extends ElementBase implements Element
             $data['questions'] = array();
         }
 
+        if(count($data['questions']) === 0){
+
+        }
+
         $questions = new QuestionManager($this->id);
+
         $questions->load($data['questions']);
         $this->questions = $questions->questions;
     }
@@ -191,7 +196,7 @@ class ReadingComprehension extends ElementBase implements Element
         if( $qm->deleteAll() === false ){
             return array('success'=> false);
         }
-        
+
         if (!count($this->questions)) {
             return array(
                 'success' => true,

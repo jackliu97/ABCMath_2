@@ -51,6 +51,11 @@ class ABCClass extends Base
             $this->{$k} = $v;
         }
     }
+
+    public function getAllGrades2(){
+        
+    }
+
     /**
      * Get all grades for this class in a grid format.
      */

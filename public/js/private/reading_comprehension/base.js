@@ -153,6 +153,8 @@
 				data: submit_data,
 				success: function(data){
 
+					console.log(data);
+
 					if(data.success){
 						if(data.is_new === true){
 							window.location = "/reading_comprehension/create/" + data.reading_comprehension_id;

@@ -52,6 +52,44 @@ class Grade_Dashboard extends CI_Controller
                                         ));
     }
 
+    public function grade2($class_id = null)
+    {
+        $data = array();
+        $class = new ABCClass();
+        $class_manager = new ClassManager();
+        $class_manager->semester_id = $this->semester_id;
+        $class->id = $class_id;
+        $class->load();
+        $data['class'] = $class;
+        $data['class_options'] = $class_manager->getAllClasses('options');
+
+        $grade_data = [
+  ["", "Ford", "Volvo", "Toyota", "Honda"],
+  ["2014", 10, 11, 12, 13],
+  ["2015", 20, 11, 14, 13],
+  ["2016", 30, 15, 12, 13]
+];
+
+
+        $data['body_html'] = $this->_template->render(
+            'Class/grades2.twig',
+            array(
+                'grade_data' => json_encode($grade_data)
+                )
+            );
+            
+        
+        //print_r($class->getAllGrades());
+
+        $this->load->view('header');
+        $this->load->view('navbar');
+        $this->load->view('dashboard/grade', $data);
+        $this->load->view('footer', array(
+                                        'handsontable' => true,
+                                        'private_js' => array('dashboard/grades2.js'),
+                                        ));
+    }
+
     public function process_grades()
     {
         $grade_data = $this->input->post('grade_data');
