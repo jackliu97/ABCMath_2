@@ -9,7 +9,7 @@
   ["2016", 30, 15, 12, 13]
 ];
         var container = document.getElementById('grade_table');
-        
+
         var hot = new Handsontable(container, {
           data: data,
           minSpareRows: 1,

@@ -12,7 +12,7 @@ if(isset($datatable)){
 }
 
 if(isset($handsontable)){
-    echo '<script src="/js/jquery.handsontable.full.min.js" type="text/javascript"></script>';
+    echo '<script src="/js/handsontable.full.js" type="text/javascript"></script>';
 }
 
 if(isset($private_js)){

@@ -13,6 +13,7 @@
 <link href="/css/jquery-ui.min.css" rel="stylesheet">
 <link href="/css/jquery-ui.structure.min.css" rel="stylesheet">
 <link href="/css/jquery-ui.theme.min.css" rel="stylesheet">
+<link href="/css/handsontable.full.css" rel="stylesheet">
 <link href="/css/private/global.css" rel="stylesheet">
 
 </head>
