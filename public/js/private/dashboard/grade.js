@@ -18,40 +18,40 @@
         var $container = $('#grade_table');
         var $save = $('.save');
         $container.handsontable({
-              data: window.grade_row_data,
+            data: window.grade_row_data,
 
-              colHeaders: function (col){
-                    return '<span class="label label-danger delete_assignment" assignment_id="' + 
-                            window.grade_col_id_mapper[col] + '">-</span>&nbsp;' + 
-                            window.grade_col_header[col];
-                },
+            colHeaders: function (col){
+                return '<span class="label label-danger delete_assignment" assignment_id="' + 
+                        window.grade_col_id_mapper[col] + '">-</span>&nbsp;' + 
+                        window.grade_col_header[col];
+            },
 
-              rowHeaders: window.grade_row_header,
-              afterChange: function (change, source) {
-
-                  if (source === 'loadData') {
+            rowHeaders: window.grade_row_header,
+            afterChange: function (change, source) {
+                
+                if (source === 'loadData') {
                     return;
-                  }
+                }
 
-                  $.ajax({
-                        type:'POST',
-                        url:'/grade_dashboard/save_delta',
-                        data: {
-                            'delta': change,
-                            'col_mapper': window.grade_col_id_mapper,
-                            'row_mapper': window.grade_row_id_mapper
-                        },
-                        success: function(data){
-                            if(data.success){
-                                console.log('Data successfully updated');
-                            }else{
-                                $C.error(data.message);
-                            }
+                $.ajax({
+                    type:'POST',
+                    url:'/grade_dashboard/save_delta',
+                    data: {
+                        'delta': change,
+                        'col_mapper': window.grade_col_id_mapper,
+                        'row_mapper': window.grade_row_id_mapper
+                    },
+                    success: function(data){
+                        if(data.success){
+                            console.log('Data successfully updated');
+                        }else{
+                            $C.error(data.message);
                         }
-                    });
+                    }
+                });
 
-              }
-            });
+            }
+        });
         
         $container.on('click', '.delete_assignment', function(){
 

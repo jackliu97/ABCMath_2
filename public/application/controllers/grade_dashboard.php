@@ -89,7 +89,6 @@ class Grade_Dashboard extends CI_Controller
         $manager = new AssignmentManager();
         $result = $manager->gradeOneAssignment($grade_data);
 
-
         $this->load->view('response/json', array('json' => $result));
     }
 

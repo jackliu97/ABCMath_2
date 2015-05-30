@@ -76,7 +76,7 @@ class AssignmentManager extends Base
                         'grade'=>$data['grade_value']
                     )
                 );
-            }catch (Exception $e){
+            }catch (\Exception $e){
                 $this->_conn->rollback();
                 return array(
                     'success'=>false,
@@ -92,7 +92,7 @@ class AssignmentManager extends Base
                         'grade'=>$data['grade_value']
                     )
                 );
-            }catch (Exception $e){
+            }catch (\Exception $e){
                 $this->_conn->rollback();
                 return array(
                     'success'=>false,
