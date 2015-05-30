@@ -82,7 +82,7 @@ class Grade_Dashboard extends CI_Controller
 
         $grade_data = array(
             'student_id' => $row_mapper[$delta[0][0]],
-            'assignment_id' => $col_mapper[$delta[0][1]],
+            'assignment_id' => $col_mapper[$delta[0][1]]['assignment_id'],
             'grade_value' => $delta[0][3]
             );
 

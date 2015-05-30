@@ -1,12 +1,6 @@
 ( function($, $C, $M) {
     'use strict';
 
-    function _saveContents(obj){
-
-        console.log(obj.getAll());
-
-    }
-
     $( document ).ready(function() {
 
         $('.class_dropdown').on('change', function(){
@@ -21,14 +15,15 @@
             data: window.grade_row_data,
 
             colHeaders: function (col){
-                return '<span class="label label-danger delete_assignment" assignment_id="' + 
-                        window.grade_col_id_mapper[col] + '">-</span>&nbsp;' + 
+                return  '<span class="glyphicon glyphicon-remove delete_assignment" aria-hidden="true" assignment_id="' + 
+                        window.grade_col_id_mapper[col]['assignment_id'] + '"></span>&nbsp;' + 
+                        '<span class="">Lesson ' + window.grade_col_id_mapper[col]['lesson_number'] + '</span></br>' + 
                         window.grade_col_header[col];
             },
 
             rowHeaders: window.grade_row_header,
             afterChange: function (change, source) {
-                
+
                 if (source === 'loadData') {
                     return;
                 }

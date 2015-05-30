@@ -54,7 +54,6 @@ class ABCClass extends Base
 
     public function getAllGrades2(){
         $rawData = $this->_getAllGradesRaw();
-        //print_r($rawData);
 
         /*
         * Conform to handsOnTable format.
@@ -77,7 +76,12 @@ class ABCClass extends Base
         $row_data = array();
 
         foreach($rawData as $k=>$box){
-            $header[$box['assignment_id']] = "{$box['assignment_name']} ({$box['maximum_score']})";
+            $header[$box['assignment_id']] = array(
+                'title' => "{$box['assignment_name']} ({$box['maximum_score']})",
+                'assignment_id' => $box['assignment_id'],
+                'lesson_id'=> $box['lesson_id'],
+                'lesson_number'=> $box['lesson_number']
+                );
 
             if(array_key_exists($box['student_id'], $students)){
                 $students[$box['student_id']][] = $box['grade'];
@@ -89,8 +93,8 @@ class ABCClass extends Base
         }
 
         foreach($header as $assignment_id=>$head){
-            $col_headers[] = $head;
-            $col_mapper[] = $assignment_id;
+            $col_headers[] = $head['title'];
+            $col_mapper[] = $head;
         }
 
         foreach($students as $student_id=>$row){
