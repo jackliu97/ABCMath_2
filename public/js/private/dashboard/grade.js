@@ -82,6 +82,8 @@
 
         });
 
+        $container.find('.htCore').addClass('table-striped').addClass('table-hover');
+
         return;
 
     });
