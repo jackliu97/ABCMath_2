@@ -1,276 +1,94 @@
 ( function($, $C, $M) {
-	'use strict';
-	var tabindex = 1;
-	var ACCEPTABLE_GRADE = ['inc', 'abs']
-	var changes_made = false;
+    'use strict';
 
-	function _saveContents(){
-		if(_validateContents() === false){
-			$C.error('You have an invalid grade. The input is marked in red.');
-			return false;
-		}
+    function _saveContents(obj){
 
-		var grade_data = [];
-		$('.process_grade').each(function(index, value){
-			var $input = $(value);
-			grade_data.push({
-				'assignment_id':$input.attr('assignment_id'),
-				'student_id':$input.attr('student_id'),
-				'grade_id':$input.attr('grade_id'),
-				'grade':$input.val()
-			});
-		});
+        console.log(obj.getAll());
 
-		$(window).unbind('beforeunload');
+    }
 
-		$.ajax({
-			type:'POST',
-			url:'/grade_dashboard/process_grades',
-			data: {
-				'grade_data': grade_data,
-			},
-			success: function(data){
-				if(data.success){
-					location.reload();
-				}else{
-					$C.error(data.message);
-				}
-			}
-		});
+    $( document ).ready(function() {
 
-	}
+        $('.class_dropdown').on('change', function(){
+            window.location.href='/grade_dashboard/grade/' + $(this).val();
+            return false;
+        });
 
-	function _validateContents(){
-		var all_values_valid = true;
+        //var container = document.getElementById('grade_table');
+        var $container = $('#grade_table');
+        var $save = $('.save');
+        $container.handsontable({
+              data: window.grade_row_data,
 
-		$('.process_grade').each(function(index, value){
-			var $input = $(value);
-			var input_val = $.trim($input.val());
+              colHeaders: function (col){
+                    return '<span class="label label-danger delete_assignment" assignment_id="' + 
+                            window.grade_col_id_mapper[col] + '">-</span>&nbsp;' + 
+                            window.grade_col_header[col];
+                },
 
-			if(input_val === ''){
-				return true;
-			}
+              rowHeaders: window.grade_row_header,
+              afterChange: function (change, source) {
 
-			if($.isNumeric(input_val)){
-				// input_val = parseFloat(input_val);
+                  if (source === 'loadData') {
+                    return;
+                  }
 
-				// if(input_val > parseFloat($input.attr('maximum_score'))){
-				// 	all_values_valid = false;
-				// 	$input.addClass('invalid-value');
-				// }
+                  $.ajax({
+                        type:'POST',
+                        url:'/grade_dashboard/save_delta',
+                        data: {
+                            'delta': change,
+                            'col_mapper': window.grade_col_id_mapper,
+                            'row_mapper': window.grade_row_id_mapper
+                        },
+                        success: function(data){
+                            if(data.success){
+                                console.log('Data successfully updated');
+                            }else{
+                                $C.error(data.message);
+                            }
+                        }
+                    });
 
-				if(input_val < 0){
-					all_values_valid = false;
-					$input.addClass('invalid-value');
-				}
+              }
+            });
+        
+        $container.on('click', '.delete_assignment', function(){
 
-				return true;
-			}
+            if(!confirm('Are you sure you want to delete this assignment?')){
+                return false;
+            }
 
-			if(ACCEPTABLE_GRADE.indexOf(input_val) === -1){
-				all_values_valid = false;
-				$input.addClass('invalid-value');
-				return true;
-			}
+            var $this = $(this);
+            var assignment_id = $this.attr('assignment_id');
+            $.ajax({
+                type:'POST',
+                url:'/class_dashboard/delete_assignment',
+                data: {
+                    'assignment_id': $(this).attr('assignment_id')
+                },
+                success: function(data){
+                    if(data.success){
+                        $this.closest('table').find('span[assignment_id="' + assignment_id + '"]').each(function(){
+                            $(this).closest('td').remove();
+                        });
 
-		});
+                        $this.closest('table').find('input[assignment_id="' + assignment_id + '"]').each(function(){
+                            $(this).closest('td').remove();
+                        });
 
-		return all_values_valid;
-	}
+                        $this.closest('th').remove();
+                    }else{
+                        $C.error(data.message, $('#assignment_error'));
+                        return false;
+                    }
+                }
+            });
 
+        });
 
-	function _makeInput($span, tabindex, ignore_focus){
-		var assignment_id = $span.attr('assignment_id');
-		var student_id = $span.attr('student_id');
-		var grade_id = $span.attr('grade_id');
-		var grade = $span.attr('grade');
-		var maximum_score = $span.attr('maximum_score');
-		var max_score_label = 'No max';
+        return;
 
-		if(maximum_score !== '0'){
-			max_score_label = maximum_score;
-		}
-
-		var $container = $span.parent();
-		$span.replaceWith(
-			$('<input>').attr({
-				'class':'process_grade',
-				'assignment_id':assignment_id,
-				'student_id':student_id,
-				'grade_id':grade_id,
-				'grade':grade,
-				'value':grade,
-				'maximum_score':maximum_score,
-				'size':4,
-				'tabindex': tabindex,
-				'placeholder': max_score_label
-				})
-			);
-		if(ignore_focus !== true){
-			$container.find('input').focus();
-		}
-	}
-
-	function _undoInput($input){
-		var assignment_id = $input.attr('assignment_id');
-		var student_id = $input.attr('student_id');
-		var grade_id = $input.attr('grade_id');
-		var grade = $input.attr('grade');
-
-		$input.replaceWith(
-			$('<span>').attr({
-				'class':'process_grade',
-				'assignment_id':assignment_id,
-				'student_id':student_id,
-				'grade_id':grade_id,
-				'grade':grade
-				}).html(grade)
-			);
-	}
-
-	function _sibling($obj, direction){
-		if(direction === 'left'){
-			var $sibling = $obj.closest('td').prev();
-		}
-
-		else if(direction === 'right'){
-			var $sibling = $obj.closest('td').next();
-		}
-
-		else if(direction === 'up'){
-			var $tr = $obj.closest('tr');
-			var $td = $obj.closest('td');
-			var $sibling = $tr.prev().find('td:eq(' + $td.index() + ')');
-		}
-
-		else if(direction === 'down'){
-			var $tr = $obj.closest('tr');
-			var $td = $obj.closest('td');
-			var $sibling = $tr.next().find('td:eq(' + $td.index() + ')');
-
-		}else{
-			return false;
-		}
-
-		if($sibling.find('input').empty()){
-			$sibling.find('span').click();
-		}
-
-		$sibling.find('input').focus();
-	}
-
-	function bindWarning(){
-		$(window).bind('beforeunload', function() {
-			return 'You have attempted to make an update.';
-		} );
-	}
-
-	$( document ).ready(function() {
-
-		$M.stopCallback = function() {
-			return false;
-		}
-
-		$M.bind(['mod+s', 'ctrl-s'], function(e){
-			e.preventDefault();
-			_saveContents();
-		})
-
-		.bind(['down'], function(e){
-			e.preventDefault();
-			_sibling($(e.target), 'down');
-		})
-
-		.bind(['up'], function(e){
-			e.preventDefault();
-			_sibling($(e.target), 'up');
-		})
-
-		.bind(['left'], function(e){
-			e.preventDefault();
-			_sibling($(e.target), 'left');
-		})
-
-		.bind(['right'], function(e){
-			e.preventDefault();
-			_sibling($(e.target), 'right');
-		})
-
-		;
-
-		$('.class_dropdown').on('change', function(){
-			window.location.href='/grade_dashboard/grade/' + $(this).val();
-			return false;
-		});
-		$('#gradeContainer').on('click', '.delete_assignment', function(){
-
-			if(!confirm('Are you sure you want to delete this assignment?')){
-				return false;
-			}
-			var $this = $(this);
-			var assignment_id = $this.attr('assignment_id');
-			$.ajax({
-				type:'POST',
-				url:'/class_dashboard/delete_assignment',
-				data: {
-					'assignment_id': $(this).attr('assignment_id')
-				},
-				success: function(data){
-					if(data.success){
-						$this.closest('table').find('span[assignment_id="' + assignment_id + '"]').each(function(){
-							$(this).closest('td').remove();
-						});
-
-						$this.closest('table').find('input[assignment_id="' + assignment_id + '"]').each(function(){
-							$(this).closest('td').remove();
-						});
-
-						$this.closest('th').remove();
-					}else{
-						$C.error(data.message, $('#assignment_error'));
-						return false;
-					}
-				}
-			});
-
-		});
-
-		// $('#gradeContainer').on('click', '.header', function(){
-		// 	var $this = $(this);
-		// 	var editing = $this.attr('editing');
-
-		// 	if(editing != 1){
-		// 		$(this).attr('editing', '1');
-		// 		$('span[assignment_id=' + $(this).attr('assignment_id') + ']')
-		// 			.each( function (index, value){
-		// 				tabindex += 1;
-		// 				_makeInput($(this), tabindex, true);
-		// 			});
-		// 	}else{
-		// 		if(!confirm('Are you sure you want to undo your changes?')){
-		// 			return false;
-		// 		}
-		// 		$(this).attr('editing', '0');
-		// 		$('input[assignment_id=' + $(this).attr('assignment_id') + ']')
-		// 			.each( function (index, value){
-		// 				_undoInput($(this));
-		// 			});
-		// 	}
-		// });
-
-
-		$('#gradeContainer').on('click', '.grade_action', function(){
-			bindWarning();
-			_makeInput($(this).find('span'));
-
-			return false;
-
-		});
-
-		$('.save').on('click', function(){
-			_saveContents();
-		});
-
-	});
+    });
 
 }(jQuery, COMMON, Mousetrap) );

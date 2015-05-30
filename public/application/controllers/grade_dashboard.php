@@ -43,7 +43,7 @@ class Grade_Dashboard extends CI_Controller
         $table_data = $class->getAllGrades2();
 
         $data['body_html'] = $this->_template->render(
-            'Class/grades.twig',
+            'Class/grade.twig',
             array(
                 'grade_col_header' => json_encode($table_data['grade_col_header']),
                 'grade_row_header' => json_encode($table_data['grade_row_header']),
@@ -59,7 +59,7 @@ class Grade_Dashboard extends CI_Controller
         $this->load->view('dashboard/grade', $data);
         $this->load->view('footer', array(
                                         'handsontable' => true,
-                                        'private_js' => array('dashboard/grades.js'),
+                                        'private_js' => array('dashboard/grade.js'),
                                         ));
     }
 
