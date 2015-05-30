@@ -53,7 +53,58 @@ class ABCClass extends Base
     }
 
     public function getAllGrades2(){
-        
+        $rawData = $this->_getAllGradesRaw();
+        //print_r($rawData);
+
+        /*
+        * Conform to handsOnTable format.
+        *
+        * [
+        *      ["", "HW (86)", "Quiz A (16)", "Quiz B (15)", "HW (100)"],
+        *      ["Bao, Kevin", 10, 11, 12, 13],
+        *      ["Chen, Wesley", 20, 11, 14, 13],
+        *      ["Chen, Alvin", 30, 15, 12, 13]
+        * ]
+        */
+        $header = array();
+        $students = array();
+        $col_headers = array();
+        $row_headers = array();
+
+        $col_mapper = array(); //array of assignment id.
+        $row_mapper = array(); //array of student id.
+
+        $row_data = array();
+
+        foreach($rawData as $k=>$box){
+            $header[$box['assignment_id']] = "{$box['assignment_name']} ({$box['maximum_score']})";
+
+            if(array_key_exists($box['student_id'], $students)){
+                $students[$box['student_id']][] = $box['grade'];
+            }else{
+                $students[$box['student_id']] = array();
+                $row_headers[] = "{$box['last_name']}, {$box['first_name']}";
+                $students[$box['student_id']][] = $box['grade'];
+            }
+        }
+
+        foreach($header as $assignment_id=>$head){
+            $col_headers[] = $head;
+            $col_mapper[] = $assignment_id;
+        }
+
+        foreach($students as $student_id=>$row){
+            $row_data[] = $row;
+            $row_mapper[] = $student_id;
+        }
+
+        return array(
+            'grade_col_header' => $col_headers,
+            'grade_row_header' => $row_headers,
+            'grade_row_data' => $row_data,
+            'grade_col_id_mapper' => $col_mapper,
+            'grade_row_id_mapper' => $row_mapper
+            );
     }
 
     /**

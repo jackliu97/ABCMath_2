@@ -39,55 +39,58 @@ class Grade_Dashboard extends CI_Controller
         $class->load();
         $data['class'] = $class;
         $data['class_options'] = $class_manager->getAllClasses('options');
+
+        $table_data = $class->getAllGrades2();
+
         $data['body_html'] = $this->_template->render(
             'Class/grades.twig',
-            $class->getAllGrades()
-            );
-
-        $this->load->view('header');
-        $this->load->view('navbar');
-        $this->load->view('dashboard/grade', $data);
-        $this->load->view('footer', array(
-                                        'private_js' => array('dashboard/grade.js'),
-                                        ));
-    }
-
-    public function grade2($class_id = null)
-    {
-        $data = array();
-        $class = new ABCClass();
-        $class_manager = new ClassManager();
-        $class_manager->semester_id = $this->semester_id;
-        $class->id = $class_id;
-        $class->load();
-        $data['class'] = $class;
-        $data['class_options'] = $class_manager->getAllClasses('options');
-
-        $grade_data = [
-  ["", "Ford", "Volvo", "Toyota", "Honda"],
-  ["2014", 10, 11, 12, 13],
-  ["2015", 20, 11, 14, 13],
-  ["2016", 30, 15, 12, 13]
-];
-
-
-        $data['body_html'] = $this->_template->render(
-            'Class/grades2.twig',
             array(
-                'grade_data' => json_encode($grade_data)
+                'grade_col_header' => json_encode($table_data['grade_col_header']),
+                'grade_row_header' => json_encode($table_data['grade_row_header']),
+                'grade_row_data' => json_encode($table_data['grade_row_data']),
+                'grade_col_id_mapper' => json_encode($table_data['grade_col_id_mapper']),
+                'grade_row_id_mapper' => json_encode($table_data['grade_row_id_mapper']),
                 )
             );
             
         
-        //print_r($class->getAllGrades());
-
         $this->load->view('header');
         $this->load->view('navbar');
         $this->load->view('dashboard/grade', $data);
         $this->load->view('footer', array(
                                         'handsontable' => true,
-                                        'private_js' => array('dashboard/grades2.js'),
+                                        'private_js' => array('dashboard/grades.js'),
                                         ));
+    }
+
+    public function save_delta(){
+        $result = array('success'=>true);
+        $delta = $this->input->post('delta');
+        $col_mapper = $this->input->post('col_mapper');
+        $row_mapper = $this->input->post('row_mapper');
+
+        //delta format
+        /*
+    
+        [
+        '0' => row_number,
+        '1' => col_number,
+        '2' => previous_value,
+        '3' => new_value
+        ]
+        */
+
+        $grade_data = array(
+            'student_id' => $row_mapper[$delta[0][0]],
+            'assignment_id' => $col_mapper[$delta[0][1]],
+            'grade_value' => $delta[0][3]
+            );
+
+        $manager = new AssignmentManager();
+        $result = $manager->gradeOneAssignment($grade_data);
+
+
+        $this->load->view('response/json', array('json' => $result));
     }
 
     public function process_grades()

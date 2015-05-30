@@ -55,6 +55,56 @@ class AssignmentManager extends Base
         return $return;
     }
 
+    public function gradeOneAssignment(array $data){
+         if (!count($data)) {
+            return array('success' => true);
+        }
+
+        $this->_conn->beginTransaction();
+
+        $single = $this->_getSingleGrade(
+                $data['student_id'],
+                $data['assignment_id']
+            );
+
+        if(empty($single)){
+            try{
+                $this->_insertGrade(
+                    array(
+                        'student_id'=>$data['student_id'],
+                        'assignment_id'=>$data['assignment_id'],
+                        'grade'=>$data['grade_value']
+                    )
+                );
+            }catch (Exception $e){
+                $this->_conn->rollback();
+                return array(
+                    'success'=>false,
+                    'message'=>$e->getMessage()
+                    );
+            }
+        }else{
+
+            try{
+                $this->_updateGrade(
+                    array(
+                        'grade_id'=>$single['id'],
+                        'grade'=>$data['grade_value']
+                    )
+                );
+            }catch (Exception $e){
+                $this->_conn->rollback();
+                return array(
+                    'success'=>false,
+                    'message'=>$e->getMessage()
+                    );
+            }
+        }
+
+        $this->_conn->commit();
+        return array('success' => true);
+    }
+
     public function gradeAssignments(array $data)
     {
         if (!count($data)) {
@@ -115,6 +165,20 @@ class AssignmentManager extends Base
                     'grade' => $grade['grade'],
                     )
                 );
+    }
+
+    protected function _getSingleGrade($student_id, $assignment_id){
+        $q = "SELECT id
+                FROM grades
+                WHERE student_id = ?
+                    AND assignment_id = ?";
+
+        $stmt = $this->_conn->prepare($q);
+        $stmt->bindValue(1, $student_id);
+        $stmt->bindValue(2, $assignment_id);
+        $stmt->execute();
+
+        return $stmt->fetch();
     }
 
     protected function _getAssignmentByLesson($lesson_id)

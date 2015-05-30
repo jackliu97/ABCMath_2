@@ -2,6 +2,10 @@ body{
     margin-bottom:100px;
 }
 
+.handsontable col.rowHeader {
+    width: 140px;
+}
+
 .invalid-value{
   border:1px solid red;
 }

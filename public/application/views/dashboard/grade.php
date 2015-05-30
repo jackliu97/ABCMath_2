@@ -13,9 +13,6 @@
 	<div class="col-md-10">
 		<h4>
 			Grading class <?php echo isset($class->external_id) ? $class->external_id : '';?>&nbsp;
-			<?php if(isset($class->external_id)): ?>
-			<a type="button" class="save btn btn-primary">Save</a>
-			<?php endif;?>
 		</h4>
 
 		<input type="hidden" name="class_id" id="class_id" value="<?php echo $class->id;?>">
