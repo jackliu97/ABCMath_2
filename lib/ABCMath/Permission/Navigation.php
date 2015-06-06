@@ -7,6 +7,8 @@ use DateTime;
 
 class Navigation extends Base
 {
+
+    public static $config;
     public $user;
 
     public $current_section;
@@ -29,6 +31,7 @@ class Navigation extends Base
         $this->_subsections = array();
 
         $this->_template = new Template(Template::FILESYSTEM);
+
     }
 
     public function setCI_URI(\CI_URI $uri)
@@ -44,6 +47,11 @@ class Navigation extends Base
     public function display_quicklinks()
     {
         $html = '';
+
+        if(self::$config['quicklink'] === false){
+            return $html;
+        }
+
         //logout
         $html .= $this->_template->render('Navigation/quicklinks.twig', array());
         return $html;

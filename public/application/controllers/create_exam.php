@@ -26,6 +26,7 @@ class Create_Exam extends CI_Controller
         $this->keywordManager = new KeywordManager();
         $this->session->set_userdata('section', 'create_exam');
         $this->_template = new Template(Template::FILESYSTEM);
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()

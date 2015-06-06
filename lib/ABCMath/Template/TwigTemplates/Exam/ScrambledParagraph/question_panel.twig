@@ -1,0 +1,14 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Unscramble this.</h3>
+  </div>
+  <div class="panel-body">
+    <p>{{paragraph.lead.text}}</p>
+  </div>
+
+  <ul class="list-group">
+    {% for line in paragraph.lines %}
+    <li class="list-group-item">{{line.text}}</li>
+    {% endfor %}
+  </ul>
+</div>

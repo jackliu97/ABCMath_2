@@ -12,6 +12,7 @@ class material extends CI_Controller
             $this->session->sess_destroy();
             header('Location: /login');
         }
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()

@@ -1,16 +1,10 @@
-<div class="row">
-	<div class="col-md-11">&nbsp;</div>
-</div>
-
 
 <div class="row">
-	<div class="col-md-1"></div>
-	<div class="col-md-10 message" id="main_error"></div>
+	<div class="col-md-10 col-md-offset-1 message" id="main_error"></div>
 </div>
 
 <div class="row">
-	<div class="col-md-1"></div>
-	<div class="col-md-10">
+	<div class="col-md-10 col-md-offset-1">
 		<h4>
 			Grading class <?php echo isset($class->external_id) ? $class->external_id : '';?>&nbsp;
 		</h4>
@@ -19,8 +13,7 @@
 	</div> 
 </div>
 <div class="row">
-	<div class="col-md-1"></div>
-	<div class="col-md-2">
+	<div class="col-md-2 col-md-offset-1">
 		<div class="form-group">
 			<?php
 				echo form_dropdown(
@@ -34,23 +27,7 @@
 </div>
 
 <div class="row">
-	<div class="col-md-1"></div>
-	<div class="col-md-2">
-		<ul class="list-group">
-		  <li class="list-group-item list-group-item-info"><b>Types of acceptable grade</b></li>
-		  <li class="list-group-item">1, 2, 3, 4 ..., "abs", "inc"</li>
-		</ul>
-	</div>
-</div>
-<div class="row">
-	<div class="col-md-10">
-		&nbsp;
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-md-1">&nbsp;</div>
-	<div class="col-md-10">
+	<div class="col-md-10 col-md-offset-1">
 		<div class="fixed-container"><?php echo $body_html; ?></div>
 	</div>
 </div>

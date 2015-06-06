@@ -21,6 +21,7 @@ class admin extends CI_Controller
                 'section' => 'admin',
                 )
             );
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()

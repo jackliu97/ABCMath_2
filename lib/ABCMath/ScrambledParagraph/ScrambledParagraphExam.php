@@ -3,6 +3,7 @@ namespace ABCMath\ScrambledParagraph;
 
 use ABCMath\Base;
 use ABCMath\Meta\Implement\ExamGenerator;
+use ABCMath\ScrambledParagraph\ScrambledParagraph;
 
 class ScrambledParagraphExam extends Base implements ExamGenerator
 {
@@ -11,8 +12,23 @@ class ScrambledParagraphExam extends Base implements ExamGenerator
         parent::__construct();
     }
 
-    public function buildExam()
+    public function buildExam(ScrambledParagraph $question)
     {
+
+        $questionFormat = array();
+        $lines = $question->lines;
+
+        if(!count($lines)){
+            return $questionFormat;
+        }
+
+        $questionFormat['lead'] = array_shift($lines);
+        shuffle($lines);
+        $questionFormat['lines'] = $lines;
+
+
+
+        return $questionFormat;
     }
 
     /**
@@ -20,18 +36,24 @@ class ScrambledParagraphExam extends Base implements ExamGenerator
      * @param mixed $keyword_id one, or an array of keywords
      * @param int   $limit
      */
-    public function getRandomExamSQL($keyword_id, $limit = 10)
+    public function getRandomExamSQL($keyword_id=null, $limit = 10)
     {
-        if (is_array($keyword_id)) {
-            $keyword_sql = implode(',', $keyword_id);
-        } else {
-            $keyword_sql = $keyword_id;
+
+        if($keyword_id === null){
+            $where = '';
+        }else{
+            if (is_array($keyword_id)) {
+                $keyword_sql = implode(',', $keyword_id);
+            } else {
+                $keyword_sql = $keyword_id;
+            }
+            $where = "WHERE spk.keyword_id IN ({$keyword_sql}) ";
         }
+        
 
         return "SELECT sp.id FROM scrambled_paragraph sp ".
                 "LEFT JOIN scrambled_paragraph_keyword spk ".
-                    "ON sp.id = spk.scrambled_paragraph_id ".
-                "WHERE spk.keyword_id IN ({$keyword_sql}) ".
+                    "ON sp.id = spk.scrambled_paragraph_id {$where}".
                 "ORDER BY RAND() ".
                 "LIMIT {$limit}";
     }
@@ -41,7 +63,7 @@ class ScrambledParagraphExam extends Base implements ExamGenerator
      * @param mixed $keyword_id one, or an array of keywords
      * @param int   $limit
      */
-    public function getRandomExamQuestions($keyword_id, $limit = 10)
+    public function getRandomExamQuestions($keyword_id=null, $limit = 10)
     {
         $stmt = $this->_conn->prepare(
             $this->getRandomExamSQL($keyword_id, $limit)

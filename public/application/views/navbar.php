@@ -77,33 +77,9 @@ $ci->session->set_userdata('semester_id', $semester_id);
   <div class="col-md-1">&nbsp;</div>
 </div>
 
-<div class="row">
-  <div class="col-md-9 col-md-offset-1 message">
-    <!-- quick links -->
-    <nav class="navbar navbar">
-      <div class="container-fluid">
-
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#quick-link-navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Quick Link</a>
-        </div>
-
-        <div class="collapse navbar-collapse" id="quick-link-navbar-collapse">
-          <ul class="nav navbar-nav">
-            <?php
-              echo $navigation->display_quicklinks();
-            ?>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </div>
-</div>
+<?php
+  echo $navigation->display_quicklinks();
+?>
 
 <div class="row">
 <div class="col-md-10 col-md-offset-1 message" id="main_error">

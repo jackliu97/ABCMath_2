@@ -1,0 +1,8 @@
+<div class="list-group">
+    {% for question in paragraphs %}
+        <a href="#" class="list-group-item show_question" data-id="{{question.id}}">
+            <h4 class="list-group-item-heading">Question {{loop.index}}</h4>
+            <p class="list-group-item-text">{{question.full_text[:50]}} ... </p>
+        </a>
+    {% endfor %}
+</div>

@@ -25,6 +25,7 @@ class vocabulary extends CI_Controller
         $this->session->set_userdata('section', 'vocabulary');
 
         $this->keywordManager = new KeywordManager();
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()

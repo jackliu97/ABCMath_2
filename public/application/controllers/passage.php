@@ -24,6 +24,7 @@ class passage extends CI_Controller
         $this->session->set_userdata('section', 'passage');
 
         $this->keywordManager = new KeywordManager();
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()

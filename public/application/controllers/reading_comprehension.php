@@ -23,6 +23,7 @@ class Reading_Comprehension extends CI_Controller
         $this->session->set_userdata('section', 'reading_comprehension');
 
         $this->keywordManager = new KeywordManager();
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()

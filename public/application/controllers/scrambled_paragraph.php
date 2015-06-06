@@ -4,9 +4,11 @@
 
 use \ABCMath\ScrambledParagraph\ScrambledParagraph;
 use \ABCMath\ScrambledParagraph\ScrambledParagraphManager;
+use \ABCMath\ScrambledParagraph\ScrambledParagraphExam;
 use \ABCMath\Grouping\Keyword;
 use \ABCMath\Grouping\KeywordManager;
 use \ABCMath\Db\Datatable;
+use \ABCMath\Template\Template;
 
 class Scrambled_Paragraph extends CI_Controller
 {
@@ -20,8 +22,9 @@ class Scrambled_Paragraph extends CI_Controller
         }
 
         $this->session->set_userdata('section', 'scrambled_paragraph');
-
+        $this->_template = new Template(Template::FILESYSTEM);
         $this->keywordManager = new KeywordManager();
+        ABCMath\Permission\Navigation::$config['quicklink'] = false;
     }
 
     public function index()
@@ -29,6 +32,56 @@ class Scrambled_Paragraph extends CI_Controller
         $this->load->view('header');
         $this->load->view('navbar');
         $this->load->view('footer');
+    }
+
+    public function exam($count=5){
+        $this->session->set_userdata('sub_section', __FUNCTION__);
+
+        $data = array();
+
+        $this->load->view('header');
+        $this->load->view('navbar');
+        
+        $spe = new ScrambledParagraphExam();
+        $ids = $spe->getRandomExamQuestions(null, 5);
+
+        $paragraphs = array();
+
+        foreach($ids as $id){
+            $paragraph = new ScrambledParagraph();
+            $paragraph->id = $id;
+            $paragraph->load();
+            $paragraphs[] = $paragraph;
+        }
+
+        $data['nav_bar'] = $this->_template->render(
+            'Exam/ScrambledParagraph/nav_bar.twig', 
+            array('paragraphs'=>$paragraphs));
+
+        $this->load->view('scrambled_paragraph/exam', $data);
+        $this->load->view('footer', array(
+            'private_js' => array('scrambled_paragraph/exam.js'),
+        ));
+    }
+
+    public function show_question(){
+        $question_id = $this->input->post('question_id');
+        $result = array('success' => true );
+
+        $paragraph = new ScrambledParagraph();
+        $paragraph->id = $question_id;
+        $paragraph->load();
+
+        $exammaker = new ScrambledParagraphExam();
+        $paragraphHTML = $exammaker->buildExam($paragraph);
+
+        //print_r($paragraphHTML);
+
+        $result['html'] = $this->_template->render(
+            'Exam/ScrambledParagraph/question_panel.twig',
+            array('paragraph'=>$paragraphHTML));
+
+        $this->load->view('response/json', array('json' => $result));
     }
 
     public function create_from_paragraph()
@@ -82,6 +135,10 @@ class Scrambled_Paragraph extends CI_Controller
 
     private function _format_question($paragraph)
     {
+        if(!count($paragraph->lines)){
+            return '';
+        }
+
         $text = array($paragraph->lines[0]['text']);
 
         foreach (array_slice($paragraph->lines, 1) as $line) {
