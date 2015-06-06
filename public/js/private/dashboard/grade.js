@@ -48,7 +48,6 @@
                 }
 
                 setTimeout(function(){
-                    console.log('new grade ' + change + '!');
                     $.ajax({
                         type:'POST',
                         url:'/grade_dashboard/save_delta',
@@ -59,7 +58,7 @@
                         },
                         success: function(data){
                             if(data.success){
-                                //console.log('Data successfully updated');
+                                console.log('Data successfully updated');
                             }else{
                                 $C.error(data.message);
                             }
