@@ -43,7 +43,7 @@ class Scrambled_Paragraph extends CI_Controller
         $this->load->view('navbar');
         
         $spe = new ScrambledParagraphExam();
-        $ids = $spe->getRandomExamQuestions(null, 5);
+        $ids = $spe->getRandomExamQuestions(null, $count);
 
         $paragraphs = array();
 
