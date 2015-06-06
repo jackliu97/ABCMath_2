@@ -2,6 +2,11 @@ body{
     margin-bottom:100px;
 }
 
+#grade_table_container .table-striped>tbody>tr:nth-child(odd)>td,
+#grade_table_container .table-striped>tbody>tr:nth-child(odd)>th {
+  background-color: #F7F693;
+}
+
 .handsontable col.rowHeader {
     width: 140px;
 }
