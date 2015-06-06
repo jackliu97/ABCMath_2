@@ -1,6 +1,25 @@
 ( function($, $C, $M) {
     'use strict';
 
+    function saveOneGrade(grade){
+        $.ajax({
+            type:'POST',
+            url:'/grade_dashboard/save_delta',
+            data: {
+                'delta': grade,
+                'col_mapper': window.grade_col_id_mapper,
+                'row_mapper': window.grade_row_id_mapper
+            },
+            success: function(data){
+                if(data.success){
+                    console.log('Data successfully updated');
+                }else{
+                    $C.error(data.message);
+                }
+            }
+        });
+    }
+
     $( document ).ready(function() {
 
         $('.class_dropdown').on('change', function(){
@@ -28,22 +47,25 @@
                     return;
                 }
 
-                $.ajax({
-                    type:'POST',
-                    url:'/grade_dashboard/save_delta',
-                    data: {
-                        'delta': change,
-                        'col_mapper': window.grade_col_id_mapper,
-                        'row_mapper': window.grade_row_id_mapper
-                    },
-                    success: function(data){
-                        if(data.success){
-                            console.log('Data successfully updated');
-                        }else{
-                            $C.error(data.message);
+                setTimeout(function(){
+                    console.log('new grade ' + change + '!');
+                    $.ajax({
+                        type:'POST',
+                        url:'/grade_dashboard/save_delta',
+                        data: {
+                            'delta': change,
+                            'col_mapper': window.grade_col_id_mapper,
+                            'row_mapper': window.grade_row_id_mapper
+                        },
+                        success: function(data){
+                            if(data.success){
+                                //console.log('Data successfully updated');
+                            }else{
+                                $C.error(data.message);
+                            }
                         }
-                    }
-                });
+                    });
+                }, 1000);
 
             }
         });
