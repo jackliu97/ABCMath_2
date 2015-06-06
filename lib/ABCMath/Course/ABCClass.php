@@ -298,6 +298,7 @@ class ABCClass extends Base
             $wheres []= 's.id = ?';
             $values[]= $student_id;
         }
+        $wheres[]= 'a.id IS NOT NULL';
 
         $q = "SELECT
                 s.id student_id,
