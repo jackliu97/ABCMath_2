@@ -4,7 +4,12 @@ body{
 
 #grade_table_container .table-striped>tbody>tr:nth-child(odd)>td,
 #grade_table_container .table-striped>tbody>tr:nth-child(odd)>th {
-  background-color: #F7F693;
+  background-color: #D8D6D6;
+}
+
+#grade_table_container .table-hover>tbody>tr:hover>td,
+#grade_table_container .table-hover>tbody>tr:hover>th {
+  background-color: #F2A6A6;
 }
 
 .handsontable col.rowHeader {
