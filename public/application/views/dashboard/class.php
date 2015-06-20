@@ -28,6 +28,7 @@
     </div>
   </div>
 
+
 <div class="row">
   <div class="col-sm-10 col-sm-offset-1">
     <div class="panel panel-success">
@@ -104,10 +105,16 @@
 
 <div class="row">
   <div class="col-sm-10 col-sm-offset-1">
-    <div class="panel panel-info">
-     <div class="panel-heading">
-      <h3 class="panel-title"><?php echo $class->external_id?>'s Details</h3>
-     </div>
+    <ul class="nav nav-tabs panel-success">
+      <li role="presentation" class="active"><a class="show_class_info pointer">Class Information</a></li>
+      <li role="presentation"><a class="show_students pointer">Registered Students</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row class_info_panel">
+  <div class="col-sm-10 col-sm-offset-1">
+
      <div class="panel-body">
       <ul class="nav nav-pills class_detail_tab" role="tablist">
         <li><a action="show_attendance" class="pointer attendance_tab is_tab" class_id="<?php echo $class->id;?>">Attendance</a></li>
@@ -120,37 +127,32 @@
 
       <div><p>
 
-  <div class="row">
-    <div class="col-sm-3">
-      <div class="list-group lessons_list">
-        <?php foreach($lessons as $lesson): ?>
-        <?php
-          $active = ($lesson->id == $lesson_id) ? 'active' : '';
-        ?>
-          <a lesson_id="<?php echo $lesson->id?>" class="lesson_sidebar list-group-item pointer nowrap_column">
-            Lesson <?php echo $lesson->lesson_number;?>
-          </a>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="list-group lessons_list">
+              <?php foreach($lessons as $lesson): ?>
+              <?php
+                $active = ($lesson->id == $lesson_id) ? 'active' : '';
+              ?>
+                <a lesson_id="<?php echo $lesson->id?>" class="lesson_sidebar list-group-item pointer nowrap_column">
+                  Lesson <?php echo $lesson->lesson_number;?>
+                </a>
 
-        <?php endforeach; ?>
-      </div>
-    </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
 
-    <div class="col-sm-8"><p><div id="detail_body"></div></p></div>
-  </div>
+          <div class="col-sm-8"><p><div id="detail_body"></div></p></div>
+        </div>
 
       </p></div>
 
      </div>
-   </div>
   </div>
 </div>
 
-<div class="row">
+<div class="row students_panel" style="display:none;">
   <div class="col-sm-10 col-sm-offset-1">
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $class->external_id?>'s Students</h3>
-      </div>
       <div class="panel-body student_panel">
         <p>
           <a type="button" id="registered_students" class="btn btn-default">Registered Students</a>
@@ -158,8 +160,6 @@
         </p>
         <p><div class="datatable_student_container table-responsive"></div></p>
        </div>
-
-    </div>
   </div>
 </div>
 

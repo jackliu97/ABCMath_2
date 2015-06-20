@@ -198,11 +198,15 @@ class StudentManager extends Base
 					CONCAT(s.first_name, ' ', s.last_name) name,
 					s.email,
 					s.telephone,
-					s.cellphone
+					s.cellphone,
+                    group_concat(c.external_id SEPARATOR ' / ') class_name
 				FROM students s
-				INNER JOIN student_class sc
-					ON sc.student_id = s.id
-				WHERE sc.class_id = {$class_id}";
+				LEFT JOIN student_class sc ON sc.student_id = s.id
+                LEFT JOIN classes c ON sc.class_id = c.id
+                WHERE s.id IN (
+                    SELECT student_id FROM student_class where class_id = {$class_id}
+                    )
+                GROUP BY sc.student_id";
 
         return $q;
     }

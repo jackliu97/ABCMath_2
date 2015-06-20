@@ -132,6 +132,7 @@
 			'<th>External ID</th>' + 
 			'<th>Name</th>' + 
 			'<th>Cell Phone</th>' + 
+			'<th>Classes</th>' + 
 			'</tr></thead><tbody></tbody></table>');
 	}
 
@@ -222,6 +223,22 @@
 		$('#registered_students').addClass('active');
 
 		
+		$body.on('click', '.show_class_info', function(){
+			$('.class_info_panel').show();
+			$('.students_panel').hide();
+
+			$(this).closest('li').addClass('active');
+			$('.show_students').closest('li').removeClass('active');
+		});
+
+		$body.on('click', '.show_students', function(){
+			$('.class_info_panel').hide();
+			$('.students_panel').show();
+
+			$(this).closest('li').addClass('active');
+			$('.show_class_info').closest('li').removeClass('active');
+		});
+
 		/*
 		* Show registered students
 		*/

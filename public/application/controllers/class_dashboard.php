@@ -190,6 +190,7 @@ class Class_Dashboard extends CI_Controller
                                 'external_id',
                                 'name',
                                 'cellphone',
+                                'class_name',
                                 'class_id', );
 
         $result = $dt->processQuery();
@@ -228,7 +229,9 @@ class Class_Dashboard extends CI_Controller
         $dt->columns = array(    'student_id',
                                 'external_id',
                                 'name',
-                                'cellphone', );
+                                'cellphone',
+                                'class_name'
+                                );
 
         $result = $dt->processQuery();
 
