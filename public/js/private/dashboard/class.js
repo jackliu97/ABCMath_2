@@ -131,8 +131,6 @@
 			'<th></th>' + 
 			'<th>External ID</th>' + 
 			'<th>Name</th>' + 
-			'<th>Email</th>' + 
-			'<th>Home Phone</th>' + 
 			'<th>Cell Phone</th>' + 
 			'</tr></thead><tbody></tbody></table>');
 	}

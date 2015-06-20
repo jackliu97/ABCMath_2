@@ -9,8 +9,7 @@
             '<th>Internal ID</th>' + 
             '<th>External ID</th>' + 
             '<th>Name</th>' + 
-            '<th>Email</th>' + 
-            '<th>Home Phone</th>' + 
+            '<th>Phone</th>' + 
             '<th>Class Name</th>' + 
             '</tr></thead><tbody></tbody></table>');
     }

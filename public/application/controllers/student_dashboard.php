@@ -76,7 +76,6 @@ class Student_Dashboard extends CI_Controller
         $dt->columns = array(    'student_id',
                                 'external_id',
                                 'name',
-                                'email',
                                 'telephone',
                                 'class_name', );
         $result = $dt->processQuery();

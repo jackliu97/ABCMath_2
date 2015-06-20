@@ -43,13 +43,6 @@ $ci->session->set_userdata('semester_id', $semester_id);
               ?>
       </form>
 
-      <form class="navbar-form navbar-left" role="search" id="student_name_form">
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search Student Name" id="student_name">
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-
       <div class="collapse navbar-collapse navbar-1-collapse">
         <ul class="nav navbar-nav navbar-right">
         <?php
@@ -82,6 +75,5 @@ $ci->session->set_userdata('semester_id', $semester_id);
 ?>
 
 <div class="row">
-<div class="col-md-10 col-md-offset-1 message" id="main_error">
-</div>
+<div class="col-md-10 col-md-offset-1 message" id="main_error"></div>
 </div>

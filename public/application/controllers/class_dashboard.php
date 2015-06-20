@@ -57,9 +57,6 @@ class Class_Dashboard extends CI_Controller
         $lessonManager->class_id = $class_id;
         $lessonInfo = $lessonManager->getLessonsByClass();
 
-        $assignment = new AssignmentManager();
-        $data['assignment_types'] = $assignment->getAssignmentTypes();
-
         $data['class'] = $class;
         $data['teacher'] = $teacher;
         $data['editable'] = $this->editable;
@@ -68,6 +65,24 @@ class Class_Dashboard extends CI_Controller
         $data['lessons'] = $lessonInfo['lessons'];
         $data['lesson_id'] = $lesson_id;
         $data['class_options'] = $class_manager->getAllClasses('options');
+
+        $assignment = new AssignmentManager();
+        $data['assignment_modal'] = $this->_template->render(
+            'Modal/assignment.twig',
+            array(
+                'assignment_types'=> form_dropdown('assignment_type_id',
+                    $assignment->getAssignmentTypes(),
+                    '',
+                    " id='assignment_type_id' class='form-control' "),
+                'lesson_info'=> $lessonInfo['lessons']
+                )
+            );
+
+        $data['attachment_modal'] = $this->_template->render(
+            'Modal/attachment.twig',
+            array()
+            );
+
         $data['note_modal'] = $this->_template->render(
             'Modal/note.twig',
             array('modal_title'=>'Attendance Notes')
@@ -174,8 +189,6 @@ class Class_Dashboard extends CI_Controller
         $dt->columns = array(    'student_id',
                                 'external_id',
                                 'name',
-                                'email',
-                                'telephone',
                                 'cellphone',
                                 'class_id', );
 
@@ -187,7 +200,7 @@ class Class_Dashboard extends CI_Controller
                     if ($k == 0) {
                         $student_id = $col;
 
-                        $class_ids = explode(',', $row[6]);
+                        $class_ids = explode(',', $row[4]);
                         if (in_array($class_id, $class_ids)) {
                             $result['aaData'][$key][$k] =
                             "<button type='button' class='btn btn-primary btn-sm'>Registered</button>";
@@ -215,8 +228,6 @@ class Class_Dashboard extends CI_Controller
         $dt->columns = array(    'student_id',
                                 'external_id',
                                 'name',
-                                'email',
-                                'telephone',
                                 'cellphone', );
 
         $result = $dt->processQuery();

@@ -104,11 +104,9 @@ class StudentManager extends Base
         $semester_id = intval($this->semester_id);
         $term_conditional = '';
         if($semester_id !== 0){
-            $term_conditional = "WHERE s.id IN (
-                    SELECT distinct sc.student_id
-                    FROM student_class sc
-                    INNER JOIN classes c ON sc.class_id = c.id AND c.term_id = {$semester_id}
-                )";
+            $term_conditional = "INNER JOIN student_class sc ON sc.student_id = s.id
+                INNER JOIN classes c ON sc.class_id = c.id AND c.term_id = {$semester_id}
+                GROUP BY sc.student_id";
         }
 
         return "SELECT
@@ -118,7 +116,7 @@ class StudentManager extends Base
                     IF(CHAR_LENGTH(s.email) > 0, s.email, s.email2) email,
                     s.telephone telephone,
                     s.cellphone cellphone,
-                    '' class_name
+                    group_concat(c.external_id SEPARATOR ' / ') class_name
                 FROM students s
                 {$term_conditional}";
     }
@@ -132,12 +130,12 @@ class StudentManager extends Base
 					IF(CHAR_LENGTH(s.email) > 0, s.email, s.email2) email,
 					s.telephone telephone,
 					s.cellphone cellphone,
-					GROUP_CONCAT(c.external_id) class_name,
-					GROUP_CONCAT(c.id) class_id
+					group_concat(c.external_id SEPARATOR ' / ') class_name,
+                    group_concat(c.id) class_id
 				FROM students s
 				LEFT JOIN student_class sc ON sc.student_id = s.id
 				LEFT JOIN classes c ON sc.class_id = c.id
-				GROUP BY s.id";
+				GROUP BY sc.student_id";
     }
 
     protected function _buildClassJoin(){
