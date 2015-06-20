@@ -104,9 +104,13 @@ class StudentManager extends Base
         $semester_id = intval($this->semester_id);
         $term_conditional = '';
         if($semester_id !== 0){
-            $term_conditional = "AND c.term_id = {$semester_id}";
+            $term_conditional = "WHERE s.id IN (
+                    SELECT distinct sc.student_id
+                    FROM student_class sc
+                    INNER JOIN classes c ON sc.class_id = c.id AND c.term_id = {$semester_id}
+                )";
         }
-        
+
         return "SELECT
                     s.id student_id,
                     s.external_id external_id,
@@ -116,11 +120,7 @@ class StudentManager extends Base
                     s.cellphone cellphone,
                     '' class_name
                 FROM students s
-                WHERE s.id IN (
-                    SELECT distinct sc.student_id
-                    FROM student_class sc
-                    INNER JOIN classes c ON sc.class_id = c.id {$term_conditional}
-                )";
+                {$term_conditional}";
     }
 
     public function getAllStudentsSQL()

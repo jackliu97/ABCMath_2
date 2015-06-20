@@ -40,6 +40,9 @@ class Grade_Dashboard extends CI_Controller
         $data['class'] = $class;
         $data['class_options'] = $class_manager->getAllClasses('options');
 
+        $assignment = new AssignmentManager();
+        $data['assignment_types'] = $assignment->getAssignmentTypes();
+
         $table_data = $class->getAllGrades2();
 
         $data['body_html'] = $this->_template->render(

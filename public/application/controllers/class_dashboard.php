@@ -582,6 +582,7 @@ class Class_Dashboard extends CI_Controller
 
         $info = array(
             'id' => $assignment->id,
+            'lesson_id' => $assignment->lesson_id,
             'name' => $assignment->name,
             'assignment_type_id' => $assignment->assignment_type_id,
             'description' => $assignment->description,

@@ -4,18 +4,15 @@
 		<div class="panel-body">
 			<input type="hidden" id="lesson_id" value="{{ lesson_id }}">
 			<div class="row">
-					<div class="col-sm-3">
+					<div class="col-sm-4">
 						<a type="button" class="add_assignment btn btn-xs btn-success">ADD</a>
 					</div>
 
 					<div class="col-sm-2">
 						<label>Type</label>
 					</div>
-					<div class="col-sm-2">
+					<div class="col-sm-4">
 						<label>Name</label>
-					</div>
-					<div class="col-sm-2">
-						<label>Weight</label>
 					</div>
 					<div class="col-sm-2">
 						<label>Max Score</label>
@@ -27,18 +24,15 @@
 		{% for assignment in assignments %}
 			<li class="list-group-item">
 				<div class="row">
-					<div class="col-sm-3">
+					<div class="col-sm-4">
 						<button assignment_id="{{ assignment.id }}" class="btn edit_assignment glyphicon glyphicon-pencil" style="width:45px;"></button>
 						<button assignment_id="{{ assignment.id }}" class="btn delete_assignment glyphicon glyphicon-remove" style="width:45px;"></button>
 					</div>
 					<div class="col-sm-2 assignment_type">
 						{{ assignment.type }}
 					</div>
-					<div class="col-sm-3 assignment_name" data-toggle="tooltip" data-placement="top" title="{{ assignment.name }}">
+					<div class="col-sm-4 assignment_name" data-toggle="tooltip" data-placement="top" title="{{ assignment.name }}">
 						{{ assignment.name [:7] }} ...
-					</div>
-					<div class="col-sm-2 assignment_weight">
-						{{ assignment.weight }}
 					</div>
 					<div class="col-sm-2 assignment_weight">
 						{{ assignment.maximum_score }}
