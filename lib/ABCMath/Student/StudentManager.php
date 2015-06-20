@@ -103,10 +103,10 @@ class StudentManager extends Base
     {
         $semester_id = intval($this->semester_id);
         $term_conditional = '';
+        $join = 'LEFT';
         if($semester_id !== 0){
-            $term_conditional = "INNER JOIN student_class sc ON sc.student_id = s.id
-                INNER JOIN classes c ON sc.class_id = c.id AND c.term_id = {$semester_id}
-                GROUP BY sc.student_id";
+            $term_conditional = "AND c.term_id = {$semester_id}";
+            $join = 'INNER';
         }
 
         return "SELECT
@@ -118,7 +118,9 @@ class StudentManager extends Base
                     s.cellphone cellphone,
                     group_concat(c.external_id SEPARATOR ' / ') class_name
                 FROM students s
-                {$term_conditional}";
+                {$join} JOIN student_class sc ON sc.student_id = s.id
+                {$join} JOIN classes c ON sc.class_id = c.id {$term_conditional}
+                GROUP BY sc.student_id";
     }
 
     public function getAllStudentsSQL()
