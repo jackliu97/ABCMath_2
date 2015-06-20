@@ -63,7 +63,6 @@ class StudentManager extends Base
 					s.cellphone cellphone,
 					c.external_id class_name
 				FROM students s
-				INNER JOIN student_class sc ON sc.student_id = s.id
 				{$class_join}
 				WHERE sc.class_id IN (
 				SELECT DISTINCT class_id FROM lessons WHERE lesson_date = '{$date}'
@@ -89,7 +88,6 @@ class StudentManager extends Base
 					s.cellphone cellphone,
 					c.external_id class_name
 				FROM students s
-				INNER JOIN student_class sc ON sc.student_id = s.id
 				{$class_join}
 				WHERE sc.class_id IN (
 				SELECT DISTINCT class_id FROM lessons WHERE lesson_date = '{$date}'
@@ -103,7 +101,12 @@ class StudentManager extends Base
 
     public function getAllRegisteredStudentsSQL()
     {
-        $class_join = $this->_buildClassJoin();
+        $semester_id = intval($this->semester_id);
+        $term_conditional = '';
+        if($semester_id !== 0){
+            $term_conditional = "AND c.term_id = {$semester_id}";
+        }
+        
         return "SELECT
                     s.id student_id,
                     s.external_id external_id,
@@ -111,11 +114,13 @@ class StudentManager extends Base
                     IF(CHAR_LENGTH(s.email) > 0, s.email, s.email2) email,
                     s.telephone telephone,
                     s.cellphone cellphone,
-                    c.external_id class_name,
-                    c.id class_id
+                    '' class_name
                 FROM students s
-                LEFT JOIN student_class sc ON sc.student_id = s.id
-                {$class_join}";
+                WHERE s.id IN (
+                    SELECT distinct sc.student_id
+                    FROM student_class sc
+                    INNER JOIN classes c ON sc.class_id = c.id {$term_conditional}
+                )";
     }
 
     public function getAllStudentsSQL()
@@ -137,12 +142,13 @@ class StudentManager extends Base
 
     protected function _buildClassJoin(){
         $semester_id = intval($this->semester_id);
+        $sql = 'LEFT JOIN student_class sc ON sc.student_id = s.id';
 
         if($semester_id > 0){
-            return "INNER JOIN classes c ON sc.class_id = c.id AND c.term_id = {$semester_id}";
+            return $sql . " INNER JOIN classes c ON sc.class_id = c.id AND c.term_id = {$semester_id}";
         }
 
-        return 'LEFT JOIN classes c ON sc.class_id = c.id';
+        return $sql . ' LEFT JOIN classes c ON sc.class_id = c.id';
 
     }
 
